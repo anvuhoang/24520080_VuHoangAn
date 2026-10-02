@@ -1,0 +1,100 @@
+/* ==========================================
+   LAYOUT STRUCTURE & 2D GRID SYSTEM
+   ========================================== */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin-x: auto;
+  padding: 0 var(--space-sm);
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md) var(--space-sm);
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+}
+
+.nav-list {
+  display: flex;
+  gap: var(--space-md);
+  list-style: none;
+}
+
+.nav-link {
+  color: var(--text-primary);
+  font-weight: 600;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: 4px;
+}
+
+.nav-link:focus-visible,
+.theme-toggle:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* 2D Portfolio Responsive Grid */
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(clamp(280px, 100%, 350px), 1fr));
+  gap: var(--space-md);
+  margin-y: var(--space-lg);
+  padding: 0;
+}
+
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: var(--transition-theme);
+}
+
+.card-title {
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  margin-bottom: var(--space-xs);
+}
+
+.card-desc {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: var(--space-sm);
+}
+
+/* Button & Focus Accessibility */
+.theme-toggle {
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+/* Mobile Viewport Fix (375px Clean Render) */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 var(--space-xs);
+  }
+
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+
+  .nav-list {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
