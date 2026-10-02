@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise Developer Portfolio</title>
+  <link rel="stylesheet" href="tokens-reset.css">
+  <link rel="stylesheet" href="grid-layout.css">
+  <!-- Dynamic Theme Switcher Script loaded early to prevent FOUC -->
+  <script src="theme-engine.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <h1>DevPortfolio</h1>
+    </div>
+    <nav aria-label="Main Navigation">
+      <ul class="nav-list">
+        <li><a href="#projects" class="nav-link">Projects</a></li>
+        <li><a href="#skills" class="nav-link">Skills</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Theme" aria-pressed="false">
+      <span id="theme-icon" aria-hidden="true">🌙</span>
+      <span id="theme-text">Dark Mode</span>
+    </button>
+  </header>
+
+  <main class="container">
+    <section id="projects" aria-labelledby="projects-heading">
+      <h2 id="projects-heading" style="margin-top: var(--space-md); color: var(--text-primary);">Enterprise Projects</h2>
+      <div class="portfolio-grid">
+        <article class="card">
+          <h3 class="card-title">Cloud Infrastructure Pipeline</h3>
+          <p class="card-desc">Zero-downtime deployment engine built with Kubernetes and Terraform.</p>
+          <a href="#" class="nav-link" tabindex="0">View Details &rarr;</a>
+        </article>
+        <article class="card">
+          <h3 class="card-title">Design System Tokens Engine</h3>
+          <p class="card-desc">Accessible WCAG 2.2 compliant design token architecture for web apps.</p>
+          <a href="#" class="nav-link" tabindex="0">View Details &rarr;</a>
+        </article>
+        <article class="card">
+          <h3 class="card-title">Realtime Metrics Dashboard</h3>
+          <p class="card-desc">High-throughput WebSocket monitoring interface with Sub-2s LCP.</p>
+          <a href="#" class="nav-link" tabindex="0">View Details &rarr;</a>
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
