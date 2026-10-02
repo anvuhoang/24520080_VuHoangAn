@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exercise 4: Resilient Component Architecture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-top">
+        <div>
+          <h1>Exercise 4: Resilient Component Architecture</h1>
+          <p class="subtitle">The 4-State Resilient Component Contract Implementation</p>
+        </div>
+        
+        <!-- Interactive State Switcher for Verification -->
+        <nav aria-label="Component State Simulator" class="state-controls">
+          <button id="btn-state-loading" class="control-btn active" onclick="setComponentState('LOADING')">Loading</button>
+          <button id="btn-state-live" class="control-btn" onclick="setComponentState('LIVE')">Live Data</button>
+          <button id="btn-state-empty" class="control-btn" onclick="setComponentState('EMPTY')">Empty</button>
+          <button id="btn-state-error" class="control-btn" onclick="setComponentState('ERROR')">Error</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="component-viewport" id="viewport">
+      <!-- Live Region for Screen Readers -->
+      <div id="aria-status" class="hidden" aria-live="polite"></div>
+
+      <!-- ===================================================================
+           SUB-TASK T-03A: Loading Skeleton (Pure CSS Shimmer gradient)
+           =================================================================== -->
+      <div id="state-loading" class="skeleton-grid">
+        <div class="skeleton-card">
+          <div class="skeleton-header">
+            <div class="skeleton-item skeleton-avatar"></div>
+            <div class="skeleton-title-group">
+              <div class="skeleton-item skeleton-line medium"></div>
+              <div class="skeleton-item skeleton-line short"></div>
+            </div>
+          </div>
+          <div class="skeleton-item skeleton-line full"></div>
+          <div class="skeleton-item skeleton-line medium"></div>
+          <div class="skeleton-badge-group">
+            <div class="skeleton-item skeleton-badge-pill"></div>
+            <div class="skeleton-item skeleton-badge-pill"></div>
+          </div>
+        </div>
+
+        <div class="skeleton-card">
+          <div class="skeleton-header">
+            <div class="skeleton-item skeleton-avatar"></div>
+            <div class="skeleton-title-group">
+              <div class="skeleton-item skeleton-line medium"></div>
+              <div class="skeleton-item skeleton-line short"></div>
+            </div>
+          </div>
+          <div class="skeleton-item skeleton-line full"></div>
+          <div class="skeleton-item skeleton-line medium"></div>
+          <div class="skeleton-badge-group">
+            <div class="skeleton-item skeleton-badge-pill"></div>
+            <div class="skeleton-item skeleton-badge-pill"></div>
+          </div>
+        </div>
+
+        <div class="skeleton-card">
+          <div class="skeleton-header">
+            <div class="skeleton-item skeleton-avatar"></div>
+            <div class="skeleton-title-group">
+              <div class="skeleton-item skeleton-line medium"></div>
+              <div class="skeleton-item skeleton-line short"></div>
+            </div>
+          </div>
+          <div class="skeleton-item skeleton-line full"></div>
+          <div class="skeleton-item skeleton-line medium"></div>
+          <div class="skeleton-badge-group">
+            <div class="skeleton-item skeleton-badge-pill"></div>
+            <div class="skeleton-item skeleton-badge-pill"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           SUB-TASK T-03B: Live Data State (Flexbox metadata badges & Grid list)
+           =================================================================== -->
+      <div id="state-live" class="projects-grid hidden">
+        <article class="card">
+          <div>
+            <div class="card-header">
+              <h2 class="card-title">Resilient State Engine</h2>
+              <span class="badge badge-status">Active</span>
+            </div>
+            <p class="card-description">State machine pattern handling loading, empty, live, and error boundaries gracefully across async pipelines.</p>
+          </div>
+          <div>
+            <div class="badge-group">
+              <span class="badge badge-tech">JavaScript</span>
+              <span class="badge badge-tech">CSS Grid</span>
+              <span class="badge badge-tech">Flexbox</span>
+            </div>
+            <div class="card-footer">
+              <span>Updated 2m ago</span>
+              <span>v1.4.0</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div>
+            <div class="card-header">
+              <h2 class="card-title">Pure CSS Shimmer Gradient</h2>
+              <span class="badge badge-status">Active</span>
+            </div>
+            <p class="card-description">High-performance 60fps skeleton loaders utilizing linear-gradient animations for smooth visual feedback.</p>
+          </div>
+          <div>
+            <div class="badge-group">
+              <span class="badge badge-tech">CSS Keyframes</span>
+              <span class="badge badge-tech">Performance</span>
+            </div>
+            <div class="card-footer">
+              <span>Updated 1h ago</span>
+              <span>v2.1.0</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div>
+            <div class="card-header">
+              <h2 class="card-title">Accessible Retry Trigger</h2>
+              <span class="badge badge-status warning">Review</span>
+            </div>
+            <p class="card-description">ARIA compliant error fallback interface featuring explicit aria-live announcements and focused retry triggers.</p>
+          </div>
+          <div>
+            <div class="badge-group">
+              <span class="badge badge-tech">a11y</span>
+              <span class="badge badge-tech">ARIA</span>
+              <span class="badge badge-tech">UX</span>
+            </div>
+            <div class="card-footer">
+              <span>Updated 5h ago</span>
+              <span>v1.0.2</span>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- ===================================================================
+           SUB-TASK T-03C: Empty State
+           =================================================================== -->
+      <div id="state-empty" class="state-container empty-state hidden">
+        <div class="state-icon">📂</div>
+        <h2 class="empty-title">No Data Available</h2>
+        <p class="empty-desc">There are currently no items matching your criteria. Try resetting filters or adding new entries.</p>
+      </div>
+
+      <!-- ===================================================================
+           SUB-TASK T-03C: Error State with Accessible Retry Trigger
+           =================================================================== -->
+      <div id="state-error" class="state-container error-state hidden" role="alert" aria-labelledby="error-title-text" aria-describedby="error-desc-text">
+        <div class="state-icon">⚠️</div>
+        <h2 id="error-title-text" class="error-title">Failed to Load Component Data</h2>
+        <p id="error-desc-text" class="error-desc">A network error occurred while establishing connection to the service endpoint.</p>
+        <button id="btn-retry" class="btn-retry" onclick="triggerRetry()" aria-label="Retry loading component data">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+          Retry Request
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
