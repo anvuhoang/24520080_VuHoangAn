@@ -166,42 +166,56 @@ class BeatRecorder {
 
 ---
 
-### Phase 3: Keyboard Listener & Throttling Controller (Step 3)
+### Phase 3: Keyboard Listener & Throttling Controller (Step 3) [COMPLETED]
 > **Goal**: Robust input handling with `event.repeat` throttling and UI synchronization.
-- [ ] **3.1 Keyboard Controller (`js/keyboard-controller.js`)**:
-  - Bind `keydown` listener to `window`.
-  - Enforce `event.repeat` guard: discard held-key repeat storms.
-  - Map `event.code` to pad elements and sound IDs via `data-key`.
-- [ ] **3.2 Pointer / Click Event Delegation**:
-  - Bind delegated click/touch handlers to drum pad elements via `data-sound`.
-- [ ] **3.3 Visual State Management**:
-  - Apply `.pressed` class on trigger.
-  - Release visual state on `keyup` / `transitionend` / timeout.
-- [ ] **3.4 Bridge to Audio Engine**:
-  - Connect input trigger to `AudioEngine.play(soundId)`.
+- [x] **3.1 Keyboard Controller (`js/keyboard-controller.js`)**:
+  - Bound `keydown` and `keyup` listeners via decoupled `KeyboardController`.
+  - Enforced `event.repeat` guard: safely discards held-key repeat storms.
+  - Dynamically resolves key mappings directly from HTML `data-key` attributes without hardcoded JS keymaps.
+  - Ignores unmapped keystrokes and typing inside form controls (`input`, `textarea`, `select`, `contenteditable`).
+- [x] **3.2 Pointer / Click Event Delegation**:
+  - Attached delegated click handler to `.drum-pad` elements resolving `data-sound`.
+- [x] **3.3 Visual State Management**:
+  - Applies `.pressed` class on trigger.
+  - Releases visual active state on `keyup` or click release.
+- [x] **3.4 Bridge to Audio Engine**:
+  - Connects input trigger to existing `playSound(soundId)`.
 
 ---
 
-### Phase 4: FIFO Beat Recorder with Timestamped Events (Step 4)
+### Phase 4: FIFO Beat Recorder with Timestamped Events (Step 4) [COMPLETED]
 > **Goal**: Record beat sequences with relative timestamps and play them back sequentially.
-- [ ] **4.1 Beat Recorder Engine (`js/beat-recorder.js`)**:
-  - State machine: `idle`, `recording`, `playing`.
-  - Time tracking via `performance.now()`.
-  - Event model: `{ soundId: string, timestamp: number }`.
-  - FIFO queue management: push new events, prune oldest if capacity is exceeded.
-- [ ] **4.2 Playback Scheduler**:
-  - Accurate timer scheduling for timestamped events.
-  - Abort / stop playback capability.
-  - Loop or single-pass playback options.
-- [ ] **4.3 Recorder UI Controller (`js/recorder-ui.js`)**:
-  - Bind Record, Stop, Play, Clear button clicks.
-  - Update UI indicators (active mode, recorded beats counter, progress).
-- [ ] **4.4 Decoupled Integration**:
-  - Connect live drum hits to `recorder.recordEvent(soundId)` when in recording mode.
-  - Connect playback events to `AudioEngine.play(soundId)` and trigger pad visual animation during playback.
-
-
+- [x] **4.1 Beat Recorder Engine (`js/beat-recorder.js`)**:
+  - Encapsulated state machine: `idle`, `recording`, `playing`.
+  - Relative time tracking via `performance.now()`.
+  - FIFO event model: `{ soundId: string, timestamp: number }`.
+  - Bounded FIFO queue management with chronological preservation.
+- [x] **4.2 Playback Scheduler**:
+  - Accurate timer scheduling for timestamped events with original relative timing.
+  - Clean cancellation/stopping via `stopPlayback()` or `stop()`.
+  - Prevents duplicate recording during playback replay.
+- [x] **4.3 Recorder UI Integration (`js/main.js` & `css/styles.css`)**:
+  - Bound Record, Stop, Play, Clear toolbar button handlers.
+  - Real-time indicator dot (pulsing red for recording, blue for playback) and beat counter.
+- [x] **4.4 Decoupled Integration**:
+  - Connected live drum hits to `recorder.record(soundId)` during active recording.
+  - Replay events invoke `playSound(soundId)` with synchronized pad visual flashes.
 
 ---
+
+### Phase 5: Verification, Edge Cases & Polish (Step 5) [COMPLETED]
+> **Goal**: Comprehensive testing, accessibility checks, and final verification.
+- [x] **5.1 Polyphony & Latency Verification**: Overlapping hits and rapid repeat triggers verified (7/7 tests passed in `test/test-audio-engine.js`).
+- [x] **5.2 `event.repeat` Throttling Verification**: Sustained keypress drops repeat events (7/7 tests passed in `test/test-keyboard-controller.js`).
+- [x] **5.3 FIFO Queue Verification**: Chronological order, relative timing replay, and duplicate recording guards verified (11/11 tests passed in `test/test-beat-recorder.js`).
+- [x] **5.4 Documentation**: `TASK_DECOMPOSITION.md` and `PROMPT_LOG.md` fully audited and established.
+
+---
+
+## 4. Current Status
+
+- **Status**: **All HW2 Steps (1 through 4) Completed, Verified & Documented**.
+- **Audit Log**: Fully documented in [`PROMPT_LOG.md`](PROMPT_LOG.md).
+
 
 
