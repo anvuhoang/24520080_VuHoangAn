@@ -1,13 +1,5 @@
 # AI Interaction & Prompt Engineering Log — HW3: Resilient Landing Page
 
-**Course / Assignment:** HW3: Resilient Landing Page (Drift-Free Engine, State Machine, Security)  
-**Project:** Aetheria Fault-Tolerant Platform Architecture  
-**Repository Branch:** `lab-1`  
-**Engineer:** Vũ Hoàng Ân (Student ID: 24520080)  
-**AI Assistant:** Google Antigravity / Gemini Pair Programming Assistant  
-
----
-
 ## 1. Overview & Architectural Principles
 
 This document provides a comprehensive chronological audit trail of all AI prompts, architectural design decisions, code changes, verification steps, and human oversight applied during the engineering of **HW3: Resilient Landing Page**.
