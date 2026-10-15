@@ -30,8 +30,8 @@
       </div>
 
       <!-- Primary Navigation Landmark -->
-      <nav class="main-nav" role="navigation" aria-label="Điều hướng chính">
-        <ul class="nav-list">
+      <nav class="main-nav" id="main-nav" role="navigation" aria-label="Điều hướng chính">
+        <ul class="nav-list" id="nav-list">
           <li><a href="#hero" class="nav-link">Giới thiệu</a></li>
           <li><a href="#skills" class="nav-link">Kỹ năng</a></li>
           <li><a href="#projects" class="nav-link">Dự án</a></li>
@@ -39,12 +39,20 @@
         </ul>
       </nav>
 
-      <!-- Theme Switcher: Accessible button with aria-pressed and dynamic icon -->
-      <button id="theme-toggle" class="theme-toggle" aria-pressed="true" aria-label="Chuyển đổi giao diện sáng/tối"
-        title="Chuyển đổi giao diện sáng/tối">
-        <span class="theme-icon" id="theme-icon" aria-hidden="true">🌙</span>
-        <span class="theme-text" id="theme-text">Dark Mode</span>
-      </button>
+      <div class="header-actions">
+        <!-- Theme Switcher: Accessible button with aria-pressed and dynamic icon -->
+        <button id="theme-toggle" class="theme-toggle" aria-pressed="true" aria-label="Chuyển đổi giao diện sáng/tối"
+          title="Chuyển đổi giao diện sáng/tối">
+          <span class="theme-icon" id="theme-icon" aria-hidden="true">🌙</span>
+          <span class="theme-text" id="theme-text">Dark Mode</span>
+        </button>
+
+        <!-- Mobile Menu Toggle Button (WCAG 2.1.2 & 2.4.3) -->
+        <button id="menu-toggle" class="menu-toggle" aria-expanded="false" aria-controls="nav-list"
+          aria-label="Mở menu điều hướng" title="Mở menu điều hướng">
+          <span class="menu-icon" aria-hidden="true">☰</span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -182,12 +190,12 @@
         <p class="section-subtitle">Các dự án kiến trúc dữ liệu phân tán và pipeline xử lý quy mô lớn độc lập</p>
       </div>
 
-      <!-- Filter Controls for Dynamic State Handling -->
+      <!-- Filter Controls with WAI-ARIA Roving Tabindex Pattern -->
       <div class="filter-bar" role="tablist" aria-label="Lọc dự án theo danh mục">
-        <button class="filter-btn active" data-filter="all" role="tab" aria-selected="true">Tất cả</button>
-        <button class="filter-btn" data-filter="pipeline" role="tab" aria-selected="false">Data Pipeline</button>
-        <button class="filter-btn" data-filter="streaming" role="tab" aria-selected="false">Streaming</button>
-        <button class="filter-btn" data-filter="lakehouse" role="tab" aria-selected="false">Lakehouse & DWH</button>
+        <button class="filter-btn active" data-filter="all" role="tab" aria-selected="true" tabindex="0">Tất cả</button>
+        <button class="filter-btn" data-filter="pipeline" role="tab" aria-selected="false" tabindex="-1">Data Pipeline</button>
+        <button class="filter-btn" data-filter="streaming" role="tab" aria-selected="false" tabindex="-1">Streaming</button>
+        <button class="filter-btn" data-filter="lakehouse" role="tab" aria-selected="false" tabindex="-1">Lakehouse & DWH</button>
       </div>
 
       <div class="projects-grid" id="projects-grid">
@@ -200,6 +208,8 @@
           <p>Hệ thống xử lý và chuẩn hóa dữ liệu phân tán tự động, chịu tải 50M+ bản ghi mỗi ngày với cơ chế tự phục hồi
             lỗi.</p>
           <footer class="card-footer">
+            <button class="card-detail-btn" data-project="pipeline" aria-haspopup="dialog"
+              aria-label="Xem chi tiết dự án Distributed ETL Pipeline Engine">Chi tiết</button>
             <a href="#" aria-label="Xem mã nguồn dự án Distributed ETL Pipeline Engine">Source Code</a>
           </footer>
         </article>
@@ -213,6 +223,8 @@
           <p>Hạ tầng đồng bộ và phân tích dữ liệu giao dịch thời gian thực từ nhiều cơ sở dữ liệu với độ trễ dưới 1
             giây.</p>
           <footer class="card-footer">
+            <button class="card-detail-btn" data-project="streaming" aria-haspopup="dialog"
+              aria-label="Xem chi tiết dự án Real-time CDC Streaming Bus">Chi tiết</button>
             <a href="#" aria-label="Xem mã nguồn dự án Real-time CDC Streaming Bus">Source Code</a>
           </footer>
         </article>
@@ -226,6 +238,8 @@
           <p>Mô hình hóa dữ liệu theo kiến trúc Medallion (Bronze-Silver-Gold) phục vụ báo cáo BI và phân tích quy mô
             Petabyte.</p>
           <footer class="card-footer">
+            <button class="card-detail-btn" data-project="lakehouse" aria-haspopup="dialog"
+              aria-label="Xem chi tiết dự án Enterprise Data Lakehouse">Chi tiết</button>
             <a href="#" aria-label="Xem mã nguồn dự án Enterprise Data Lakehouse">Source Code</a>
           </footer>
         </article>
@@ -239,6 +253,8 @@
           <p>Nền tảng kiểm định chất lượng dữ liệu tự động, phát hiện trôi dạt lược đồ (schema drift) và cảnh báo
             real-time.</p>
           <footer class="card-footer">
+            <button class="card-detail-btn" data-project="dataops" aria-haspopup="dialog"
+              aria-label="Xem chi tiết dự án Automated DataOps Platform">Chi tiết</button>
             <a href="#" aria-label="Xem mã nguồn dự án Automated DataOps Platform">Source Code</a>
           </footer>
         </article>
@@ -337,6 +353,24 @@
       <p>Lab 1: Web Application Development</p>
     </div>
   </footer>
+
+  <!-- Accessible Modal Dialog for Project Details (WCAG 2.1.2 & 2.4.3 Focus Containment) -->
+  <div id="project-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <header class="modal-header">
+        <h3 id="modal-title">Chi Tiết Dự Án</h3>
+        <button id="modal-close-btn" class="modal-close-btn" aria-label="Đóng hộp thoại chi tiết dự án">✕</button>
+      </header>
+      <div id="modal-body" class="modal-body">
+        <p id="modal-desc"></p>
+        <div id="modal-tech-stack" class="badges" style="margin-top: 1rem;"></div>
+      </div>
+      <footer class="modal-footer">
+        <button id="modal-action-btn" class="btn-primary">Đóng hộp thoại</button>
+      </footer>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
