@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Portfolio Kỹ sư Dữ liệu (Data Engineer) - Thiết kế Kiến trúc Pipeline Dữ liệu, Data Warehouse & Hệ thống Phân tán - Vũ Hoàng Ân">
+  <title>Vũ Hoàng Ân - Data Engineer Portfolio</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- Accessible Skip Link (WCAG 2.4.1 Bypass Blocks) -->
+  <a href="#main-content" class="skip-link">Chuyển đến nội dung chính</a>
+
+  <!-- Header & Primary Navigation Landmarks (WCAG 1.3.1, 2.4.1) -->
+  <header class="top-header" role="banner">
+    <div class="container header-container">
+      <div class="brand-logo">
+        <span class="logo-icon" aria-hidden="true">&lt;/&gt;</span>
+        <span class="logo-text">DataArchitecture</span>
+      </div>
+
+      <!-- Primary Navigation Landmark -->
+      <nav class="main-nav" role="navigation" aria-label="Điều hướng chính">
+        <ul class="nav-list">
+          <li><a href="#hero" class="nav-link">Giới thiệu</a></li>
+          <li><a href="#skills" class="nav-link">Kỹ năng</a></li>
+          <li><a href="#projects" class="nav-link">Dự án</a></li>
+          <li><a href="#contact" class="nav-link">Liên hệ</a></li>
+        </ul>
+      </nav>
+
+      <!-- Theme Switcher: Accessible button with aria-pressed and dynamic icon -->
+      <button id="theme-toggle" class="theme-toggle" aria-pressed="true" aria-label="Chuyển đổi giao diện sáng/tối"
+        title="Chuyển đổi giao diện sáng/tối">
+        <span class="theme-icon" id="theme-icon" aria-hidden="true">🌙</span>
+        <span class="theme-text" id="theme-text">Dark Mode</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Exactly One Main Landmark (WCAG 1.3.1) with Skip Link Target -->
+  <main id="main-content" class="container main-content" role="main" tabindex="-1">
+
+    <!-- 1. Hero Section: High-res portrait with explicit dimensions, headline, pitch & Personal Bio -->
+    <section id="hero" class="hero-section" aria-labelledby="hero-title">
+      <div class="portrait-wrapper">
+        <img src="portrait.jpg" alt="Chân dung Kỹ sư Dữ liệu Vũ Hoàng An" width="160" height="160" class="portrait-img"
+          loading="eager">
+        <span class="status-indicator" role="status" aria-label="Sẵn sàng nhận dự án"
+          title="Sẵn sàng nhận dự án"></span>
+      </div>
+      <div class="hero-content">
+        <div class="hero-tags-wrapper">
+          <span class="hero-tag">Data Engineer</span>
+          <span class="hero-tag">UIT - VNU-HCM</span>
+        </div>
+        <h1 id="hero-title">Vũ Hoàng Ân</h1>
+        <p class="hero-role-subtitle">Kỹ sư Dữ liệu & Kiến trúc Hệ thống Phân tán</p>
+        <p class="pitch">
+          Sinh viên chuyên ngành Hệ Thống Thông tin tại <strong>Trường Đại học Công nghệ Thông tin – ĐHQG-HCM
+            (UIT)</strong>.
+          Đam mê và chuyên sâu về thiết kế pipeline ETL/ELT chịu tải cao, tối ưu hóa Data Warehouse/Lakehouse
+          và vận hành hệ thống streaming thời gian thực chuẩn Production.
+        </p>
+
+        <!-- Quick Personal & Contact Info Grid -->
+        <div class="personal-info-grid">
+          <div class="info-item">
+            <span class="info-icon" aria-hidden="true">🎓</span>
+            <div class="info-details">
+              <span class="info-label">Trường Đào Tạo</span>
+              <span class="info-val">ĐH Công nghệ Thông tin - ĐHQG-HCM</span>
+            </div>
+          </div>
+          <div class="info-item">
+            <span class="info-icon" aria-hidden="true">📧</span>
+            <div class="info-details">
+              <span class="info-label">Email Trực Tiếp</span>
+              <a href="mailto:aan.vuhoang@gmail.com" class="info-val info-link">aan.vuhoang@gmail.com</a>
+            </div>
+          </div>
+          <div class="info-item">
+            <span class="info-icon" aria-hidden="true">📍</span>
+            <div class="info-details">
+              <span class="info-label">Khu Vực</span>
+              <span class="info-val">TP. Hồ Chí Minh, Việt Nam</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-cta-group">
+          <a href="#contact" class="btn-primary">
+            <span>✉️</span> Liên hệ ngay
+          </a>
+          <a href="https://github.com/anvuhoang" target="_blank" rel="noopener noreferrer" class="btn-secondary"
+            aria-label="Xem trang GitHub của Vũ Hoàng An">
+            <span aria-hidden="true">🐙</span> GitHub
+          </a>
+          <a href="#projects" class="btn-secondary">
+            <span>🚀</span> Xem dự án
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Skills Matrix: Categorized badges arranged in clean CSS Grid -->
+    <section id="skills" class="skills-section" aria-labelledby="skills-title">
+      <div class="section-header">
+        <h2 id="skills-title">Skills Matrix</h2>
+        <p class="section-subtitle">Ma trận kỹ năng chuyên môn về kỹ thuật dữ liệu, hạ tầng phân tán và DataOps</p>
+      </div>
+
+      <div class="skills-grid">
+        <div class="skill-category">
+          <div class="category-header">
+            <span class="cat-icon" aria-hidden="true">⚡</span>
+            <h3>Data Processing & Streaming</h3>
+          </div>
+          <div class="badges">
+            <span class="badge">Apache Spark (PySpark)</span>
+            <span class="badge">Apache Kafka</span>
+            <span class="badge">Apache Flink</span>
+            <span class="badge">Python / SQL</span>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <div class="category-header">
+            <span class="cat-icon" aria-hidden="true">🗄️</span>
+            <h3>Warehouse & Lakehouse</h3>
+          </div>
+          <div class="badges">
+            <span class="badge">Snowflake / BigQuery</span>
+            <span class="badge">Apache Iceberg</span>
+            <span class="badge">Delta Lake</span>
+            <span class="badge">dbt (Data Build Tool)</span>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <div class="category-header">
+            <span class="cat-icon" aria-hidden="true">🔄</span>
+            <h3>Orchestration & DataOps</h3>
+          </div>
+          <div class="badges">
+            <span class="badge">Apache Airflow</span>
+            <span class="badge">Docker / Kubernetes</span>
+            <span class="badge">Great Expectations</span>
+            <span class="badge">CI/CD & Terraform</span>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <div class="category-header">
+            <span class="cat-icon" aria-hidden="true">☁️</span>
+            <h3>Cloud & Architecture</h3>
+          </div>
+          <div class="badges">
+            <span class="badge">AWS / GCP Cloud</span>
+            <span class="badge">Medallion Lakehouse</span>
+            <span class="badge">Event-Driven Systems</span>
+            <span class="badge">Data Governance</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Project Cards: Self-contained <article> blocks with tags, links, and descriptions -->
+    <section id="projects" class="projects-section" aria-labelledby="projects-title">
+      <div class="section-header">
+        <h2 id="projects-title">Dự Án Nổi Bật</h2>
+        <p class="section-subtitle">Các dự án kiến trúc dữ liệu phân tán và pipeline xử lý quy mô lớn độc lập</p>
+      </div>
+
+      <!-- Filter Controls for Dynamic State Handling -->
+      <div class="filter-bar" role="tablist" aria-label="Lọc dự án theo danh mục">
+        <button class="filter-btn active" data-filter="all" role="tab" aria-selected="true">Tất cả</button>
+        <button class="filter-btn" data-filter="pipeline" role="tab" aria-selected="false">Data Pipeline</button>
+        <button class="filter-btn" data-filter="streaming" role="tab" aria-selected="false">Streaming</button>
+        <button class="filter-btn" data-filter="lakehouse" role="tab" aria-selected="false">Lakehouse & DWH</button>
+      </div>
+
+      <div class="projects-grid" id="projects-grid">
+        <!-- Project Card 1 -->
+        <article class="project-card" data-category="pipeline">
+          <header class="card-header">
+            <h3>Distributed ETL Pipeline Engine</h3>
+            <span class="badge">PySpark / Airflow</span>
+          </header>
+          <p>Hệ thống xử lý và chuẩn hóa dữ liệu phân tán tự động, chịu tải 50M+ bản ghi mỗi ngày với cơ chế tự phục hồi
+            lỗi.</p>
+          <footer class="card-footer">
+            <a href="#" aria-label="Xem mã nguồn dự án Distributed ETL Pipeline Engine">Source Code</a>
+          </footer>
+        </article>
+
+        <!-- Project Card 2 -->
+        <article class="project-card" data-category="streaming">
+          <header class="card-header">
+            <h3>Real-time CDC Streaming Bus</h3>
+            <span class="badge">Kafka / Flink</span>
+          </header>
+          <p>Hạ tầng đồng bộ và phân tích dữ liệu giao dịch thời gian thực từ nhiều cơ sở dữ liệu với độ trễ dưới 1
+            giây.</p>
+          <footer class="card-footer">
+            <a href="#" aria-label="Xem mã nguồn dự án Real-time CDC Streaming Bus">Source Code</a>
+          </footer>
+        </article>
+
+        <!-- Project Card 3 -->
+        <article class="project-card" data-category="lakehouse">
+          <header class="card-header">
+            <h3>Enterprise Data Lakehouse</h3>
+            <span class="badge">dbt / Snowflake</span>
+          </header>
+          <p>Mô hình hóa dữ liệu theo kiến trúc Medallion (Bronze-Silver-Gold) phục vụ báo cáo BI và phân tích quy mô
+            Petabyte.</p>
+          <footer class="card-footer">
+            <a href="#" aria-label="Xem mã nguồn dự án Enterprise Data Lakehouse">Source Code</a>
+          </footer>
+        </article>
+
+        <!-- Project Card 4 -->
+        <article class="project-card" data-category="pipeline">
+          <header class="card-header">
+            <h3>Automated DataOps Platform</h3>
+            <span class="badge">Great Expectations</span>
+          </header>
+          <p>Nền tảng kiểm định chất lượng dữ liệu tự động, phát hiện trôi dạt lược đồ (schema drift) và cảnh báo
+            real-time.</p>
+          <footer class="card-footer">
+            <a href="#" aria-label="Xem mã nguồn dự án Automated DataOps Platform">Source Code</a>
+          </footer>
+        </article>
+      </div>
+    </section>
+
+    <!-- 4. Contact Form: Validated native form with client-side state handling -->
+    <section id="contact" class="contact-section" aria-labelledby="contact-title">
+      <div class="contact-wrapper">
+        <div class="section-header">
+          <h2 id="contact-title">Liên Hệ Trực Tiếp</h2>
+          <p class="section-subtitle">Kết nối trao đổi về giải pháp dữ liệu, cơ hội thực tập, việc làm hoặc dự án</p>
+        </div>
+
+        <!-- Direct Contact Channels Grid -->
+        <div class="contact-cards-grid">
+          <a href="mailto:aan.vuhoang@gmail.com" class="contact-channel-card" aria-label="Gửi email cho Vũ Hoàng An">
+            <span class="channel-icon" aria-hidden="true">📧</span>
+            <div class="channel-info">
+              <strong>Email</strong>
+              <span>aan.vuhoang@gmail.com</span>
+            </div>
+          </a>
+          <div class="contact-channel-card">
+            <span class="channel-icon" aria-hidden="true">🎓</span>
+            <div class="channel-info">
+              <strong>Trường Đại Học</strong>
+              <span>ĐH Công nghệ Thông tin - ĐHQG-HCM</span>
+            </div>
+          </div>
+          <a href="https://github.com/anvuhoang" target="_blank" rel="noopener noreferrer" class="contact-channel-card"
+            aria-label="Xem GitHub của Vũ Hoàng An">
+            <span class="channel-icon" aria-hidden="true">🐙</span>
+            <div class="channel-info">
+              <strong>GitHub Repository</strong>
+              <span>github.com/anvuhoang</span>
+            </div>
+          </a>
+          <div class="contact-channel-card">
+            <span class="channel-icon" aria-hidden="true">📍</span>
+            <div class="channel-info">
+              <strong>Địa Điểm</strong>
+              <span>Thủ Đức, TP. Hồ Chí Minh</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-container">
+          <form id="contact-form" class="contact-form" novalidate>
+            <div class="form-group">
+              <label for="name">Họ và tên <span class="required">*</span></label>
+              <input type="text" id="name" name="name" required placeholder="Nguyễn Văn A" aria-describedby="name-error"
+                autocomplete="name">
+              <span class="error-msg" id="name-error" aria-live="polite"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Địa chỉ Email <span class="required">*</span></label>
+              <input type="email" id="email" name="email" required placeholder="example@domain.com"
+                aria-describedby="email-error" autocomplete="email">
+              <span class="error-msg" id="email-error" aria-live="polite"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="subject">Chủ đề <span class="required">*</span></label>
+              <input type="text" id="subject" name="subject" required
+                placeholder="Hợp tác dự án / Tư vấn kiến trúc dữ liệu" aria-describedby="subject-error">
+              <span class="error-msg" id="subject-error" aria-live="polite"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="message">Nội dung lời nhắn <span class="required">*</span></label>
+              <textarea id="message" name="message" rows="5" required
+                placeholder="Mô tả chi tiết bài toán dữ liệu hoặc nhu cầu trao đổi của bạn..."
+                aria-describedby="message-error"></textarea>
+              <span class="error-msg" id="message-error" aria-live="polite"></span>
+            </div>
+
+            <button type="submit" id="submit-btn" class="submit-btn">
+              <span class="btn-text">Gửi Tin Nhắn</span>
+              <span class="btn-spinner" aria-hidden="true"></span>
+            </button>
+
+            <!-- Form Status Feedback Box -->
+            <div id="form-status" class="form-status" aria-live="polite" role="status"></div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer Landmark (WCAG 1.3.1) -->
+  <footer class="bottom-footer" role="contentinfo">
+    <div class="container">
+      <p>Lab 1: Web Application Development</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
