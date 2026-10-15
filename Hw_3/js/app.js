@@ -251,6 +251,8 @@ function renderFormUi(state, context = {}, elements = {}) {
       }
       if (submitBtn) {
         submitBtn.disabled = false;
+        submitBtn.removeAttribute?.('aria-disabled');
+        submitBtn.removeAttribute?.('aria-busy');
       }
       if (btnText) {
         btnText.textContent = 'Request Key';
@@ -272,6 +274,8 @@ function renderFormUi(state, context = {}, elements = {}) {
       }
       if (submitBtn) {
         submitBtn.disabled = true;
+        submitBtn.setAttribute?.('aria-disabled', 'true');
+        submitBtn.setAttribute?.('aria-busy', 'true');
       }
       if (btnText) {
         btnText.textContent = 'Verifying...';
@@ -293,6 +297,8 @@ function renderFormUi(state, context = {}, elements = {}) {
       }
       if (submitBtn) {
         submitBtn.disabled = true;
+        submitBtn.setAttribute?.('aria-disabled', 'true');
+        submitBtn.removeAttribute?.('aria-busy');
       }
       if (btnText) {
         btnText.textContent = 'Key Dispatched';
@@ -318,6 +324,8 @@ function renderFormUi(state, context = {}, elements = {}) {
       }
       if (submitBtn) {
         submitBtn.disabled = false;
+        submitBtn.removeAttribute?.('aria-disabled');
+        submitBtn.removeAttribute?.('aria-busy');
       }
       if (btnText) {
         btnText.textContent = 'Try Again';
@@ -358,6 +366,7 @@ function createSignupStateMachine(options = {}) {
   } = options;
 
   let state = FORM_STATES.IDLE;
+  let inFlight = false;
   let context = {
     error: null,
     message: null,
@@ -393,53 +402,59 @@ function createSignupStateMachine(options = {}) {
 
   /**
    * Handles user submission attempts.
-   * Validates before submitting and rejects if already submitting.
+   * Synchronously guards against concurrent requests and double submissions.
    *
    * @param {string} rawEmail
    * @returns {Promise<boolean>}
    */
   async function submit(rawEmail) {
-    // Prevent double submission while already processing
-    if (state === FORM_STATES.SUBMITTING) {
+    // Immediate synchronous lock against concurrent/double submission
+    if (inFlight || state === FORM_STATES.SUBMITTING) {
       return false;
     }
 
-    // Step 1: Pre-flight client validation
-    const validation = validateEmail(rawEmail);
-    if (!validation.isValid) {
-      transition(FORM_STATES.ERROR, {
-        error: validation.error,
-        email: rawEmail
-      });
-      return false;
-    }
+    inFlight = true;
 
-    // Step 2: Transition to SUBMITTING state
-    const transitioned = transition(FORM_STATES.SUBMITTING, {
-      email: validation.sanitized,
-      error: null,
-      message: null
-    });
-
-    if (!transitioned) {
-      return false;
-    }
-
-    // Step 3: Handle async dispatch and failure resilience
     try {
-      const response = await asyncSubmit(validation.sanitized);
-      transition(FORM_STATES.SUCCESS, {
-        message: response?.message || 'Access granted. Verification sent.'
+      // Step 1: Pre-flight client validation
+      const validation = validateEmail(rawEmail);
+      if (!validation.isValid) {
+        transition(FORM_STATES.ERROR, {
+          error: validation.error,
+          email: rawEmail
+        });
+        return false;
+      }
+
+      // Step 2: Transition to SUBMITTING state
+      const transitioned = transition(FORM_STATES.SUBMITTING, {
+        email: validation.sanitized,
+        error: null,
+        message: null
       });
-      return true;
-    } catch (err) {
-      const failureMessage = err && err.message
-        ? err.message
-        : 'Network turbulence detected. Please try again.';
-      transition(FORM_STATES.ERROR, {
-        error: failureMessage
-      });
-      return false;
+
+      if (!transitioned) {
+        return false;
+      }
+
+      // Step 3: Handle async dispatch and failure resilience
+      try {
+        const response = await asyncSubmit(validation.sanitized);
+        transition(FORM_STATES.SUCCESS, {
+          message: response?.message || 'Access granted. Verification sent.'
+        });
+        return true;
+      } catch (err) {
+        const failureMessage = err && err.message
+          ? err.message
+          : 'Network turbulence detected. Please try again.';
+        transition(FORM_STATES.ERROR, {
+          error: failureMessage
+        });
+        return false;
+      }
+    } finally {
+      inFlight = false;
     }
   }
 
@@ -447,7 +462,7 @@ function createSignupStateMachine(options = {}) {
    * Resets form state back to IDLE.
    */
   function reset() {
-    if (state === FORM_STATES.SUBMITTING) {
+    if (inFlight || state === FORM_STATES.SUBMITTING) {
       return false;
     }
     return transition(FORM_STATES.IDLE, {
@@ -463,6 +478,7 @@ function createSignupStateMachine(options = {}) {
   return {
     getState: () => state,
     getContext: () => ({ ...context }),
+    isSubmitting: () => inFlight || state === FORM_STATES.SUBMITTING,
     transition,
     submit,
     reset
@@ -506,19 +522,36 @@ function initSignupForm(form, options = {}) {
     onStateChange: options.onStateChange
   });
 
-  // Submit handler
+  // Submit handler with rapid-submission guard
   form.addEventListener(
     'submit',
     (e) => {
       e.preventDefault();
+      if (machine.isSubmitting() || (elements.submitBtn && elements.submitBtn.disabled)) {
+        return;
+      }
       const emailValue = elements.input ? elements.input.value : '';
       machine.submit(emailValue);
     },
     { signal }
   );
 
+  // Direct submit button click guard
+  if (elements.submitBtn && typeof elements.submitBtn.addEventListener === 'function') {
+    elements.submitBtn.addEventListener(
+      'click',
+      (e) => {
+        if (machine.isSubmitting() || elements.submitBtn.disabled) {
+          e.preventDefault();
+          e.stopImmediatePropagation?.();
+        }
+      },
+      { signal }
+    );
+  }
+
   // Clear error state on input change to enhance responsiveness
-  if (elements.input) {
+  if (elements.input && typeof elements.input.addEventListener === 'function') {
     elements.input.addEventListener(
       'input',
       () => {
