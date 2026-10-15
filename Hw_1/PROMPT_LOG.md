@@ -1,12 +1,5 @@
 # AI Interaction & Prompt Engineering Log
 
-**Course / Assignment:** HW1: Production Portfolio (Minimum 4 Atomic Commits)  
-**Project:** Data Engineer Production Portfolio  
-**Repository Branch:** `lab-1`  
-**Engineer:** Vũ Hoàng Ân  
-**AI Assistant:** Google Antigravity / Gemini Pair Programming Assistant  
-
----
 
 ## 1. Overview & Objective
 
