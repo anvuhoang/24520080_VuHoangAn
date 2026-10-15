@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contract-First Polyphonic Drum Kit Engine">
+  <title>HW2: Drum Kit Engine</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <h1 class="title">Drum Kit Engine</h1>
+      <p class="subtitle">Contract-First Polyphonic Web Audio Engine</p>
+    </header>
+
+    <main class="main-content">
+      <!-- Drum Pads HTML Contract: data-key & data-sound -->
+      <section class="drum-section" aria-label="Drum Pads">
+        <div class="drum-grid" id="drum-kit">
+          <button class="drum-pad" type="button" data-key="KeyW" data-sound="crash" aria-label="Crash Cymbal (Key W)">
+            <kbd class="pad-key">W</kbd>
+            <span class="pad-sound">Crash</span>
+          </button>
+
+          <button class="drum-pad" type="button" data-key="KeyA" data-sound="kick" aria-label="Kick Drum (Key A)">
+            <kbd class="pad-key">A</kbd>
+            <span class="pad-sound">Kick</span>
+          </button>
+
+          <button class="drum-pad" type="button" data-key="KeyS" data-sound="snare" aria-label="Snare Drum (Key S)">
+            <kbd class="pad-key">S</kbd>
+            <span class="pad-sound">Snare</span>
+          </button>
+
+          <button class="drum-pad" type="button" data-key="KeyD" data-sound="tom1" aria-label="Tom 1 (Key D)">
+            <kbd class="pad-key">D</kbd>
+            <span class="pad-sound">Tom 1</span>
+          </button>
+
+          <button class="drum-pad" type="button" data-key="KeyJ" data-sound="tom2" aria-label="Tom 2 (Key J)">
+            <kbd class="pad-key">J</kbd>
+            <span class="pad-sound">Tom 2</span>
+          </button>
+
+          <button class="drum-pad" type="button" data-key="KeyK" data-sound="tom3" aria-label="Tom 3 (Key K)">
+            <kbd class="pad-key">K</kbd>
+            <span class="pad-sound">Tom 3</span>
+          </button>
+
+          <button class="drum-pad" type="button" data-key="KeyL" data-sound="hihat" aria-label="Hi-Hat Cymbal (Key L)">
+            <kbd class="pad-key">L</kbd>
+            <span class="pad-sound">Hi-Hat</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Beat Recorder Controls Contract (Preserved for Step 4) -->
+      <section class="recorder-section" aria-label="Beat Recorder Controls">
+        <div class="recorder-toolbar">
+          <button id="btn-record" class="ctrl-btn btn-record" type="button" aria-label="Record Beat Sequence" disabled>
+            <span class="btn-icon"></span>
+            <span>Record</span>
+          </button>
+          <button id="btn-stop" class="ctrl-btn btn-stop" type="button" aria-label="Stop Recording or Playback" disabled>
+            <span>Stop</span>
+          </button>
+          <button id="btn-play" class="ctrl-btn btn-play" type="button" aria-label="Play Recorded Sequence" disabled>
+            <span>Play</span>
+          </button>
+          <button id="btn-clear" class="ctrl-btn btn-clear" type="button" aria-label="Clear Recorded Events" disabled>
+            <span>Clear</span>
+          </button>
+        </div>
+
+        <div class="recorder-status-bar" role="status" aria-live="polite">
+          <div class="status-indicator">
+            <span id="recording-indicator" class="status-dot"></span>
+            <span id="recording-status">Engine Ready</span>
+          </div>
+          <div class="status-counter">
+            Recorded: <strong id="beat-count">0</strong> beats
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
