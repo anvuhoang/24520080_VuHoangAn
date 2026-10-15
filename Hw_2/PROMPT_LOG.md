@@ -1,13 +1,5 @@
 # AI Interaction & Prompt Engineering Log — HW2: Drum Kit Engine
 
-**Course / Assignment:** HW2: Drum Kit Engine (Contract-First Polyphonic Engine)  
-**Project:** Contract-First Polyphonic Drum Machine & FIFO Beat Recorder  
-**Repository Branch:** `lab-1`  
-**Engineer:** Vũ Hoàng Ân  
-**AI Assistant:** Google Antigravity / Gemini Pair Programming Assistant  
-
----
-
 ## 1. Overview & Architectural Principles
 
 This document provides a comprehensive chronological audit trail of all AI prompts, architectural design decisions, code changes, verification steps, and human oversight applied during the engineering of **HW2: Drum Kit Engine**.
