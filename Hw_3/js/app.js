@@ -1,16 +1,21 @@
 /**
  * HW3: Resilient Landing Page - Engine Core
+ * -----------------------------------------------------------------------------
  * Slice 1: Drift-Free UTC Countdown Engine
+ * Slice 2: Signup Form State Machine (idle, submitting, success, error)
  * -----------------------------------------------------------------------------
  * Resilience Characteristics:
  * 1. Target Invariance: Strict UTC ISO 8601 timestamp ending in 'Z'.
- * 2. Drift Immunity: Recalculates remaining time from (target - Date.now()) on
- *    every tick; never decrements a tick-counter state.
+ * 2. Drift Immunity: Recalculates remaining time from (target - Date.now()).
  * 3. Completion Clamping: Clamps at zero when target is reached or passed.
- * 4. Resource Hygiene: Immediately clears setInterval on completion or teardown.
- * -----------------------------------------------------------------------------
- * Note: Form logic intentionally untouched for Slice 1.
+ * 4. Resource Hygiene: Immediate cleanup of timers & event listeners.
+ * 5. Deterministic State Machine: Explicit transitions prevent double-submits.
+ * 6. Defensive Validation: Verifies input before initiating async network I/O.
  */
+
+/* ==========================================================================
+   SLICE 1: DRIFT-FREE COUNTDOWN ENGINE
+   ========================================================================== */
 
 const DEFAULT_TARGET_UTC = '2026-11-01T00:00:00Z';
 
@@ -93,19 +98,6 @@ function formatTimeUnit(unit) {
 
 /**
  * Creates and manages a countdown timer controller with interval cleanup.
- *
- * @param {Object} options
- * @param {string} [options.target=DEFAULT_TARGET_UTC] - UTC ISO 8601 timestamp ending in 'Z'
- * @param {Object} [options.elements] - Bound DOM elements
- * @param {HTMLElement} [options.elements.daysEl]
- * @param {HTMLElement} [options.elements.hoursEl]
- * @param {HTMLElement} [options.elements.minutesEl]
- * @param {HTMLElement} [options.elements.secondsEl]
- * @param {Function} [options.onTick] - Callback executed on each evaluation
- * @param {Function} [options.onComplete] - Callback executed when clamped at zero
- * @param {number} [options.tickInterval=1000] - Interval tick rate in ms
- * @param {Function} [options.nowFn=Date.now] - Current time provider
- * @returns {{ start: Function, stop: Function, isRunning: Function, getRemaining: Function, tick: Function }}
  */
 function createCountdown(options = {}) {
   const {
@@ -174,13 +166,395 @@ function createCountdown(options = {}) {
   };
 }
 
-// Browser bootstrap
+/* ==========================================================================
+   SLICE 2: SIGNUP FORM STATE MACHINE
+   ========================================================================== */
+
+/**
+ * Explicit finite states for signup form.
+ */
+const FORM_STATES = Object.freeze({
+  IDLE: 'idle',
+  SUBMITTING: 'submitting',
+  SUCCESS: 'success',
+  ERROR: 'error'
+});
+
+/**
+ * Deterministic state transition table.
+ * Guards against illegal jumps and duplicate submissions.
+ */
+const VALID_TRANSITIONS = Object.freeze({
+  [FORM_STATES.IDLE]: Object.freeze([FORM_STATES.SUBMITTING, FORM_STATES.ERROR]),
+  [FORM_STATES.SUBMITTING]: Object.freeze([FORM_STATES.SUCCESS, FORM_STATES.ERROR]),
+  [FORM_STATES.SUCCESS]: Object.freeze([FORM_STATES.IDLE]),
+  [FORM_STATES.ERROR]: Object.freeze([FORM_STATES.SUBMITTING, FORM_STATES.IDLE])
+});
+
+/**
+ * Validates input prior to network submission.
+ * @param {string} email
+ * @returns {{ isValid: boolean, sanitized?: string, error?: string }}
+ */
+function validateEmail(email) {
+  if (typeof email !== 'string') {
+    return { isValid: false, error: 'Email address must be a string.' };
+  }
+
+  const trimmed = email.trim();
+
+  if (!trimmed) {
+    return { isValid: false, error: 'Email address is required.' };
+  }
+
+  // Simplified standard pattern for preliminary client validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(trimmed)) {
+    return { isValid: false, error: 'Please enter a valid email address (e.g., engineer@domain.com).' };
+  }
+
+  return { isValid: true, sanitized: trimmed };
+}
+
+/**
+ * Default asynchronous mock submission handler.
+ * @param {string} email
+ * @returns {Promise<{ success: boolean, message: string }>}
+ */
+async function defaultAsyncSubmit(email) {
+  // Simulates network latency
+  await new Promise((resolve) => setTimeout(resolve, 800));
+
+  if (email.toLowerCase().includes('fail') || email.toLowerCase().includes('reject')) {
+    throw new Error('Cluster rejected request. Upstream authorization service unavailable.');
+  }
+
+  return {
+    success: true,
+    message: 'Access requested! Verification link dispatched to your inbox.'
+  };
+}
+
+/**
+ * Updates UI DOM elements to reflect the current state machine state.
+ * @param {string} state - Current FORM_STATES value
+ * @param {Object} context - State context { error, message, email }
+ * @param {Object} elements - Bound DOM elements
+ */
+function renderFormUi(state, context = {}, elements = {}) {
+  const { input, inputWrapper, submitBtn, btnText, errorBox, errorMsg, successBox, successMsg } = elements;
+
+  switch (state) {
+    case FORM_STATES.IDLE:
+      if (input) {
+        input.disabled = false;
+      }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+      }
+      if (btnText) {
+        btnText.textContent = 'Request Key';
+      }
+      if (errorBox) {
+        errorBox.classList.add('hidden');
+      }
+      if (successBox) {
+        successBox.classList.add('hidden');
+      }
+      if (inputWrapper) {
+        inputWrapper.classList.remove('has-error');
+      }
+      break;
+
+    case FORM_STATES.SUBMITTING:
+      if (input) {
+        input.disabled = true;
+      }
+      if (submitBtn) {
+        submitBtn.disabled = true;
+      }
+      if (btnText) {
+        btnText.textContent = 'Verifying...';
+      }
+      if (errorBox) {
+        errorBox.classList.add('hidden');
+      }
+      if (successBox) {
+        successBox.classList.add('hidden');
+      }
+      if (inputWrapper) {
+        inputWrapper.classList.remove('has-error');
+      }
+      break;
+
+    case FORM_STATES.SUCCESS:
+      if (input) {
+        input.disabled = true;
+      }
+      if (submitBtn) {
+        submitBtn.disabled = true;
+      }
+      if (btnText) {
+        btnText.textContent = 'Key Dispatched';
+      }
+      if (errorBox) {
+        errorBox.classList.add('hidden');
+      }
+      if (successBox) {
+        successBox.classList.remove('hidden');
+        if (successMsg && context.message) {
+          successMsg.textContent = context.message;
+        }
+      }
+      if (inputWrapper) {
+        inputWrapper.classList.remove('has-error');
+      }
+      break;
+
+    case FORM_STATES.ERROR:
+      if (input) {
+        input.disabled = false;
+        input.focus?.();
+      }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+      }
+      if (btnText) {
+        btnText.textContent = 'Try Again';
+      }
+      if (errorBox) {
+        errorBox.classList.remove('hidden');
+        if (errorMsg && context.error) {
+          errorMsg.textContent = context.error;
+        }
+      }
+      if (successBox) {
+        successBox.classList.add('hidden');
+      }
+      if (inputWrapper) {
+        inputWrapper.classList.add('has-error');
+      }
+      break;
+
+    default:
+      break;
+  }
+}
+
+/**
+ * Creates an instance of the Signup Form State Machine.
+ *
+ * @param {Object} options
+ * @param {Object} [options.elements] - Bound DOM elements
+ * @param {Function} [options.asyncSubmit=defaultAsyncSubmit] - Async submit handler returning Promise
+ * @param {Function} [options.onStateChange] - Listener for state changes
+ * @returns {Object} State machine controller
+ */
+function createSignupStateMachine(options = {}) {
+  const {
+    elements = {},
+    asyncSubmit = defaultAsyncSubmit,
+    onStateChange
+  } = options;
+
+  let state = FORM_STATES.IDLE;
+  let context = {
+    error: null,
+    message: null,
+    email: ''
+  };
+
+  /**
+   * Performs an explicit state transition with rule verification.
+   * @param {string} nextState
+   * @param {Object} [newContextPayload={}]
+   * @returns {boolean} Whether transition succeeded
+   */
+  function transition(nextState, newContextPayload = {}) {
+    const allowed = VALID_TRANSITIONS[state];
+
+    if (!allowed || !allowed.includes(nextState)) {
+      console.warn(`[StateMachine] Illegal transition rejected: "${state}" -> "${nextState}"`);
+      return false;
+    }
+
+    const prevState = state;
+    state = nextState;
+    context = { ...context, ...newContextPayload };
+
+    renderFormUi(state, context, elements);
+
+    if (typeof onStateChange === 'function') {
+      onStateChange(state, prevState, context);
+    }
+
+    return true;
+  }
+
+  /**
+   * Handles user submission attempts.
+   * Validates before submitting and rejects if already submitting.
+   *
+   * @param {string} rawEmail
+   * @returns {Promise<boolean>}
+   */
+  async function submit(rawEmail) {
+    // Prevent double submission while already processing
+    if (state === FORM_STATES.SUBMITTING) {
+      return false;
+    }
+
+    // Step 1: Pre-flight client validation
+    const validation = validateEmail(rawEmail);
+    if (!validation.isValid) {
+      transition(FORM_STATES.ERROR, {
+        error: validation.error,
+        email: rawEmail
+      });
+      return false;
+    }
+
+    // Step 2: Transition to SUBMITTING state
+    const transitioned = transition(FORM_STATES.SUBMITTING, {
+      email: validation.sanitized,
+      error: null,
+      message: null
+    });
+
+    if (!transitioned) {
+      return false;
+    }
+
+    // Step 3: Handle async dispatch and failure resilience
+    try {
+      const response = await asyncSubmit(validation.sanitized);
+      transition(FORM_STATES.SUCCESS, {
+        message: response?.message || 'Access granted. Verification sent.'
+      });
+      return true;
+    } catch (err) {
+      const failureMessage = err && err.message
+        ? err.message
+        : 'Network turbulence detected. Please try again.';
+      transition(FORM_STATES.ERROR, {
+        error: failureMessage
+      });
+      return false;
+    }
+  }
+
+  /**
+   * Resets form state back to IDLE.
+   */
+  function reset() {
+    if (state === FORM_STATES.SUBMITTING) {
+      return false;
+    }
+    return transition(FORM_STATES.IDLE, {
+      error: null,
+      message: null,
+      email: ''
+    });
+  }
+
+  // Initial UI sync
+  renderFormUi(state, context, elements);
+
+  return {
+    getState: () => state,
+    getContext: () => ({ ...context }),
+    transition,
+    submit,
+    reset
+  };
+}
+
+/**
+ * Initializes DOM event listeners idempotently with duplicate prevention.
+ * Uses AbortController and attaches cleanup handle to the form element.
+ *
+ * @param {HTMLFormElement} form
+ * @param {Object} [options]
+ * @returns {Object} State machine controller instance
+ */
+function initSignupForm(form, options = {}) {
+  if (!form) return null;
+
+  // Clean up any previously attached state machine / listeners to prevent duplicates
+  if (form._stateMachine && typeof form._stateMachine.destroy === 'function') {
+    form._stateMachine.destroy();
+  }
+
+  const abortController = new AbortController();
+  const { signal } = abortController;
+
+  const elements = {
+    form,
+    input: form.querySelector('#user-email'),
+    inputWrapper: form.querySelector('.input-affix-wrapper'),
+    submitBtn: form.querySelector('#submit-btn'),
+    btnText: form.querySelector('#submit-btn span'),
+    errorBox: form.querySelector('#form-error'),
+    errorMsg: form.querySelector('#form-error-msg'),
+    successBox: form.querySelector('#form-success'),
+    successMsg: form.querySelector('#form-success-msg')
+  };
+
+  const machine = createSignupStateMachine({
+    elements,
+    asyncSubmit: options.asyncSubmit || defaultAsyncSubmit,
+    onStateChange: options.onStateChange
+  });
+
+  // Submit handler
+  form.addEventListener(
+    'submit',
+    (e) => {
+      e.preventDefault();
+      const emailValue = elements.input ? elements.input.value : '';
+      machine.submit(emailValue);
+    },
+    { signal }
+  );
+
+  // Clear error state on input change to enhance responsiveness
+  if (elements.input) {
+    elements.input.addEventListener(
+      'input',
+      () => {
+        if (machine.getState() === FORM_STATES.ERROR) {
+          machine.reset();
+        }
+      },
+      { signal }
+    );
+  }
+
+  const controller = {
+    ...machine,
+    destroy: () => {
+      abortController.abort();
+      if (form._stateMachine === controller) {
+        delete form._stateMachine;
+      }
+    }
+  };
+
+  form._stateMachine = controller;
+  return controller;
+}
+
+/* ==========================================================================
+   BROWSER BOOTSTRAP
+   ========================================================================== */
+
 if (typeof document !== 'undefined') {
   document.addEventListener('DOMContentLoaded', () => {
+    // 1. Countdown Initialization
     const countdownWrapper = document.getElementById('countdown');
     const targetUtc = countdownWrapper?.dataset?.target || DEFAULT_TARGET_UTC;
 
-    const elements = {
+    const countdownElements = {
       daysEl: document.getElementById('days-val'),
       hoursEl: document.getElementById('hours-val'),
       minutesEl: document.getElementById('minutes-val'),
@@ -189,7 +563,7 @@ if (typeof document !== 'undefined') {
 
     const countdown = createCountdown({
       target: targetUtc,
-      elements,
+      elements: countdownElements,
       onComplete: () => {
         const badge = document.querySelector('.countdown-badge');
         if (badge) {
@@ -202,20 +576,42 @@ if (typeof document !== 'undefined') {
 
     countdown.start();
 
-    // Prevent memory leaks on page unload / navigation
+    // 2. Signup Form State Machine Initialization
+    const waitlistForm = document.getElementById('waitlist-form');
+    if (waitlistForm) {
+      initSignupForm(waitlistForm);
+    }
+
+    // Teardown on page unload to prevent leaks
     window.addEventListener('beforeunload', () => {
       countdown.stop();
+      if (waitlistForm?._stateMachine) {
+        waitlistForm._stateMachine.destroy();
+      }
     });
   });
 }
 
-// CommonJS / Node.js export for automated tests
+/* ==========================================================================
+   MODULE EXPORTS (Node.js & Automated Tests)
+   ========================================================================== */
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
+    // Slice 1: Countdown
     DEFAULT_TARGET_UTC,
     isValidUtcIsoString,
     calculateRemainingTime,
     formatTimeUnit,
-    createCountdown
+    createCountdown,
+
+    // Slice 2: Signup State Machine
+    FORM_STATES,
+    VALID_TRANSITIONS,
+    validateEmail,
+    defaultAsyncSubmit,
+    renderFormUi,
+    createSignupStateMachine,
+    initSignupForm
   };
 }
