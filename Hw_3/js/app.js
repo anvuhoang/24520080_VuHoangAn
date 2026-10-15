@@ -192,9 +192,30 @@ const VALID_TRANSITIONS = Object.freeze({
 });
 
 /**
- * Validates input prior to network submission.
+ * Normalizes user email input:
+ * 1. Strips ASCII control characters (0x00-0x1F, 0x7F) and null bytes.
+ * 2. Trims leading and trailing whitespace.
+ * 3. Converts to lowercase for deterministic storage.
+ *
+ * @param {string} input
+ * @returns {string}
+ */
+function normalizeEmail(input) {
+  if (typeof input !== 'string') {
+    return '';
+  }
+  return input
+    .replace(/[\x00-\x1F\x7F]/g, '')
+    .trim()
+    .toLowerCase();
+}
+
+/**
+ * Validates and normalizes input prior to network submission.
+ * Enforces strict XSS payload rejection, RFC length limits, and syntax checks.
+ *
  * @param {string} email
- * @returns {{ isValid: boolean, sanitized?: string, error?: string }}
+ * @returns {{ isValid: boolean, sanitized?: string, normalized?: string, error?: string }}
  */
 function validateEmail(email) {
   if (typeof email !== 'string') {
@@ -207,13 +228,38 @@ function validateEmail(email) {
     return { isValid: false, error: 'Email address is required.' };
   }
 
-  // Simplified standard pattern for preliminary client validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(trimmed)) {
-    return { isValid: false, error: 'Please enter a valid email address (e.g., engineer@domain.com).' };
+  // Strict rejection of XSS characters & injection payloads
+  if (/[<>"'`\\;\x00-\x1F\x7F]/.test(email)) {
+    return {
+      isValid: false,
+      error: 'Please enter a valid email address. Special characters (<, >, ", \', `, \\, ;) are not permitted.'
+    };
   }
 
-  return { isValid: true, sanitized: trimmed };
+  const normalized = normalizeEmail(email);
+
+  // RFC 5321 length constraint (254 characters maximum)
+  if (normalized.length > 254) {
+    return {
+      isValid: false,
+      error: 'Email address exceeds maximum allowed length of 254 characters.'
+    };
+  }
+
+  // Standard safe RFC email syntax check
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+  if (!emailRegex.test(normalized)) {
+    return {
+      isValid: false,
+      error: 'Please enter a valid email address (e.g., engineer@domain.com).'
+    };
+  }
+
+  return {
+    isValid: true,
+    sanitized: normalized,
+    normalized
+  };
 }
 
 /**
@@ -638,9 +684,10 @@ if (typeof module !== 'undefined' && module.exports) {
     formatTimeUnit,
     createCountdown,
 
-    // Slice 2: Signup State Machine
+    // Slice 2 & 3: Signup State Machine & Security
     FORM_STATES,
     VALID_TRANSITIONS,
+    normalizeEmail,
     validateEmail,
     defaultAsyncSubmit,
     renderFormUi,
