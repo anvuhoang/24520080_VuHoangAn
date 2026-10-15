@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="HW3 Resilient Landing Page - Next-generation resilient developer platform with zero downtime architecture.">
+  <title>Aetheria // Resilient Systems Platform</title>
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Core Styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Ambient Background Glows -->
+  <div class="ambient-glow glow-top-left" aria-hidden="true"></div>
+  <div class="ambient-glow glow-bottom-right" aria-hidden="true"></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
+
+  <!-- Header / Navigation -->
+  <header class="site-header" id="header">
+    <div class="container header-container">
+      <a href="#" class="brand-logo" aria-label="Aetheria Home">
+        <span class="logo-symbol">
+          <span class="logo-pulse"></span>
+        </span>
+        <span class="logo-text">AETHERIA<span class="logo-accent">.IO</span></span>
+      </a>
+
+      <nav class="site-nav" aria-label="Main Navigation">
+        <ul class="nav-list">
+          <li><a href="#features" class="nav-link">Features</a></li>
+          <li><a href="#countdown" class="nav-link">Launch</a></li>
+          <li><a href="#signup" class="nav-link">Access</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <span class="system-status-pill">
+          <span class="status-indicator"></span>
+          <span>Core Operational</span>
+        </span>
+        <a href="#signup" class="btn btn-outline btn-sm">Get Priority</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="main-content">
+    <!-- Hero Section -->
+    <section class="hero-section" id="hero">
+      <div class="container hero-container">
+        <!-- Release Badge -->
+        <div class="badge-pill">
+          <span class="badge-icon">⚡</span>
+          <span class="badge-text">Genesis v3.0 Protocol • Public Debut</span>
+          <span class="badge-highlight">Q4 2026</span>
+        </div>
+
+        <!-- Hero Headline -->
+        <h1 class="hero-title">
+          Architected for <span class="text-gradient">Zero-Downtime</span> Fault-Tolerant Futures.
+        </h1>
+
+        <p class="hero-description">
+          A resilient distributed engine designed to survive network turbulence, graceful degradation failures, and scale spikes without dropping a single packet.
+        </p>
+
+        <!-- Countdown Display UI (Logic Not Yet Implemented) -->
+        <section class="countdown-wrapper" id="countdown" aria-label="Launch Countdown Timer">
+          <div class="countdown-header">
+            <span class="countdown-label">DEPLOYMENT SYNCHRONIZATION WINDOW</span>
+            <span class="countdown-badge">T-MINUS</span>
+          </div>
+
+          <div class="countdown-grid">
+            <!-- Days Card -->
+            <div class="countdown-card" id="card-days">
+              <div class="card-inner">
+                <span class="countdown-value" id="days-val">14</span>
+                <span class="countdown-unit">DAYS</span>
+              </div>
+              <div class="card-glow" aria-hidden="true"></div>
+            </div>
+
+            <div class="countdown-divider" aria-hidden="true">:</div>
+
+            <!-- Hours Card -->
+            <div class="countdown-card" id="card-hours">
+              <div class="card-inner">
+                <span class="countdown-value" id="hours-val">08</span>
+                <span class="countdown-unit">HOURS</span>
+              </div>
+              <div class="card-glow" aria-hidden="true"></div>
+            </div>
+
+            <div class="countdown-divider" aria-hidden="true">:</div>
+
+            <!-- Minutes Card -->
+            <div class="countdown-card" id="card-minutes">
+              <div class="card-inner">
+                <span class="countdown-value" id="minutes-val">42</span>
+                <span class="countdown-unit">MINUTES</span>
+              </div>
+              <div class="card-glow" aria-hidden="true"></div>
+            </div>
+
+            <div class="countdown-divider" aria-hidden="true">:</div>
+
+            <!-- Seconds Card -->
+            <div class="countdown-card" id="card-seconds">
+              <div class="card-inner">
+                <span class="countdown-value" id="seconds-val">19</span>
+                <span class="countdown-unit">SECONDS</span>
+              </div>
+              <div class="card-glow" aria-hidden="true"></div>
+            </div>
+          </div>
+
+          <p class="countdown-caption">
+            Nodes synchronized across 28 global edge regions. Scheduled automated rollout.
+          </p>
+        </section>
+
+        <!-- Signup Form UI (Logic Not Yet Implemented) -->
+        <section class="signup-wrapper" id="signup" aria-label="Early Access Waitlist Form">
+          <div class="signup-card">
+            <div class="signup-card-header">
+              <h2 class="signup-title">Secure Priority Cluster Access</h2>
+              <p class="signup-subtitle">
+                Join 12,400+ infrastructure engineers and devops specialists receiving early credentials.
+              </p>
+            </div>
+
+            <!-- Static UI Form with Progressive Enhancement markup -->
+            <form class="signup-form" id="waitlist-form" action="#" method="POST" novalidate>
+              <div class="form-row">
+                <div class="input-container">
+                  <label for="user-email" class="sr-only">Email address</label>
+                  <div class="input-affix-wrapper">
+                    <span class="input-icon" aria-hidden="true">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                      </svg>
+                    </span>
+                    <input 
+                      type="email" 
+                      id="user-email" 
+                      name="email" 
+                      class="form-input" 
+                      placeholder="engineer@domain.com"
+                      required
+                      autocomplete="email"
+                      spellcheck="false"
+                    >
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-submit" id="submit-btn">
+                  <span>Request Key</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-arrow">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Feedback Messages placeholders (styled & ready for logic integration) -->
+              <div class="form-feedback hidden" id="form-error" role="alert" aria-live="polite">
+                <span class="feedback-icon">⚠️</span>
+                <span class="feedback-text" id="form-error-msg">Please provide a valid work email address.</span>
+              </div>
+              <div class="form-feedback form-feedback-success hidden" id="form-success" role="status" aria-live="polite">
+                <span class="feedback-icon">✓</span>
+                <span class="feedback-text" id="form-success-msg">Access requested! Verification link dispatched.</span>
+              </div>
+
+              <!-- Trust metadata -->
+              <div class="form-footer-meta">
+                <span class="meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                  256-Bit Encrypted
+                </span>
+                <span class="meta-bullet">•</span>
+                <span class="meta-item">Zero Spam Guarantee</span>
+                <span class="meta-bullet">•</span>
+                <span class="meta-item">Revoke Anytime</span>
+              </div>
+            </form>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- Resilience Pillars Section -->
+    <section class="features-section" id="features">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">ENGINEERED RESILIENCE</span>
+          <h2 class="section-title">Built to withstand the unpredictable.</h2>
+          <p class="section-desc">Designed with defensive architectural patterns to ensure graceful degradation under all conditions.</p>
+        </div>
+
+        <div class="features-grid">
+          <!-- Card 1 -->
+          <article class="feature-card">
+            <div class="feature-icon-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+            </div>
+            <h3 class="feature-title">Progressive Enhancement</h3>
+            <p class="feature-text">
+              Core access functions reliably even when scripts fail, network stalls, or client constraints trigger degraded modes.
+            </p>
+          </article>
+
+          <!-- Card 2 -->
+          <article class="feature-card">
+            <div class="feature-icon-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 6v6l4 2"></path>
+              </svg>
+            </div>
+            <h3 class="feature-title">Temporal Synchronization</h3>
+            <p class="feature-text">
+              Monotonic clock compensation safeguards against client-side system clock drift and regional timezone anomalies.
+            </p>
+          </article>
+
+          <!-- Card 3 -->
+          <article class="feature-card">
+            <div class="feature-icon-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+            </div>
+            <h3 class="feature-title">Strict Input Sanitization</h3>
+            <p class="feature-text">
+              Multi-layered client defensive checks paired with idempotency tokens prevent replay storms and malformed payloads.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-left">
+        <span class="footer-brand">AETHERIA SYSTEMS</span>
+        <span class="footer-copy">© 2026 HW3 Resilient Engineering Lab. All rights reserved.</span>
+      </div>
+      <div class="footer-links">
+        <a href="#hero">Back to top</a>
+        <a href="#features">Architecture</a>
+        <a href="AI_FAILURE_AUDIT.md" class="footer-audit-link">Audit Protocol</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script Hook (Logic stubbed for subsequent phase) -->
+  <script src="js/app.js"></script>
+</body>
+</html>
