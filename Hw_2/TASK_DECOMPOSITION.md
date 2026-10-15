@@ -149,7 +149,7 @@ class BeatRecorder {
 
 ---
 
-### Phase 2: Independent Polyphonic Audio Engine (Step 2) [COMPLETED]
+### Phase 2: Independent Polyphonic Audio Engine (Step 2) 
 > **Goal**: Low-latency, polyphonic sound playback isolated from the DOM.
 - [x] **2.1 Audio Engine Core (`js/audio-engine.js`)**:
   - Implemented decoupled `AudioEngine` class with Web Audio API `AudioContext`.
@@ -200,25 +200,8 @@ class BeatRecorder {
   - Connect live drum hits to `recorder.recordEvent(soundId)` when in recording mode.
   - Connect playback events to `AudioEngine.play(soundId)` and trigger pad visual animation during playback.
 
----
 
-### Phase 5: Verification, Edge Cases & Polish (Step 5)
-> **Goal**: Comprehensive testing, accessibility checks, and final verification.
-- [ ] **5.1 Polyphony & Latency Verification**:
-  - Rapid multi-finger keyboard tapping test.
-- [ ] **5.2 `event.repeat` Throttling Verification**:
-  - Sustained keypress test to confirm exactly 1 sound trigger and 1 recorded event.
-- [ ] **5.3 FIFO Queue Verification**:
-  - Fill recorder up to limit; verify oldest events are cleanly discarded first.
-  - Verification of accurate playback timing vs. recorded relative timing.
-- [ ] **5.4 Browser Compatibility & A11y**:
-  - Keyboard navigation (Tab + Enter/Space), screen reader labels.
-  - Check console for zero errors or memory leaks.
 
 ---
 
-## 4. Current Status & Next Immediate Action
-
-- **Status**: **Step 2 (Polyphonic Audio Engine) Completed & Verified**. Step 1 HTML contract preserved.
-- **Next Action**: Await user direction to proceed to **Phase 3: Keydown Listener with `event.repeat` Throttling**.
 
