@@ -1032,6 +1032,10 @@ body {
   line-height: 1.6;
 }
 
+.modal-badges {
+  margin-top: 1rem;
+}
+
 .modal-footer {
   display: flex;
   justify-content: flex-end;

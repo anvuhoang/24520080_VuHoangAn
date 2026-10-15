@@ -7,13 +7,19 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
   <meta name="description"
     content="Portfolio Kỹ sư Dữ liệu (Data Engineer) - Thiết kế Kiến trúc Pipeline Dữ liệu, Data Warehouse & Hệ thống Phân tán - Vũ Hoàng Ân">
+  <meta name="theme-color" content="#0b0f19">
   <title>Vũ Hoàng Ân - Data Engineer Portfolio</title>
-  <!-- Google Fonts -->
+  <!-- Favicon & PWA Icons -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" href="favicon.ico">
+  <!-- Google Fonts: Preconnect & Asynchronous Loading (Strict CSP Compliant) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
-    rel="stylesheet">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" id="google-fonts-stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" media="print">
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+  </noscript>
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -42,7 +48,7 @@
 
       <div class="header-actions">
         <!-- Theme Switcher: Accessible button with aria-pressed and dynamic icon -->
-        <button id="theme-toggle" class="theme-toggle" aria-pressed="true" aria-label="Chuyển đổi giao diện sáng/tối"
+        <button id="theme-toggle" class="theme-toggle" aria-pressed="true"
           title="Chuyển đổi giao diện sáng/tối">
           <span class="theme-icon" id="theme-icon" aria-hidden="true">🌙</span>
           <span class="theme-text" id="theme-text">Dark Mode</span>
@@ -63,8 +69,11 @@
     <!-- 1. Hero Section: High-res portrait with explicit dimensions, headline, pitch & Personal Bio -->
     <section id="hero" class="hero-section" aria-labelledby="hero-title">
       <div class="portrait-wrapper">
-        <img src="portrait.jpg" alt="Chân dung Kỹ sư Dữ liệu Vũ Hoàng An" width="160" height="160" class="portrait-img"
-          loading="eager">
+        <picture>
+          <source srcset="portrait.webp" type="image/webp">
+          <img src="portrait.jpg" alt="Chân dung Kỹ sư Dữ liệu Vũ Hoàng An" width="160" height="160" class="portrait-img"
+            fetchpriority="high" decoding="async">
+        </picture>
         <span class="status-indicator" role="status" aria-label="Sẵn sàng nhận dự án"
           title="Sẵn sàng nhận dự án"></span>
       </div>
@@ -211,7 +220,7 @@
           <footer class="card-footer">
             <button class="card-detail-btn" data-project="pipeline" aria-haspopup="dialog"
               aria-label="Xem chi tiết dự án Distributed ETL Pipeline Engine">Chi tiết</button>
-            <a href="#" aria-label="Xem mã nguồn dự án Distributed ETL Pipeline Engine">Source Code</a>
+            <a href="#" aria-label="Source Code: Xem mã nguồn dự án Distributed ETL Pipeline Engine">Source Code</a>
           </footer>
         </article>
 
@@ -226,7 +235,7 @@
           <footer class="card-footer">
             <button class="card-detail-btn" data-project="streaming" aria-haspopup="dialog"
               aria-label="Xem chi tiết dự án Real-time CDC Streaming Bus">Chi tiết</button>
-            <a href="#" aria-label="Xem mã nguồn dự án Real-time CDC Streaming Bus">Source Code</a>
+            <a href="#" aria-label="Source Code: Xem mã nguồn dự án Real-time CDC Streaming Bus">Source Code</a>
           </footer>
         </article>
 
@@ -241,7 +250,7 @@
           <footer class="card-footer">
             <button class="card-detail-btn" data-project="lakehouse" aria-haspopup="dialog"
               aria-label="Xem chi tiết dự án Enterprise Data Lakehouse">Chi tiết</button>
-            <a href="#" aria-label="Xem mã nguồn dự án Enterprise Data Lakehouse">Source Code</a>
+            <a href="#" aria-label="Source Code: Xem mã nguồn dự án Enterprise Data Lakehouse">Source Code</a>
           </footer>
         </article>
 
@@ -256,7 +265,7 @@
           <footer class="card-footer">
             <button class="card-detail-btn" data-project="dataops" aria-haspopup="dialog"
               aria-label="Xem chi tiết dự án Automated DataOps Platform">Chi tiết</button>
-            <a href="#" aria-label="Xem mã nguồn dự án Automated DataOps Platform">Source Code</a>
+            <a href="#" aria-label="Source Code: Xem mã nguồn dự án Automated DataOps Platform">Source Code</a>
           </footer>
         </article>
       </div>
@@ -365,7 +374,7 @@
       </header>
       <div id="modal-body" class="modal-body">
         <p id="modal-desc"></p>
-        <div id="modal-tech-stack" class="badges" style="margin-top: 1rem;"></div>
+        <div id="modal-tech-stack" class="badges modal-badges"></div>
       </div>
       <footer class="modal-footer">
         <button id="modal-action-btn" class="btn-primary">Đóng hộp thoại</button>
@@ -373,7 +382,7 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
 
 </html>

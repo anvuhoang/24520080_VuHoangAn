@@ -1,3 +1,9 @@
+// Asynchronously activate Google Fonts stylesheet to prevent render-blocking (M4 Performance)
+const fontStylesheet = document.getElementById("google-fonts-stylesheet");
+if (fontStylesheet) {
+  fontStylesheet.media = "all";
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   // ==========================================================================
   // 1. Skip-Link Programmatic Focus Shift (WCAG 2.4.1 & 2.4.3)
