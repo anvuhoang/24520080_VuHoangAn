@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab 2 - Exercise 1: Mini-React Test Runner</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --pass: #22c55e;
+      --fail: #ef4444;
+      --border: #334155;
+      --accent: #38bdf8;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem;
+    }
+    header {
+      max-width: 860px;
+      margin: 0 auto 2rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+    }
+    h1 {
+      font-size: 1.8rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .summary-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 2.5rem;
+    }
+    .stat {
+      display: flex;
+      flex-direction: column;
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .stat-val {
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+    .stat-val.passed {
+      color: var(--pass);
+    }
+    .stat-val.failed {
+      color: var(--fail);
+    }
+    .suite-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .suite-title {
+      font-size: 1.05rem;
+      color: #e2e8f0;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+    .test-item {
+      display: flex;
+      flex-direction: column;
+      padding: 0.45rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 0.9rem;
+    }
+    .test-item:last-child {
+      border-bottom: none;
+    }
+    .test-row {
+      display: flex;
+      align-items: center;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-right: 0.75rem;
+      flex-shrink: 0;
+    }
+    .badge.pass {
+      background: rgba(34, 197, 94, 0.2);
+      color: var(--pass);
+    }
+    .badge.fail {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--fail);
+    }
+    .error-msg {
+      margin-top: 0.4rem;
+      margin-left: 3.5rem;
+      color: var(--fail);
+      font-family: monospace;
+      font-size: 0.8rem;
+      background: rgba(239, 68, 68, 0.1);
+      padding: 0.4rem 0.6rem;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Exercise 1: Mini-React (Phase 1)</h1>
+    <p class="subtitle">Virtual DOM Factory &amp; Type Guard Test Suite</p>
+  </header>
+  <main id="root">
+    <div id="test-results">
+      <p style="color: var(--text-muted);">Running test suite...</p>
+    </div>
+  </main>
+  <script type="module" src="./test-runner.js"></script>
+</body>
+</html>
