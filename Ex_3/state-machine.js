@@ -112,6 +112,8 @@ export function createAsyncDataLoader(onStateChange) {
   }
 
   let currentRequestId = 0;
+  let activePromise = null;
+  let inFlight = false;
 
   /**
    * Executes an asynchronous fetcher function safely.
@@ -119,52 +121,74 @@ export function createAsyncDataLoader(onStateChange) {
    *
    * @template T
    * @param {() => Promise<T>} fetcher
-   * @returns {Promise<{ stale: boolean, data?: T, error?: string }>}
+   * @param {{ preventDuplicate?: boolean }} [options]
+   * @returns {Promise<{ stale?: boolean, duplicate?: boolean, data?: T, error?: string }>}
    */
-  async function loadData(fetcher) {
+  async function loadData(fetcher, options = {}) {
     if (typeof fetcher !== 'function') {
       throw new TypeError('Fetcher must be a function returning a Promise');
     }
 
+    if (options.preventDuplicate && inFlight) {
+      return activePromise || Promise.resolve({ duplicate: true });
+    }
+
+    inFlight = true;
     const requestId = ++currentRequestId;
 
     // Transition to LOADING
     onStateChange(createLoadingState());
 
-    try {
-      const data = await fetcher();
+    const execPromise = (async () => {
+      try {
+        const data = await fetcher();
 
-      // Race-condition check: if a newer request began, discard this result
-      if (requestId !== currentRequestId) {
-        return { stale: true };
+        // Race-condition check: if a newer request began, discard this result
+        if (requestId !== currentRequestId) {
+          return { stale: true };
+        }
+
+        // Transition to SUCCESS with retrieved data
+        onStateChange(createSuccessState(data));
+        return { stale: false, data };
+      } catch (err) {
+        // Race-condition check: discard stale error
+        if (requestId !== currentRequestId) {
+          return { stale: true };
+        }
+
+        // Transition to ERROR with safe error message
+        const errorState = createErrorState(err);
+        onStateChange(errorState);
+        return { stale: false, error: errorState.error };
+      } finally {
+        if (requestId === currentRequestId) {
+          inFlight = false;
+          activePromise = null;
+        }
       }
+    })();
 
-      // Transition to SUCCESS with retrieved data
-      onStateChange(createSuccessState(data));
-      return { stale: false, data };
-    } catch (err) {
-      // Race-condition check: discard stale error
-      if (requestId !== currentRequestId) {
-        return { stale: true };
-      }
-
-      // Transition to ERROR with safe error message
-      const errorState = createErrorState(err);
-      onStateChange(errorState);
-      return { stale: false, error: errorState.error };
-    }
+    activePromise = execPromise;
+    return execPromise;
   }
 
   function getCurrentRequestId() {
     return currentRequestId;
   }
 
+  function isInFlight() {
+    return inFlight;
+  }
+
   function reset() {
     currentRequestId++;
+    inFlight = false;
+    activePromise = null;
     onStateChange(createIdleState());
   }
 
-  return { loadData, getCurrentRequestId, reset };
+  return { loadData, getCurrentRequestId, isInFlight, reset };
 }
 
 /**
@@ -206,8 +230,12 @@ export class ResilientStateMachine {
     }
   }
 
-  async loadData(fetcher) {
-    return this._loader.loadData(fetcher);
+  async loadData(fetcher, options = {}) {
+    return this._loader.loadData(fetcher, options);
+  }
+
+  isInFlight() {
+    return this._loader.isInFlight();
   }
 
   reset() {

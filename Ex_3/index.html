@@ -3,20 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lab 2 - Exercise 3: Resilient State Machine</title>
+  <meta name="description" content="Exercise 3 - Resilient State Machine &amp; Skeleton Loader with Four-State Asynchronous Lifecycle">
+  <title>Lab 2 - Exercise 3: Resilient State Machine &amp; Skeleton Loader</title>
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <div class="container">
     <header class="page-header">
       <h1>Exercise 3: Resilient State Machine &amp; Skeleton Loader</h1>
-      <p style="color: var(--text-muted); font-size: 0.95rem;">
-        Four-State Asynchronous Lifecycle (IDLE &bull; LOADING &bull; SUCCESS &bull; ERROR)
+      <p>
+        Semantic Data-Feed UI with Four States (IDLE &bull; LOADING &bull; SUCCESS &bull; ERROR)
       </p>
     </header>
-    <main id="app">
-      <!-- State views will be mounted here -->
+
+    <main id="app" aria-label="Project Data Feed Application">
+      <!-- Semantic UI views will be mounted here dynamically -->
     </main>
+
+    <aside id="demo-controls" class="demo-controls" aria-label="Interactive Simulation Controls">
+      <label for="simulate-error-checkbox">
+        <input type="checkbox" id="simulate-error-checkbox" />
+        <span>Simulate network outage on next fetch (test Error &amp; Retry flow)</span>
+      </label>
+      <span style="color: var(--text-muted); font-size: 0.8rem;">Vanilla JS &bull; Zero External Dependencies</span>
+    </aside>
   </div>
   <script type="module" src="./app.js"></script>
 </body>
