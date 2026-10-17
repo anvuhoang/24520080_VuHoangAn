@@ -324,6 +324,33 @@ export function mountApp(Component, container) {
 }
 
 /**
+ * Mounts or updates an application component into a container.
+ * Compatible with instructor verification suite contract:
+ * import { useState, renderApp } from './reactive-engine.js';
+ *
+ * @param {Function} [Component] - Root component function
+ * @param {HTMLElement} [container] - Target DOM container (defaults to #app)
+ * @returns {any} Rendered output
+ */
+export function renderApp(Component, container) {
+  if (Component) {
+    currentRenderer = Component;
+  }
+  if (container) {
+    currentContainer = container;
+    setupEventDelegation(container);
+  }
+  if (!currentContainer && typeof document !== "undefined") {
+    currentContainer = document.getElementById("app");
+    if (currentContainer) {
+      setupEventDelegation(currentContainer);
+    }
+  }
+
+  return triggerReRender();
+}
+
+/**
  * Custom useState hook with closure-bound slot binding.
  *
  * @param {any} initialValue - Default value or factory function for new slots
@@ -407,6 +434,7 @@ export default {
   setRenderer,
   triggerReRender,
   mountApp,
+  renderApp,
   useState,
   allocateSlot,
   clearStateStore
