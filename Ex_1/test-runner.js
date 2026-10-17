@@ -97,6 +97,9 @@ if (typeof document === "undefined") {
         fn(event);
       }
     }
+    click() {
+      this.dispatchEvent({ type: "click" });
+    }
   }
 
   const appRoot = new MockElement("div");
@@ -509,11 +512,17 @@ describe("Phase 2: renderToDOM() - Element Creation & Supported Props", () => {
     const vnode = createElement("button", { onClick: handler }, "Submit");
     const dom = renderToDOM(vnode);
 
-    // Trigger click event
-    dom.dispatchEvent({ type: "click" });
+    // Trigger click event across both browser DOM and mock DOM
+    if (typeof dom.click === "function") {
+      dom.click();
+    } else if (typeof Event !== "undefined") {
+      dom.dispatchEvent(new Event("click"));
+    } else {
+      dom.dispatchEvent({ type: "click" });
+    }
 
     assert(clicked, "onClick listener should have been invoked");
-    assertEqual(eventParam.type, "click");
+    assertEqual(eventParam?.type, "click");
   });
 
   it("should handle multiple props simultaneously (id, className, role, onClick)", () => {
@@ -530,7 +539,13 @@ describe("Phase 2: renderToDOM() - Element Creation & Supported Props", () => {
     assertEqual(dom.className, "btn primary");
     assertEqual(dom.getAttribute("role"), "button");
 
-    dom.dispatchEvent("click");
+    if (typeof dom.click === "function") {
+      dom.click();
+    } else if (typeof Event !== "undefined") {
+      dom.dispatchEvent(new Event("click"));
+    } else {
+      dom.dispatchEvent({ type: "click" });
+    }
     assert(clicked);
   });
 });
