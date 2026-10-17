@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab 2 - Exercise 2: Reactive Task Manager</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem;
+    }
+    header {
+      max-width: 720px;
+      margin: 0 auto 2rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+    }
+    h1 { font-size: 1.8rem; color: var(--accent); }
+    #app {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Exercise 2: Reactive Task Manager</h1>
+    <p style="color: var(--text-muted); font-size: 0.95rem;">Custom useState Closure Engine &amp; Root Event Delegation</p>
+  </header>
+  <main id="app">
+    <!-- Reactive application will be mounted here -->
+  </main>
+  <script type="module" src="./checkpoint2-verify.js"></script>
+</body>
+</html>
