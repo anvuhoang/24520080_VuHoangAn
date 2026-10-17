@@ -169,9 +169,141 @@ export function createElement(type, props, ...children) {
   return vnode;
 }
 
+// Disallowed dangerous attributes and properties
+const FORBIDDEN_PROPS = new Set([
+  "innerhtml",
+  "outerhtml",
+  "insertadjacenthtml",
+  "dangerouslysetinnerhtml"
+]);
+
+/**
+ * Applies properties and event listeners to a native DOM element securely.
+ *
+ * @param {HTMLElement} domElement
+ * @param {object} props
+ */
+function applyProps(domElement, props) {
+  if (!props || typeof props !== "object") return;
+
+  for (const [key, value] of Object.entries(props)) {
+    // Skip internal/structural props
+    if (key === "children" || key === "nodeValue") {
+      continue;
+    }
+
+    const lowerKey = key.toLowerCase();
+
+    // Security guard: forbid direct HTML injection properties
+    if (FORBIDDEN_PROPS.has(lowerKey)) {
+      throw new TypeError(`Forbidden property '${key}': direct HTML injection is strictly disallowed`);
+    }
+
+    // Security guard: reject javascript: protocol URIs in any attribute
+    if (typeof value === "string" && /^\s*javascript\s*:/i.test(value)) {
+      throw new Error(`Unsafe URI detected in attribute '${key}': javascript: URLs are rejected`);
+    }
+
+    // Event handlers (e.g. onClick, onKeyDown, etc.)
+    if (/^on[A-Z]/.test(key) || /^on[a-z]/.test(key)) {
+      if (typeof value !== "function") {
+        throw new TypeError(
+          `Event handler for '${key}' must be a function, but got ${typeof value}. Inline string handlers are forbidden.`
+        );
+      }
+      const eventName = key.slice(2).toLowerCase();
+      domElement.addEventListener(eventName, value);
+      continue;
+    }
+
+    // Explicitly handled standard attributes
+    if (key === "className" || key === "class") {
+      if (typeof value !== "string") {
+        throw new TypeError("className must be a string");
+      }
+      domElement.className = value;
+      domElement.setAttribute("class", value);
+    } else if (key === "id") {
+      if (typeof value !== "string") {
+        throw new TypeError("id must be a string");
+      }
+      domElement.id = value;
+      domElement.setAttribute("id", value);
+    } else if (key === "role") {
+      if (typeof value !== "string") {
+        throw new TypeError("role must be a string");
+      }
+      domElement.setAttribute("role", value);
+    } else if (typeof value === "boolean") {
+      if (value) {
+        domElement.setAttribute(key, "");
+      } else {
+        domElement.removeAttribute(key);
+      }
+    } else if (typeof value === "string" || typeof value === "number") {
+      domElement.setAttribute(key, String(value));
+    } else if (value === null || value === undefined) {
+      // Ignore null or undefined attribute values
+    } else {
+      throw new TypeError(`Unsupported prop value type for '${key}': ${typeof value}`);
+    }
+  }
+}
+
+/**
+ * Mounts a Virtual DOM tree to native DOM nodes recursively.
+ *
+ * @param {object} vnode - The Virtual DOM node to render
+ * @param {Node|null} [container=null] - Optional DOM container to append to
+ * @returns {Node} Created native DOM node (Element or Text)
+ * @throws {TypeError} if vnode or container is invalid
+ */
+export function renderToDOM(vnode, container = null) {
+  // 1. Validate VNode before rendering
+  if (!isValidVNode(vnode)) {
+    throw new TypeError("Invalid VNode: cannot render malformed or non-VNode object");
+  }
+
+  // 2. Validate container if provided
+  if (container !== null && container !== undefined) {
+    if (!container || typeof container.appendChild !== "function") {
+      throw new TypeError("Container must be a valid DOM node supporting appendChild");
+    }
+  }
+
+  let domNode;
+
+  // 3. Mount text or element node
+  if (vnode.type === TEXT_ELEMENT) {
+    // Use document.createTextNode to guarantee text is rendered inertly
+    domNode = document.createTextNode(vnode.props.nodeValue);
+  } else {
+    // Use document.createElement for elements
+    domNode = document.createElement(vnode.type);
+
+    // Apply attributes, styles, and event listeners safely
+    applyProps(domNode, vnode.props);
+
+    // Mount children recursively in exact order without extra wrappers
+    for (const child of vnode.props.children) {
+      const childDom = renderToDOM(child);
+      domNode.appendChild(childDom);
+    }
+  }
+
+  // 4. Mount to container if specified
+  if (container !== null && container !== undefined) {
+    container.appendChild(domNode);
+  }
+
+  return domNode;
+}
+
 export default {
   TEXT_ELEMENT,
   isValidVNode,
   createTextElement,
-  createElement
+  createElement,
+  renderToDOM
 };
+

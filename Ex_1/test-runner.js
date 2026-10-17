@@ -1,11 +1,91 @@
 /**
- * Test Runner for Exercise 1 - Phase 1 (createElement & VNode Factory)
+ * Test Runner for Exercise 1 - Phase 1 & Phase 2
  *
  * Runs seamlessly in both Node.js environment and browser.
  * Zero external dependencies.
  */
 
-import { createElement, createTextElement, isValidVNode, TEXT_ELEMENT } from "./mini-react.js";
+// Minimal mock DOM for Node.js test execution (when running outside browser)
+if (typeof document === "undefined") {
+  class MockNode {
+    constructor(nodeType, nodeName) {
+      this.nodeType = nodeType;
+      this.nodeName = nodeName;
+      this.childNodes = [];
+      this.parentNode = null;
+    }
+    appendChild(child) {
+      if (!child || !(child instanceof MockNode)) {
+        throw new TypeError("Failed to execute 'appendChild': parameter is not of type 'Node'.");
+      }
+      child.parentNode = this;
+      this.childNodes.push(child);
+      return child;
+    }
+    get children() {
+      return this.childNodes.filter(n => n.nodeType === 1);
+    }
+    get textContent() {
+      if (this.nodeType === 3) return this.nodeValue;
+      return this.childNodes.map(c => c.textContent).join("");
+    }
+  }
+
+  class MockTextNode extends MockNode {
+    constructor(text) {
+      super(3, "#text");
+      this.nodeValue = String(text);
+    }
+  }
+
+  class MockElement extends MockNode {
+    constructor(tagName) {
+      super(1, tagName.toUpperCase());
+      this.tagName = tagName.toUpperCase();
+      this.attributes = new Map();
+      this.listeners = new Map();
+      this.id = "";
+      this.className = "";
+      this.role = "";
+    }
+    setAttribute(name, value) {
+      this.attributes.set(name, String(value));
+      if (name === "id") this.id = String(value);
+      if (name === "class") this.className = String(value);
+      if (name === "role") this.role = String(value);
+    }
+    getAttribute(name) {
+      return this.attributes.get(name) || null;
+    }
+    removeAttribute(name) {
+      this.attributes.delete(name);
+    }
+    addEventListener(event, fn) {
+      if (!this.listeners.has(event)) {
+        this.listeners.set(event, []);
+      }
+      this.listeners.get(event).push(fn);
+    }
+    dispatchEvent(event) {
+      const type = typeof event === "string" ? event : event.type;
+      const list = this.listeners.get(type) || [];
+      for (const fn of list) {
+        fn(event);
+      }
+    }
+  }
+
+  globalThis.document = {
+    createElement(tag) {
+      return new MockElement(tag);
+    },
+    createTextNode(text) {
+      return new MockTextNode(text);
+    }
+  };
+}
+
+import { createElement, createTextElement, isValidVNode, TEXT_ELEMENT, renderToDOM } from "./mini-react.js";
 
 // Test suite state
 const suites = [];
@@ -65,7 +145,9 @@ function assertThrows(fn, expectedErrorType, message) {
   }
 }
 
-// --- Test Suites ---
+// ==========================================
+// Phase 1 Test Suites: VNode Factory
+// ==========================================
 
 describe("Phase 1: createTextElement()", () => {
   it("should create a valid text VNode for a string", () => {
@@ -132,8 +214,6 @@ describe("Phase 1: createElement() - Basic & Null Props", () => {
 describe("Phase 1: createElement() - No Input Mutation", () => {
   it("should never mutate the passed props object", () => {
     const inputProps = Object.freeze({ className: "btn", title: "Submit" });
-    // In strict mode or with frozen objects, attempting to mutate inputProps
-    // (such as adding inputProps.children) would throw. createElement must succeed.
     const vnode = createElement("button", inputProps, "Click me");
 
     assertEqual(vnode.props.className, "btn");
@@ -141,7 +221,6 @@ describe("Phase 1: createElement() - No Input Mutation", () => {
     assertEqual(vnode.props.children.length, 1);
     assert(!("children" in inputProps), "Caller's props object must not have 'children' added");
 
-    // Also verify with a regular mutable object
     const mutableProps = { a: 1, b: 2 };
     createElement("div", mutableProps, "test");
     assertEqual(Object.keys(mutableProps).length, 2);
@@ -255,23 +334,262 @@ describe("Phase 1: isValidVNode() Contract", () => {
     assert(!isValidVNode([]));
     assert(!isValidVNode({}));
     assert(!isValidVNode({ type: "" }));
-    assert(!isValidVNode({ type: "div" })); // missing props
-    assert(!isValidVNode({ type: "div", props: {} })); // missing props.children
-    assert(!isValidVNode({ type: TEXT_ELEMENT, props: { children: [] } })); // missing props.nodeValue
+    assert(!isValidVNode({ type: "div" }));
+    assert(!isValidVNode({ type: "div", props: {} }));
+    assert(!isValidVNode({ type: TEXT_ELEMENT, props: { children: [] } }));
   });
 });
 
-// --- Execution & Reporting ---
+// ==========================================
+// Phase 2 Test Suites: DOM Mounting Engine
+// ==========================================
+
+describe("Phase 2: renderToDOM() - Input Validation & Guards", () => {
+  it("should throw TypeError when called with null or undefined VNode", () => {
+    assertThrows(() => renderToDOM(null), TypeError);
+    assertThrows(() => renderToDOM(undefined), TypeError);
+  });
+
+  it("should throw TypeError when called with a primitive or non-object", () => {
+    assertThrows(() => renderToDOM("hello"), TypeError);
+    assertThrows(() => renderToDOM(123), TypeError);
+    assertThrows(() => renderToDOM(true), TypeError);
+  });
+
+  it("should throw TypeError on malformed VNode objects missing required schema", () => {
+    assertThrows(() => renderToDOM({ type: "div" }), TypeError);
+    assertThrows(() => renderToDOM({ type: "", props: { children: [] } }), TypeError);
+    assertThrows(() => renderToDOM({ type: "div", props: { children: "not-array" } }), TypeError);
+  });
+
+  it("should throw TypeError when container argument is not a valid DOM node", () => {
+    const vnode = createElement("div", null);
+    assertThrows(() => renderToDOM(vnode, "not-a-node"), TypeError);
+    assertThrows(() => renderToDOM(vnode, {}), TypeError);
+  });
+});
+
+describe("Phase 2: renderToDOM() - Text Node Rendering & XSS Security", () => {
+  it("should create a native Text node with document.createTextNode", () => {
+    const textVNode = createTextElement("Safe text content");
+    const domNode = renderToDOM(textVNode);
+
+    assertEqual(domNode.nodeType, 3); // 3 = Node.TEXT_NODE
+    assertEqual(domNode.nodeValue, "Safe text content");
+  });
+
+  it("should render '<script>alert(1)</script>' as inert text without executing or parsing HTML", () => {
+    const scriptPayload = "<script>alert(1)</script>";
+    const vnode = createElement("div", null, scriptPayload);
+    const dom = renderToDOM(vnode);
+
+    // Verify it contains a text node with literal script payload, not a script element
+    assertEqual(dom.childNodes.length, 1);
+    assertEqual(dom.childNodes[0].nodeType, 3);
+    assertEqual(dom.childNodes[0].nodeValue, scriptPayload);
+    assertEqual(dom.children.length, 0); // No HTML elements created inside
+  });
+
+  it("should render '<img onerror=alert(1)>' as inert text without creating an img element", () => {
+    const imgPayload = "<img src=x onerror=alert(1)>";
+    const vnode = createElement("p", null, imgPayload);
+    const dom = renderToDOM(vnode);
+
+    assertEqual(dom.childNodes.length, 1);
+    assertEqual(dom.childNodes[0].nodeType, 3);
+    assertEqual(dom.childNodes[0].nodeValue, imgPayload);
+    assertEqual(dom.children.length, 0); // No img element created
+  });
+
+  it("should correctly render numeric values (including 0) as text nodes", () => {
+    const vnode = createElement("span", null, 0);
+    const dom = renderToDOM(vnode);
+
+    assertEqual(dom.childNodes.length, 1);
+    assertEqual(dom.childNodes[0].nodeValue, "0");
+  });
+});
+
+describe("Phase 2: renderToDOM() - Element Creation & Supported Props", () => {
+  it("should create native element matching vnode type", () => {
+    const vnode = createElement("section", null);
+    const dom = renderToDOM(vnode);
+
+    assertEqual(dom.nodeType, 1); // 1 = Node.ELEMENT_NODE
+    assertEqual(dom.tagName.toLowerCase(), "section");
+  });
+
+  it("should set id property and attribute correctly", () => {
+    const vnode = createElement("div", { id: "user-profile" });
+    const dom = renderToDOM(vnode);
+
+    assertEqual(dom.id, "user-profile");
+    assertEqual(dom.getAttribute("id"), "user-profile");
+  });
+
+  it("should set className property and class attribute correctly", () => {
+    const vnode = createElement("div", { className: "card active highlighted" });
+    const dom = renderToDOM(vnode);
+
+    assertEqual(dom.className, "card active highlighted");
+    assertEqual(dom.getAttribute("class"), "card active highlighted");
+  });
+
+  it("should set role attribute for accessible semantic HTML", () => {
+    const vnode = createElement("div", { role: "alert", id: "notify" });
+    const dom = renderToDOM(vnode);
+
+    assertEqual(dom.getAttribute("role"), "alert");
+    assertEqual(dom.id, "notify");
+  });
+
+  it("should register onClick handler with addEventListener and trigger on click", () => {
+    let clicked = false;
+    let eventParam = null;
+
+    const handler = (evt) => {
+      clicked = true;
+      eventParam = evt;
+    };
+
+    const vnode = createElement("button", { onClick: handler }, "Submit");
+    const dom = renderToDOM(vnode);
+
+    // Trigger click event
+    dom.dispatchEvent({ type: "click" });
+
+    assert(clicked, "onClick listener should have been invoked");
+    assertEqual(eventParam.type, "click");
+  });
+
+  it("should handle multiple props simultaneously (id, className, role, onClick)", () => {
+    let clicked = false;
+    const vnode = createElement("button", {
+      id: "submit-btn",
+      className: "btn primary",
+      role: "button",
+      onClick: () => { clicked = true; }
+    }, "Save");
+
+    const dom = renderToDOM(vnode);
+    assertEqual(dom.id, "submit-btn");
+    assertEqual(dom.className, "btn primary");
+    assertEqual(dom.getAttribute("role"), "button");
+
+    dom.dispatchEvent("click");
+    assert(clicked);
+  });
+});
+
+describe("Phase 2: renderToDOM() - Security & Unsafe Attribute Rejection", () => {
+  it("should reject inline string event handlers with TypeError", () => {
+    const vnodeWithInline = {
+      type: "button",
+      props: { onClick: "alert(1)", children: [] },
+      children: []
+    };
+    assertThrows(() => renderToDOM(vnodeWithInline), TypeError);
+  });
+
+  it("should reject dangerous javascript: protocol URIs with Error", () => {
+    const vnodeWithJsUri = {
+      type: "a",
+      props: { href: "javascript:alert(1)", children: [] },
+      children: []
+    };
+    assertThrows(() => renderToDOM(vnodeWithJsUri), Error);
+  });
+
+  it("should reject innerHTML / dangerouslySetInnerHTML properties with TypeError", () => {
+    const vnodeWithInnerHTML = {
+      type: "div",
+      props: { innerHTML: "<span>pwned</span>", children: [] },
+      children: []
+    };
+    assertThrows(() => renderToDOM(vnodeWithInnerHTML), TypeError);
+
+    const vnodeWithDangerous = {
+      type: "div",
+      props: { dangerouslySetInnerHTML: { __html: "alert" }, children: [] },
+      children: []
+    };
+    assertThrows(() => renderToDOM(vnodeWithDangerous), TypeError);
+  });
+});
+
+describe("Phase 2: renderToDOM() - Semantic DOM Fidelity & Recursive Mounting", () => {
+  it("should recursively mount nested elements in order without extra wrappers", () => {
+    const vnode = createElement(
+      "article",
+      { id: "post-1" },
+      createElement("header", null, createElement("h2", null, "Article Title")),
+      createElement("section", { className: "content" }, createElement("p", null, "Article body paragraph")),
+      createElement("footer", null, createElement("small", null, "Published 2026"))
+    );
+
+    const dom = renderToDOM(vnode);
+
+    assertEqual(dom.tagName.toLowerCase(), "article");
+    assertEqual(dom.childNodes.length, 3);
+    assertEqual(dom.childNodes[0].tagName.toLowerCase(), "header");
+    assertEqual(dom.childNodes[1].tagName.toLowerCase(), "section");
+    assertEqual(dom.childNodes[2].tagName.toLowerCase(), "footer");
+
+    // Check header children
+    const header = dom.childNodes[0];
+    assertEqual(header.childNodes.length, 1);
+    assertEqual(header.childNodes[0].tagName.toLowerCase(), "h2");
+    assertEqual(header.childNodes[0].childNodes[0].nodeValue, "Article Title");
+
+    // Check section children
+    const section = dom.childNodes[1];
+    assertEqual(section.className, "content");
+    assertEqual(section.childNodes[0].tagName.toLowerCase(), "p");
+    assertEqual(section.childNodes[0].childNodes[0].nodeValue, "Article body paragraph");
+  });
+
+  it("should mount directly to container when provided", () => {
+    const container = document.createElement("div");
+    const vnode = createElement("span", { id: "child-span" }, "Mounted in container");
+
+    const returnedDom = renderToDOM(vnode, container);
+
+    assertEqual(container.childNodes.length, 1);
+    assertEqual(container.childNodes[0], returnedDom);
+    assertEqual(container.childNodes[0].id, "child-span");
+  });
+
+  it("should preserve semantic HTML elements without introducing div wrappers", () => {
+    const semanticVNode = createElement(
+      "nav",
+      { role: "navigation" },
+      createElement("ul", null,
+        createElement("li", null, createElement("a", { href: "/home" }, "Home")),
+        createElement("li", null, createElement("a", { href: "/about" }, "About"))
+      )
+    );
+
+    const dom = renderToDOM(semanticVNode);
+    assertEqual(dom.tagName.toLowerCase(), "nav");
+    assertEqual(dom.childNodes.length, 1);
+    assertEqual(dom.childNodes[0].tagName.toLowerCase(), "ul");
+    assertEqual(dom.childNodes[0].childNodes.length, 2);
+  });
+});
+
+// ==========================================
+// Execution & Reporting
+// ==========================================
 
 export async function runTests() {
   let passedCount = 0;
   let failedCount = 0;
   const results = [];
 
-  const isBrowser = typeof window !== "undefined" && typeof document !== "undefined";
+  const isBrowser = typeof window !== "undefined" && typeof document !== "undefined" && document.getElementById;
 
   console.log("\n=========================================");
-  console.log(" Mini-React Phase 1 Test Runner");
+  console.log(" Mini-React Phase 1 & Phase 2 Test Suite");
   console.log("=========================================\n");
 
   for (const suite of suites) {
@@ -335,6 +653,9 @@ export async function runTests() {
           const item = document.createElement("div");
           item.className = "test-item";
 
+          const row = document.createElement("div");
+          row.className = "test-row";
+
           const badge = document.createElement("span");
           badge.className = `badge ${t.passed ? "pass" : "fail"}`;
           badge.textContent = t.passed ? "PASS" : "FAIL";
@@ -342,8 +663,9 @@ export async function runTests() {
           const nameSpan = document.createElement("span");
           nameSpan.textContent = t.name;
 
-          item.appendChild(badge);
-          item.appendChild(nameSpan);
+          row.appendChild(badge);
+          row.appendChild(nameSpan);
+          item.appendChild(row);
 
           if (!t.passed && t.error) {
             const errDiv = document.createElement("div");
