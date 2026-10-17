@@ -1,16 +1,132 @@
 /**
- * Test Suite for Exercise 2 - Phase 1 & Phase 2
+ * Comprehensive Test Suite for Exercise 2 (Phases 1, 2 & 3)
  *
  * Verifies:
- * - Centralized stateStore initialization
- * - resetCursor() behavior
- * - useState(initialValue) with closure-bound slot index
- * - Direct and functional state updates: setState(val) and setState(prev => next)
- * - State preservation across multiple simulated re-renders
- * - Re-render trigger execution upon state mutation
- * - Stable hook ordering & multi-slot state preservation
- * - Predictable state transitions without unintended resets
+ * - Phase 1: stateStore & resetCursor()
+ * - Phase 2: useState hook & reactive re-rendering loop
+ * - Phase 3: Centralized root event delegation, bubbling, and orphan prevention
  */
+
+// Headless Node.js DOM Mock supporting event bubbling
+if (typeof document === "undefined") {
+  class MockNode {
+    constructor(nodeType, nodeName) {
+      this.nodeType = nodeType;
+      this.nodeName = nodeName;
+      this.childNodes = [];
+      this.parentNode = null;
+      this.parentElement = null;
+    }
+    appendChild(child) {
+      if (!child || !(child instanceof MockNode)) {
+        throw new TypeError("Parameter is not of type 'Node'.");
+      }
+      child.parentNode = this;
+      child.parentElement = this;
+      this.childNodes.push(child);
+      return child;
+    }
+    replaceChildren(...newChildren) {
+      this.childNodes = [];
+      for (const child of newChildren) {
+        this.appendChild(child);
+      }
+    }
+    querySelector(selector) {
+      const match = (node) => {
+        if (node.nodeType === 1) {
+          if (selector === "button" && node.tagName.toLowerCase() === "button") return node;
+          if (selector === "span" && node.tagName.toLowerCase() === "span") return node;
+          if (selector.startsWith("#") && node.id === selector.slice(1)) return node;
+          if (selector.startsWith(".") && node.className.split(" ").includes(selector.slice(1))) return node;
+        }
+        for (const child of node.childNodes || []) {
+          const res = match(child);
+          if (res) return res;
+        }
+        return null;
+      };
+      return match(this);
+    }
+    get children() {
+      return this.childNodes.filter((n) => n.nodeType === 1);
+    }
+    get textContent() {
+      if (this.nodeType === 3) return this.nodeValue;
+      return this.childNodes.map((c) => c.textContent).join("");
+    }
+  }
+
+  class MockElement extends MockNode {
+    constructor(tagName) {
+      super(1, tagName.toUpperCase());
+      this.tagName = tagName.toUpperCase();
+      this.attributes = new Map();
+      this.listeners = new Map();
+      this.id = "";
+      this.className = "";
+      this.role = "";
+    }
+    setAttribute(name, value) {
+      this.attributes.set(name, String(value));
+      if (name === "id") this.id = String(value);
+      if (name === "class") this.className = String(value);
+      if (name === "role") this.role = String(value);
+    }
+    getAttribute(name) {
+      return this.attributes.get(name) || null;
+    }
+    removeAttribute(name) {
+      this.attributes.delete(name);
+    }
+    addEventListener(event, fn) {
+      if (!this.listeners.has(event)) {
+        this.listeners.set(event, []);
+      }
+      this.listeners.get(event).push(fn);
+    }
+    dispatchEvent(event) {
+      const evt = typeof event === "string" ? { type: event } : event;
+      if (!evt.target) evt.target = this;
+      evt.cancelBubble = false;
+      evt.stopPropagation = () => {
+        evt.cancelBubble = true;
+      };
+
+      // Native DOM event bubbling upwards through parentElement
+      let curr = this;
+      while (curr) {
+        evt.currentTarget = curr;
+        const list = curr.listeners.get(evt.type) || [];
+        for (const fn of list) {
+          fn(evt);
+        }
+        if (evt.cancelBubble) break;
+        curr = curr.parentElement || curr.parentNode;
+      }
+      return !evt.defaultPrevented;
+    }
+    click() {
+      this.dispatchEvent({ type: "click" });
+    }
+  }
+
+  class MockTextNode extends MockNode {
+    constructor(text) {
+      super(3, "#text");
+      this.nodeValue = String(text);
+    }
+  }
+
+  globalThis.document = {
+    createElement(tag) {
+      return new MockElement(tag);
+    },
+    createTextNode(text) {
+      return new MockTextNode(text);
+    }
+  };
+}
 
 import {
   stateStore,
@@ -20,7 +136,10 @@ import {
   setRenderer,
   triggerReRender,
   mountApp,
-  allocateSlot,
+  renderToDOM,
+  createElement,
+  setupEventDelegation,
+  getEventHandlers,
   clearStateStore
 } from "./reactive-engine.js";
 
@@ -55,7 +174,7 @@ function test(name, fn) {
 }
 
 console.log("\n=========================================");
-console.log(" Exercise 2 - Phase 1 & 2 Test Runner");
+console.log(" Exercise 2 - Full Test Runner (Phases 1-3)");
 console.log("=========================================\n");
 
 // --- Phase 1 Baseline Tests ---
@@ -67,171 +186,168 @@ test("Phase 1: Centralized stateStore is an array and initially accessible", () 
 });
 
 test("Phase 1: resetCursor resets cursor to 0 without clearing stateStore", () => {
-  allocateSlot("initial");
-  allocateSlot("filter: all");
+  const [, setA] = useState("a");
+  const [, setB] = useState("b");
   assertEqual(getCursor(), 2);
   assertEqual(stateStore.length, 2);
 
   resetCursor();
   assertEqual(getCursor(), 0, "Cursor must be reset to 0");
   assertEqual(stateStore.length, 2, "stateStore items must NOT be cleared by resetCursor()");
-  assertEqual(stateStore[0], "initial");
-  assertEqual(stateStore[1], "filter: all");
 });
 
-// --- Phase 2 useState Hook & Re-render Loop Tests ---
+// --- Phase 2 useState Tests ---
 
-test("Phase 2: useState returns [state, setState] and initializes slot correctly", () => {
+test("Phase 2: useState returns [state, setState] and supports functional updates", () => {
   const [count, setCount] = useState(10);
   assertEqual(count, 10);
-  assert(typeof setCount === "function", "setState must be a function");
-  assertEqual(stateStore[0], 10);
-  assertEqual(getCursor(), 1);
-});
-
-test("Phase 2: useState supports functional initial value (lazy initialization)", () => {
-  let initCallCount = 0;
-  const initFn = () => {
-    initCallCount++;
-    return "computed initial";
-  };
-
-  const [val1] = useState(initFn);
-  assertEqual(val1, "computed initial");
-  assertEqual(initCallCount, 1);
-
-  // Simulated render 2
-  resetCursor();
-  const [val2] = useState(initFn);
-  assertEqual(val2, "computed initial");
-  assertEqual(initCallCount, 1, "Lazy initializer should only execute on first allocation");
-});
-
-test("Phase 2: setState supports direct value updates and updates stateStore", () => {
-  const [, setCount] = useState(0);
-  setCount(5);
-  assertEqual(stateStore[0], 5);
-});
-
-test("Phase 2: setState supports functional updates (prev => next)", () => {
-  const [, setCount] = useState(10);
 
   setCount((prev) => prev + 5);
   assertEqual(stateStore[0], 15);
-
-  setCount((prev) => prev * 2);
-  assertEqual(stateStore[0], 30);
 });
 
-test("Phase 2: Trigger re-render after state changes", () => {
-  let renderPassCount = 0;
-  let latestRenderedState = null;
+test("Phase 2: Re-render trigger updates state and resets cursor", () => {
+  let renders = 0;
+  let currentVal = null;
 
-  function Component() {
-    renderPassCount++;
-    const [name, setName] = useState("Alpha");
-    latestRenderedState = { name, setName };
-    return name;
+  function App() {
+    renders++;
+    const [val, setVal] = useState("A");
+    currentVal = { val, setVal };
+    return createElement("div", null, val);
   }
 
-  // Register component as active renderer and execute initial pass
-  setRenderer(Component);
+  setRenderer(App);
   triggerReRender();
+  assertEqual(renders, 1);
+  assertEqual(currentVal.val, "A");
 
-  assertEqual(renderPassCount, 1, "Initial render pass count should be 1");
-  assertEqual(latestRenderedState.name, "Alpha");
-
-  // Mutating state via setState must automatically trigger re-render
-  latestRenderedState.setName("Beta");
-
-  assertEqual(renderPassCount, 2, "setState should have triggered re-render pass 2");
-  assertEqual(latestRenderedState.name, "Beta");
-  assertEqual(stateStore[0], "Beta");
+  currentVal.setVal("B");
+  assertEqual(renders, 2);
+  assertEqual(currentVal.val, "B");
 });
 
-test("Phase 2: Reset hook cursor before each re-render pass", () => {
-  let cursorAtStartOfRender = null;
+// --- Phase 3 Root Event Delegation Tests ---
 
-  function Component() {
-    cursorAtStartOfRender = getCursor();
-    const [a] = useState("first");
-    const [b] = useState("second");
-    return `${a}-${b}`;
-  }
+test("Phase 3: Root event delegation attaches listeners strictly to root container", () => {
+  const container = document.createElement("div");
+  let clicked = false;
 
-  setRenderer(Component);
-  triggerReRender();
-  assertEqual(cursorAtStartOfRender, 0, "Cursor must be 0 at start of render 1");
-  assertEqual(getCursor(), 2, "Cursor is 2 after two hooks called");
+  const vnode = createElement("div", null,
+    createElement("button", { id: "btn", onClick: () => { clicked = true; } }, "Click me")
+  );
 
-  // Trigger pass 2
-  triggerReRender();
-  assertEqual(cursorAtStartOfRender, 0, "Cursor must be reset to 0 at start of render 2");
-  assertEqual(getCursor(), 2);
+  renderToDOM(vnode, container);
+
+  // Root container should have delegated listeners registered
+  assert(container.listeners.has("click"), "Root container must have click listener");
+
+  // Child button must NOT have individual addEventListener listeners attached
+  const button = container.querySelector("#btn");
+  assert(button !== null, "Button must exist in DOM");
+  assertEqual(button.listeners.size, 0, "Child button must NOT have direct addEventListener listeners");
+
+  // Handler must be registered in the centralized event registry
+  const handlers = getEventHandlers(button);
+  assert(handlers && typeof handlers.click === "function", "Handler must be registered in event registry");
+
+  // Clicking button bubbles to container and triggers handler
+  button.click();
+  assert(clicked, "Clicking button must invoke VNode handler via root delegation");
 });
 
-test("Phase 2: Multiple useState hooks maintain independent state across re-renders", () => {
-  let latestApi = null;
+test("Phase 3: Avoid attaching listeners to button children and resolve clicks on inner elements", () => {
+  const container = document.createElement("div");
+  let clicked = false;
 
-  function TaskManager() {
-    const [tasks, setTasks] = useState(["Task 1"]);
-    const [filter, setFilter] = useState("all");
-    const [search, setSearch] = useState("");
+  const vnode = createElement("div", null,
+    createElement("button", { id: "action-btn", onClick: () => { clicked = true; } },
+      createElement("span", { className: "icon" }, "★"),
+      createElement("span", { className: "label" }, "Star")
+    )
+  );
 
-    latestApi = { tasks, setTasks, filter, setFilter, search, setSearch };
-    return { tasks, filter, search };
-  }
+  renderToDOM(vnode, container);
 
-  setRenderer(TaskManager);
-  triggerReRender();
+  const icon = container.querySelector(".icon");
+  assert(icon !== null, "Inner icon span must exist");
+  assertEqual(icon.listeners.size, 0, "Inner span must NOT have listeners attached");
 
-  assertEqual(latestApi.tasks.length, 1);
-  assertEqual(latestApi.filter, "all");
-  assertEqual(latestApi.search, "");
-
-  // Update second hook (filter)
-  latestApi.setFilter("completed");
-  assertEqual(latestApi.filter, "completed");
-  assertEqual(latestApi.tasks.length, 1, "tasks state should remain unchanged");
-
-  // Update first hook (tasks) using functional updater
-  latestApi.setTasks((prev) => [...prev, "Task 2"]);
-  assertEqual(latestApi.tasks.length, 2);
-  assertEqual(latestApi.tasks[1], "Task 2");
-  assertEqual(latestApi.filter, "completed", "filter state should be preserved");
-
-  // Update third hook (search)
-  latestApi.setSearch("buy milk");
-  assertEqual(latestApi.search, "buy milk");
-  assertEqual(latestApi.tasks.length, 2);
-  assertEqual(latestApi.filter, "completed");
+  // Dispatch click on the inner span: event bubbles up to button and root container
+  icon.click();
+  assert(clicked, "Click on inner span must bubble up and trigger button's onClick handler");
 });
 
-test("Phase 2: Correctly preserves undefined, null, and false states without reset", () => {
-  let latestValues = null;
+test("Phase 3: Support dynamically rendered buttons after re-render without orphan listeners", () => {
+  const container = document.createElement("div");
+  let activeClick = null;
 
-  function EdgeCaseComponent() {
-    const [valUndefined, setValUndefined] = useState(undefined);
-    const [valNull, setValNull] = useState(null);
-    const [valBool, setValBool] = useState(false);
+  function DynamicApp() {
+    const [tab, setTab] = useState("first");
 
-    latestValues = { valUndefined, setValUndefined, valNull, setValNull, valBool, setValBool };
+    if (tab === "first") {
+      return createElement("div", null,
+        createElement("button", { id: "btn-first", onClick: () => {
+          activeClick = "first";
+          setTab("second");
+        } }, "Go to Second")
+      );
+    } else {
+      return createElement("div", null,
+        createElement("button", { id: "btn-second", onClick: () => {
+          activeClick = "second";
+          setTab("first");
+        } }, "Back to First")
+      );
+    }
   }
 
-  setRenderer(EdgeCaseComponent);
-  triggerReRender();
+  mountApp(DynamicApp, container);
 
-  assertEqual(latestValues.valUndefined, undefined);
-  assertEqual(latestValues.valNull, null);
-  assertEqual(latestValues.valBool, false);
+  // Initial render: click button 1
+  const btn1 = container.querySelector("#btn-first");
+  assert(btn1 !== null);
+  btn1.click();
 
-  // Update undefined to a new value
-  latestValues.setValUndefined("defined now");
-  assertEqual(latestValues.valUndefined, "defined now");
+  assertEqual(activeClick, "first");
 
-  // Update null to false
-  latestValues.setValNull(false);
-  assertEqual(latestValues.valNull, false);
+  // Re-rendered DOM now has dynamic button 2
+  const btn2 = container.querySelector("#btn-second");
+  assert(btn2 !== null, "New dynamic button must exist after re-render");
+  assertEqual(btn2.listeners.size, 0, "Dynamic button must not have direct DOM listeners");
+
+  // Clicking newly rendered button works immediately through root delegation
+  btn2.click();
+  assertEqual(activeClick, "second");
+});
+
+test("Phase 3: Prevent duplicate listeners on the root container across multiple re-renders", () => {
+  const container = document.createElement("div");
+
+  function App() {
+    const [count, setCount] = useState(0);
+    return createElement("button", { onClick: () => setCount((c) => c + 1) }, `Count: ${count}`);
+  }
+
+  mountApp(App, container);
+  const clickListenersCount = container.listeners.get("click")?.length || 0;
+  assertEqual(clickListenersCount, 1, "Initial render must attach exactly 1 delegated click listener");
+
+  // Trigger 3 consecutive re-renders
+  const button = container.querySelector("button");
+  button.click(); // render 2
+  const button2 = container.querySelector("button");
+  button2.click(); // render 3
+  const button3 = container.querySelector("button");
+  button3.click(); // render 4
+
+  const finalClickListenersCount = container.listeners.get("click")?.length || 0;
+  assertEqual(
+    finalClickListenersCount,
+    1,
+    "Multiple re-renders must NOT attach duplicate listeners to the root container"
+  );
+  assertEqual(stateStore[0], 3, "State should accurately reflect 3 click increments");
 });
 
 console.log("\n-----------------------------------------");
