@@ -22,6 +22,30 @@ if (typeof document === "undefined") {
       this.childNodes.push(child);
       return child;
     }
+    replaceChildren(...newChildren) {
+      this.childNodes = [];
+      for (const child of newChildren) {
+        this.appendChild(child);
+      }
+    }
+    querySelector(selector) {
+      const match = (node) => {
+        if (node.nodeType === 1) {
+          if (selector === "button" && node.tagName.toLowerCase() === "button") return node;
+          if (selector === "img" && node.tagName.toLowerCase() === "img") return node;
+          if (selector === "h1" && node.tagName.toLowerCase() === "h1") return node;
+          if (selector === "p" && node.tagName.toLowerCase() === "p") return node;
+          if (selector.startsWith("#") && node.id === selector.slice(1)) return node;
+          if (selector.startsWith(".") && node.className.split(" ").includes(selector.slice(1))) return node;
+        }
+        for (const child of node.childNodes || []) {
+          const res = match(child);
+          if (res) return res;
+        }
+        return null;
+      };
+      return match(this);
+    }
     get children() {
       return this.childNodes.filter(n => n.nodeType === 1);
     }
@@ -75,17 +99,47 @@ if (typeof document === "undefined") {
     }
   }
 
+  const appRoot = new MockElement("div");
+  appRoot.id = "app";
+
   globalThis.document = {
     createElement(tag) {
       return new MockElement(tag);
     },
     createTextNode(text) {
       return new MockTextNode(text);
+    },
+    getElementById(id) {
+      if (id === "app") return appRoot;
+      return null;
     }
   };
 }
 
 import { createElement, createTextElement, isValidVNode, TEXT_ELEMENT, renderToDOM } from "./mini-react.js";
+
+// ==========================================
+// Checkpoint 1 Verification Test Suite:
+// (Provided by instructor)
+// ==========================================
+const vApp = createElement(
+  'main',
+  { id: 'root-view', role: 'main' },
+  createElement(
+    'header',
+    { className: 'hero' },
+    createElement('h1', null, 'Mini React Engine'),
+    createElement('p', null, '<img onerror=alert(1)> Safe Text')
+  ),
+  createElement('button', { onClick: () => console.log('Ping') }, 'Click')
+);
+
+const root = document.getElementById('app');
+if (root) {
+  root.replaceChildren(renderToDOM(vApp));
+  console.assert(root.querySelector('button') !== null, 'Mount failed');
+  console.log('[Checkpoint 1] root.querySelector("button") !== null: Assertion Passed');
+}
 
 // Test suite state
 const suites = [];
