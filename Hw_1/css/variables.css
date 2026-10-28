@@ -1,0 +1,13 @@
+:root {
+  --bg-primary: #0f172a;
+  --bg-surface: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: #334155;
+  --accent-color: #38bdf8;
+  --focus-ring: #22d3ee;
+  
+  /* Đảm bảo độ tương phản màu sắc đạt >= 4.5:1 theo chuẩn WCAG 2.2 AA */
+  --contrast-check-bg: #1e293b; 
+  --contrast-check-text: #f8fafc; /* Tỉ lệ tương phản > 10:1 */
+}

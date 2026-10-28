@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HW 1: Production Enterprise Data-Grid (WCAG 2.2 AA)</title>
+  <link rel="stylesheet" href="./css/datagrid.css">
+</head>
+<body style="background-color: var(--bg-primary); color: var(--text-main); padding: 2rem; font-family: sans-serif;">
+
+  <main>
+    <h1>HW 1: Production Enterprise Data-Grid (WCAG 2.2 AA)</h1>
+    <p>Bảng dữ liệu công nghiệp chuẩn semantic HTML, hỗ trợ bàn phím đầy đủ và đạt chuẩn Accessibility[cite: 1].</p>
+    
+    <!-- Vùng chứa DataGrid Component -->
+    <div id="grid-root"></div>
+  </main>
+
+  <script type="module">
+    import { DataGrid } from './js/datagrid.js';
+
+    // Dữ liệu mẫu giả định
+    const sampleData = [
+      { id: 1, name: 'Nguyễn Văn A', role: 'Developer', department: 'Engineering', status: 'Active' },
+      { id: 2, name: 'Trần Thị B', role: 'Designer', department: 'UI/UX', status: 'Pending' },
+      { id: 3, name: 'Lê Văn C', role: 'Manager', department: 'Product', status: 'Active' },
+      { id: 4, name: 'Phạm Thị D', role: 'QA Engineer', department: 'Testing', status: 'Inactive' },
+      { id: 5, name: 'Hoàng Văn E', role: 'DevOps', department: 'Infrastructure', status: 'Active' },
+      { id: 6, name: 'Vũ Thị F', role: 'HR Specialist', department: 'Human Resources', status: 'Active' }
+    ];
+
+    const sampleColumns = [
+      { header: 'ID', accessorKey: 'id', sortable: true },
+      { header: 'Họ và tên', accessorKey: 'name', sortable: true },
+      { header: 'Chức vụ', accessorKey: 'role', sortable: true },
+      { header: 'Phòng ban', accessorKey: 'department', sortable: true },
+      { header: 'Trạng thái', accessorKey: 'status', sortable: false }
+    ];
+
+    // Khởi tạo DataGrid
+    new DataGrid({
+      container: document.getElementById('grid-root'),
+      data: sampleData,
+      columns: sampleColumns,
+      ariaLabel: 'Bảng danh sách nhân viên doanh nghiệp',
+      onRowSelect: (row) => {
+        console.log('Đã chọn dòng:', row);
+        alert(`Bạn đã chọn nhân viên: ${row.name} (${row.role})`);
+      }
+    });
+  </script>
+
+</body>
+</html>

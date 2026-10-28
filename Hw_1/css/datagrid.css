@@ -1,0 +1,60 @@
+@import url('./variables.css');
+
+.datagrid-container {
+  width: 100%;
+  overflow-x: auto;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.enterprise-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  color: var(--text-main);
+  font-family: inherit;
+}
+
+.enterprise-table th,
+.enterprise-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.enterprise-table th {
+  background-color: var(--bg-primary);
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Đảm bảo focus rõ ràng phục vụ Keyboard Navigation (WCAG 2.2 AA) */
+.enterprise-table td:focus,
+.enterprise-table th:focus {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+  background-color: rgba(56, 189, 248, 0.1);
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  color: var(--text-muted);
+}
+
+.pagination-controls button {
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination-controls button:hover {
+  background-color: var(--border-color);
+}
