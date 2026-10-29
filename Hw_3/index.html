@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="description" content="A flash-sale engine under peak load: a drift-free countdown, an optimistic inventory lock, and live reservation timers." />
+    <title>Flash Sale Simulator</title>
+    <link rel="stylesheet" href="css/dashboard.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to the dashboard</a>
+
+    <header class="topbar">
+      <div class="brand">
+        <h1>Siêu Sale 11.11</h1>
+        <p>Flash-sale engine · peak-load simulation</p>
+      </div>
+      <div class="chips" role="group" aria-label="Status">
+        <span class="chip" id="phase-chip" data-state="idle">Not started</span>
+        <span class="chip" id="audit-chip" data-state="idle">Stock audit: waiting</span>
+      </div>
+    </header>
+
+    <main id="main" class="layout">
+      <section class="card hero" aria-labelledby="clock-heading">
+        <h2 id="clock-heading">Countdown</h2>
+        <p class="clock-label" id="clock-label">Sale opens in</p>
+        <p class="clock" id="countdown" role="timer" aria-live="off" aria-label="Sale countdown">--:--:--.---</p>
+        <p class="muted" id="countdown-note">Press “Start simulation” to schedule a sale.</p>
+
+        <div class="skew">
+          <div class="field">
+            <label for="skew">Your device clock</label>
+            <select id="skew">
+              <option value="0">Accurate</option>
+              <option value="3000">3 s fast</option>
+              <option value="-3000">3 s slow</option>
+              <option value="8000">8 s fast</option>
+            </select>
+          </div>
+          <button type="button" class="btn" id="sync" disabled>Sync with server</button>
+        </div>
+        <p class="muted" id="offset-note">The countdown runs on your device clock. Skew it to see the server keep the sale closed.</p>
+      </section>
+
+      <section class="card controls" aria-labelledby="controls-heading">
+        <h2 id="controls-heading">Simulation</h2>
+        <form id="config" novalidate>
+          <div class="field">
+            <label for="profile">Traffic pattern</label>
+            <select id="profile" name="profile"></select>
+          </div>
+          <div class="field">
+            <label for="buyers">Virtual buyers</label>
+            <input id="buyers" name="buyers" type="number" inputmode="numeric" min="100" max="20000" step="100" value="5000" />
+          </div>
+          <div class="field">
+            <label for="starts-in">Opens in (seconds)</label>
+            <input id="starts-in" name="startsIn" type="number" inputmode="numeric" min="3" max="120" value="10" />
+          </div>
+          <div class="field">
+            <label for="duration">Sale length (seconds)</label>
+            <input id="duration" name="duration" type="number" inputmode="numeric" min="15" max="600" value="90" />
+          </div>
+          <div class="field">
+            <label for="hold">Hold time (seconds)</label>
+            <input id="hold" name="hold" type="number" inputmode="numeric" min="5" max="120" value="20" />
+          </div>
+          <div class="field">
+            <label for="seed">Random seed</label>
+            <input id="seed" name="seed" type="number" inputmode="numeric" min="0" max="999999" value="1111" />
+          </div>
+          <div class="actions">
+            <button type="submit" class="btn primary" id="start">Start simulation</button>
+            <button type="button" class="btn" id="stop" disabled>Stop and reset</button>
+          </div>
+          <p class="error" id="form-error" role="alert" hidden></p>
+        </form>
+        <p class="muted" id="profile-note"></p>
+      </section>
+
+      <section class="products" aria-labelledby="products-heading">
+        <h2 id="products-heading">Flash deals</h2>
+        <div class="product-grid" id="products"></div>
+        <div class="field inline">
+          <input id="optimistic" type="checkbox" checked />
+          <label for="optimistic">Optimistic lock: send the stock version I saw when I click “Buy now”</label>
+        </div>
+      </section>
+
+      <section class="card holds-card" aria-labelledby="holds-heading">
+        <h2 id="holds-heading">Reservation timers</h2>
+        <h3>Your holds</h3>
+        <ul class="holds" id="my-holds" aria-live="polite"></ul>
+        <p class="muted" id="my-holds-empty">You have no active holds. Buy a deal to start a timer.</p>
+        <h3>Next to expire, all buyers <span class="muted" id="all-holds-count"></span></h3>
+        <ul class="holds compact" id="other-holds"></ul>
+        <p class="muted" id="other-holds-empty">No active holds.</p>
+      </section>
+
+      <section class="card traffic-card" aria-labelledby="traffic-heading">
+        <h2 id="traffic-heading">Live traffic</h2>
+        <dl class="metrics" id="metrics"></dl>
+        <h3>Buyers by market</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Market</th>
+                <th scope="col" class="num">Buyers</th>
+                <th scope="col" class="num">Holds</th>
+                <th scope="col" class="num">Paid</th>
+              </tr>
+            </thead>
+            <tbody id="regions"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card wide" aria-labelledby="log-heading">
+        <h2 id="log-heading">Activity</h2>
+        <ol class="log" id="log" aria-live="polite" aria-relevant="additions"></ol>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        The sale phase is decided by the server clock. The countdown is only a display. Stock is changed in one
+        synchronous step, so it cannot oversell. Reload to start over.
+      </p>
+    </footer>
+
+    <template id="product-template">
+      <article class="card product">
+        <header>
+          <h3 class="p-name"></h3>
+          <p class="p-price"></p>
+        </header>
+        <div class="stockbar" role="img">
+          <span class="seg sold"></span>
+          <span class="seg held"></span>
+          <span class="seg avail"></span>
+        </div>
+        <dl class="stock-nums">
+          <div><dt>Available</dt><dd class="n-avail"></dd></div>
+          <div><dt>Held</dt><dd class="n-held"></dd></div>
+          <div><dt>Sold</dt><dd class="n-sold"></dd></div>
+        </dl>
+        <p class="muted p-meta"></p>
+        <button type="button" class="btn primary buy"></button>
+      </article>
+    </template>
+
+    <template id="hold-template">
+      <li class="hold">
+        <div class="h-main">
+          <strong class="h-name"></strong>
+          <span class="h-qty"></span>
+          <span class="badge h-state"></span>
+        </div>
+        <div class="h-time">
+          <span class="h-timer"></span>
+          <span class="h-bar" aria-hidden="true"><span class="h-fill"></span></span>
+        </div>
+        <div class="h-actions">
+          <button type="button" class="btn" data-action="checkout">Checkout</button>
+          <button type="button" class="btn primary" data-action="pay">Pay now</button>
+          <button type="button" class="btn" data-action="cancel">Cancel</button>
+        </div>
+      </li>
+    </template>
+
+    <script type="module" src="js/dashboard.js"></script>
+  </body>
+</html>

@@ -1,38 +1,3 @@
-/**
- * Anti-drift countdown timer for the Vietnam mega-sale scenario (11.11 midnight flash sale).
- *
- * Why this does not drift
- * -----------------------
- * A `setInterval` countdown subtracts a fixed step on every tick. Every late, coalesced or
- * skipped tick is lost for good, so the error only grows. This timer never accumulates.
- * Each sample computes `remaining = targetTime - now()` from an absolute target, so the
- * value is as accurate as the clock at the moment of the sample, however late the frame ran.
- *
- * Background tabs
- * ---------------
- * `requestAnimationFrame` pauses in a hidden tab. Nothing is lost, because the next sample
- * after the tab returns is computed from the absolute target. Two extra safeguards:
- *   1. A `visibilitychange` listener samples immediately when the tab becomes visible, so
- *      the display is correct before the next frame.
- *   2. One drift-corrected `setTimeout` is armed for the exact remaining time, so the
- *      completion callback still fires while the tab is hidden. Browsers may delay it;
- *      `lateByMs` on the completion event reports how late it actually was.
- *
- * Accuracy
- * --------
- * Samples are exact to the millisecond relative to the clock they read. The clock is
- * `Date.now()` by default, so accuracy against the real world is bounded by the device clock.
- * `calibrate()` removes a constant device-to-server offset (error up to half the round trip).
- * `Date.now()` is not monotonic: if the user changes the device clock, the countdown follows it.
- * Frames arrive at the display rate (about 16.7 ms at 60 Hz); values are exact at each frame.
- *
- * Ownership: the timer owns its frame request, its fallback timeout and its visibility
- * listener. `stop()`, completion and `dispose()` release all three.
- *
- * Time is injected (`now`, `requestFrame`, `setTimer`, ...) so the module runs in Node
- * and can be tested with a fake clock. The defaults use the browser globals.
- */
-
 /** Vietnam uses a fixed UTC+7 offset with no daylight saving. */
 export const VIETNAM_UTC_OFFSET_MINUTES = 7 * 60;
 
@@ -300,7 +265,9 @@ export class AntiDriftTimer {
     this.#listen();
     this.#sample(true);
     if (!this.#running) return;
-    this.#scheduleFrame();
+    // An `onComplete` handler may have restarted the timer during the first sample. Do not
+    // start a second frame loop in that case.
+    if (this.#frameId === null) this.#scheduleFrame();
     this.#armTimeout();
   }
 

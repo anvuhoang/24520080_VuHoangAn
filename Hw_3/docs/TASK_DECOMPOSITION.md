@@ -53,15 +53,15 @@ Every milestone is judged against these invariants. They are checked by code (`c
 | Milestone | Name | Exit Criteria | Status | Evidence |
 |---|---|---|---|---|
 | M0 | Workspace & Governance | Docs in place, stack confirmed, folder layout created | [ ] | |
-| M1 | Domain Contracts & Invariant Checker | Types documented, `checkInvariants` implemented, invariant tests written | [ ] | |
-| M2 | Atomic Inventory Core | I-1 to I-3 hold under exhaustive interleavings of N buyers | [ ] | |
-| M3 | Reservations & Expiry | I-4, I-5 hold; expiry driven by an injected clock | [ ] | |
-| M4 | Idempotency & Purchase Limits | I-6, I-7 hold under duplicate and concurrent retries | [ ] | |
+| M1 | Domain Contracts & Invariant Checker | Types documented, `checkInvariants` implemented, invariant tests written | [~] Implemented for the inventory FSM; awaiting Human Lead sign-off | `js/inventory-fsm.js` (contracts; checker for I-1 to I-4 and I-7); `test/inventory-fsm.test.js` |
+| M2 | Atomic Inventory Core | I-1 to I-3 hold under exhaustive interleavings of N buyers | [~] Implemented; awaiting Human Lead sign-off | All 90 interleavings of 3 buyers and 2 units; 20 seeded races of 60 buyers; 19 of 19 planted defects caught (PL-003) |
+| M3 | Reservations & Expiry | I-4, I-5 hold; expiry driven by an injected clock | [~] Implemented; awaiting Human Lead sign-off | Lazy, swept and timer-driven expiry; checkout window; boundary and zombie-commit tests (PL-003) |
+| M4 | Idempotency & Purchase Limits | I-6, I-7 hold under duplicate and concurrent retries | [~] Partly implemented (reserve only); awaiting Human Lead sign-off | 100 concurrent identical requests give one effect; per-buyer limit across holds and sold units (PL-003) |
 | M5 | Admission Control & Fairness | I-8, I-9 hold; bounded queue, backpressure, rate limit | [ ] | |
 | M6 | Failure Injection & Recovery | I-12 holds; every injected failure ends in a consistent state | [ ] | |
 | M7 | Ledger & Audit Framework | I-10, I-11 hold; replay, tamper and reconciliation audits pass | [ ] | |
-| M8 | Load Simulation & Metrics | Oversell = 0 across seeded runs; baseline throughput and latency recorded | [ ] | |
-| M9 | Demo UI & Accessibility | Live stock, queue position and order status; WCAG 2.2 AA | [ ] | |
+| M8 | Load Simulation & Metrics | Oversell = 0 across seeded runs; baseline throughput and latency recorded | [~] Simulator and live metrics implemented; no baseline recorded; awaiting Human Lead sign-off | `js/traffic-simulator.js`; `test/traffic-simulator.test.js`; browser run (PL-004) |
+| M9 | Demo UI & Accessibility | Live stock, queue position and order status; WCAG 2.2 AA | [~] Dashboard implemented and exercised in a real browser; contrast, Lighthouse and queue position not done; awaiting Human Lead sign-off | `index.html`; `css/dashboard.css`; `js/dashboard.js`; `js/flash-sale-engine.js` (PL-004) |
 | M10 | Final Audit & Review | All audits pass; open findings closed or accepted; demo recorded | [ ] | |
 
 ---
@@ -74,33 +74,34 @@ Every milestone is judged against these invariants. They are checked by code (`c
 - [ ] List the tree and record it as the baseline in `PROMPT_LOG.md` (`PROJECT_RULE.md` §5.2).
 
 ## Phase 2: Domain Contracts & Invariant Checker (M1)
-- [ ] Document with JSDoc: `Sku`, `StockRecord`, `Reservation`, `Order`, `Request`, `Outcome`, `LedgerEntry`, `EngineOptions`.
-- [ ] Define closed state sets: reservation (`active | committed | released | expired`), order (`pending | paid | failed | refunded`), engine (`IDLE | RUNNING | DRAINING | DISPOSED`).
-- [ ] Define typed errors: `OutOfStockError`, `LimitExceededError`, `ReservationExpiredError`, `QueueFullError`, `RateLimitedError`, `DuplicateRequestError`, `InvariantViolationError`.
-- [ ] Implement `checkInvariants(state, ledger)` returning every violation with its invariant ID.
-- [ ] Write the invariant tests first, against hand-built valid and invalid states.
-- [ ] Inject the clock, the ID generator and the random source. The core never calls `Date.now()` or `Math.random()`.
+- [~] Document contracts with JSDoc. Done in `js/inventory-fsm.js` for `ReservationView`, `StockSnapshot`, `ReserveRequest`, `Result`, `JournalEntry`, `InventoryFsmOptions` and `ExportedState`. Not yet: `Order`, a ledger entry with a hash, and the engine-level request type.
+- [~] Define closed state sets. Done for reservations: `HELD | CHECKOUT | CONFIRMED | RELEASED | EXPIRED`, with an exported, frozen transition table. The plan's `active | committed | released | expired` became these five names, adding `CHECKOUT` for the payment window. Not yet: order and engine states.
+- [~] Define typed errors. Done: `OutOfStockError`, `LimitExceededError`, `ReservationExpiredError`, `VersionConflictError`, `InvalidTransitionError`, `UnknownSkuError`, `UnknownReservationError`, `IdempotencyConflictError`. Not yet: `QueueFullError`, `RateLimitedError`, `InvariantViolationError`.
+- [~] Implement `checkInvariants` returning every violation with its invariant ID. Done for I-1, I-2, I-3, I-4 and I-7 (`checkInvariantState`, a pure function, and `InventoryFsm.checkInvariants()`). I-5 is enforced by the transition rules and tested, not by the checker. I-6 and I-8 to I-12 belong to later milestones.
+- [ ] Write the invariant tests first, against hand-built valid and invalid states. Not followed: the hand-built state tests exist, but they were written after the implementation (PL-003).
+- [x] Inject the clock and the ID generator. The core never calls `Date.now()` or `Math.random()`; `Date.now` is only the default value of the `clock` option. No random source is needed yet.
 
 ## Phase 3: Atomic Inventory Core (M2)
-- [ ] Implement `reserve`, `commit` and `release` as single synchronous sections over one store.
-- [ ] Prove no `await` sits between any stock read and its write (review checklist plus a test with an adversarial scheduler).
-- [ ] Build a **deterministic scheduler** that runs N request coroutines under a chosen interleaving.
-- [ ] Explore interleavings exhaustively for small N (for example 3 buyers, 2 units) and by seeded sampling for large N. Assert I-1 to I-3 after each run.
-- [ ] Add a **planted defect** version (an `await` inserted between check and decrement). The tests must fail on it (mutation audit, `PROJECT_RULE.md` §7.3).
+- [x] Implement `reserve`, `confirm` (the plan's `commit`) and `release` as single synchronous sections over one store (`js/inventory-fsm.js`).
+- [~] Prove no `await` sits between any stock read and its write. A test checks that no public operation returns a promise, and a control test shows that a version with an `await` in the middle oversells under the same load. There is no review checklist or static check yet.
+- [~] Deterministic scheduler. Not built as a reusable component: the tests contain an interleaving generator for small cases and seeded microtask yields for large ones.
+- [x] Explore interleavings exhaustively for small N (3 buyers, 2 units: all 90 schedules, with and without the version check) and by seeded sampling for large N (20 seeds of 60 buyers, 30 random-operation sequences). I-1 to I-4 and I-7 are asserted after each step.
+- [~] Planted defects. 19 defects were planted in a scratch copy of the module, and all 19 were caught (PL-003). The specific "await inserted between check and decrement" defect is covered by the control test and not by a planted copy of the module, because the module's API is synchronous.
 
 ## Phase 4: Reservations & Expiry (M3)
-- [ ] Reservation holds stock for a time-to-live measured on the injected clock.
-- [ ] Expiry returns held units to `available` exactly once.
-- [ ] `commit` after expiry or release fails with `ReservationExpiredError` (I-5).
-- [ ] Test expiry at the boundary (`ttl - 1`, `ttl`, `ttl + 1`), expiry racing a commit, and many reservations expiring on one tick.
-- [ ] Expiry sweep is bounded per tick and cannot starve request handling.
+- [x] Reservation holds stock for a time-to-live measured on the injected clock.
+- [x] Expiry returns held units to `available` exactly once, through the timer, the sweep and the lazy check on access.
+- [x] `confirm` after expiry or release fails (I-5): `ReservationExpiredError` after expiry, `InvalidTransitionError` after release.
+- [~] Test expiry at the boundary: valid at `ttl - 1`, expired at `ttl` and well past it. Many reservations expiring on one tick are covered by the sweep budget test. Expiry racing a confirm is covered through lazy expiry on access; there is no separate interleaving test for it.
+- [x] Expiry sweep is bounded per tick (`sweepBudget`) and re-arms at once for the rest.
+- [x] Added under PL-003: a checkout window. `beginCheckout` extends the deadline once and never shortens it; a checkout that outlasts its window expires and rolls back.
 
 ## Phase 5: Idempotency & Purchase Limits (M4)
-- [ ] Every state-changing request carries an idempotency key. A missing key is rejected.
-- [ ] Store the key with its outcome. A repeat returns the stored outcome; a repeat while the first is in flight waits for it, and does not run again.
-- [ ] Enforce the per-buyer, per-SKU limit across holds and sold units together (I-7).
-- [ ] Define key lifetime and eviction, and test that eviction cannot allow a double effect inside the sale window.
-- [ ] Test: 100 concurrent identical requests produce one effect.
+- [~] Every creating request carries an idempotency key, and a missing key is rejected. `reserve` does this. `confirm`, `release` and `beginCheckout` are idempotent by reservation id instead of by key.
+- [x] Store the key with its reservation. A repeat returns the same reservation (`replayed: true`). Every operation is synchronous, so there is no in-flight state to wait for. Only successful reservations are remembered, because a failed attempt had no effect.
+- [x] Enforce the per-buyer, per-SKU limit across holds and sold units together (I-7).
+- [~] Define key lifetime and eviction. A key lives as long as its reservation record, which is kept up to `terminalRetention` finished reservations. After eviction the same key is a new request. This is tested and documented, but it is a boundary and not a guarantee: `terminalRetention` must exceed the retries expected inside the sale window.
+- [x] Test: 100 concurrent identical requests produce one effect.
 
 ## Phase 6: Admission Control & Fairness (M5)
 - [ ] Bounded FIFO request queue with a stated capacity and a backpressure signal at 80% depth.
@@ -125,18 +126,20 @@ Every milestone is judged against these invariants. They are checked by code (`c
 - [ ] Recovery test: discard live state, rebuild from the ledger, continue selling.
 
 ## Phase 9: Load Simulation & Metrics (M8)
-- [ ] A seeded load generator: ramp, spike (all buyers at t = 0), and sustained profiles; mixed outcomes (success, out of stock, duplicate, failure).
-- [ ] Metrics: accepted, rejected by cause, oversell count, p50 and p95 latency on the simulated clock, queue depth over time.
-- [ ] Hard pass condition: oversell count = 0 and all invariants hold, for every seed in a fixed list.
-- [ ] Record a baseline (throughput, p95) in `PROMPT_LOG.md`. Later changes are compared to it. No performance number is promised before the baseline exists.
-- [ ] Run at least one profile where demand is 100 times stock.
+- [x] A seeded load generator with spike, ramp and steady profiles, a pre-sale crowd, double clicks, optimistic-lock conflicts, abandoned carts and payment failures (`js/traffic-simulator.js`), drawing buyers from six Southeast Asian markets with different latency. The spike is an exponential burst around opening, not "all buyers at t = 0".
+- [~] Metrics: holds taken, refusals by cause, conflicts, duplicates absorbed, expiries, and p50 and p95 latency. The latency is the simulated network round trip, not engine processing time. The oversell count is reported through the invariant audit and not as a counter. No queue depth, because there is no admission queue yet (M5).
+- [~] Hard pass condition: the simulator tests run the invariant checker after sampled steps, and every dashboard run audits once a second. The tests use a handful of seeds, not a fixed list.
+- [ ] Record a baseline (throughput, p95). Not done. PL-004 notes one informal observation from headless Edge; it is not a baseline.
+- [ ] Run at least one profile where demand is 100 times stock. Not done. The default demand is about 3.3 buyers per unit (5,000 buyers for 1,500 units).
 
 ## Phase 10: Demo UI & Accessibility (M9)
-- [ ] `index.html` shows remaining stock, the buyer's queue position, the order status, and the activity log.
-- [ ] Controls are native elements with visible focus; status updates use `aria-live="polite"`.
-- [ ] Respect `prefers-reduced-motion` and `prefers-color-scheme`; text contrast at least 4.5:1.
-- [ ] The page holds no business logic: it calls the engine and renders its results.
-- [ ] Run the load profile from the page and show the invariant checker's verdict.
+- [~] `index.html` shows remaining stock (available, held and sold per product), the buyer's own holds with live timers, and the activity log, which also carries the order status. Not done: the buyer's queue position, because there is no admission queue yet (M5).
+- [x] Controls are native elements with visible focus; status updates use `aria-live="polite"`. The countdown has `role="timer"`.
+- [~] The CSS respects `prefers-reduced-motion` and `prefers-color-scheme`. Colour tokens were chosen to meet 4.5:1, but contrast was not measured.
+- [~] Sale countdown: `js/anti-drift-timer.js`, coordinated by `js/flash-sale-engine.js` and shown on the dashboard. Added under PL-002 (not in the original plan). Unit-tested, and shown counting down in headless Edge, including with a skewed device clock. Not yet checked in a real hidden tab.
+- [x] The page holds no business logic: `js/dashboard.js` reads engine state, renders it and forwards clicks.
+- [x] Added under PL-004: a device-clock skew demo. The countdown can run on a wrong clock, hit zero early while the server keeps the sale closed, and resume with the true remaining time after "Sync with server".
+- [x] Run the load profile from the page and show the invariant checker's verdict (the audit chip, updated every second).
 
 ## Phase 11: Final Audit & Review (M10)
 - [ ] Run every audit in `PROJECT_RULE.md` §7 and attach the output to `PROMPT_LOG.md`.
