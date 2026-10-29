@@ -1,25 +1,43 @@
 # Prompt Log - HW 3: High-Concurrency Flash-Sale E-Commerce Engine
 
-This log records every substantive prompt given to an AI agent on this project: intent, outputs, executed verification, and the Human Lead's decision. It is append-only. A correction is a new entry that references the original ID. `PROJECT_RULE.md` §5.4 sets the obligations.
+## 1. Purpose and Conventions
 
-**Entry template**
+This log records every substantive prompt issued to an AI agent on this project, together with its intent, outputs, executed verification, and the Human Lead's disposition. It is the traceability record between requirements, implementation, test evidence and audit findings. `PROJECT_RULE.md` §5.4 sets the logging obligations.
 
-```markdown
-### PL-<NNN> | <YYYY-MM-DD> | <Milestone> - <Title>
-- **Agent / Model:** <name and model ID>
-- **Intent:** <one sentence>
-- **Prompt (summary):** <faithful summary>
-- **Output:** <files created or changed>
-- **Design decisions:** <material choices and why>
-- **Verification:** <commands run and their actual results>
-- **Not verified:** <explicit gaps>
-- **Human decision:** <accepted | accepted with edits | rejected | pending review>
-- **Notes:** <deviations, open questions, cross-references>
-```
+**Conventions**
+
+- **Append-only.** Entries are never deleted or rewritten. A correction is recorded in the Corrections Register (Section 4) or as a new entry that references the original ID.
+- **Milestone-organised.** Entries are grouped under the five engineering milestones in Section 3. Each entry keeps its original sequential ID (`PL-NNN`), so chronology is recoverable from the IDs.
+- **Verification is mandatory.** The `Verification` field contains executed commands and their actual results. Anything not run is listed under `Not verified`.
+- **Cross-references.** Task identifiers (`M0` to `M10`) refer to `TASK_DECOMPOSITION.md`. Rule identifiers (§n) refer to `PROJECT_RULE.md`. Audit identifiers (`A1` to `A8`) are the audits in `PROJECT_RULE.md` §7. Failure identifiers (`AF-NNN`) refer to `AI_FAILURE_AUDIT.md`. Invariant identifiers (`I-1` to `I-12`) refer to `TASK_DECOMPOSITION.md`.
 
 ---
 
-### PL-001 | 2026-10-29 | M0 - Workspace Governance Documents
+## 2. Milestone Index
+
+| Milestone | Name | Entries | Task reference | Status | Failure findings |
+|---|---|---|---|---|---|
+| **MS-1** | Project Architecture Initialization | PL-001 | M0 | Governance documents complete; Human Lead review pending | None |
+| **MS-2** | Zero-Drift Timer Module | PL-002 | Added under M9 | Implemented; real hidden-tab behaviour not verified | AF-002, AF-009 |
+| **MS-3** | Optimistic Inventory Lock FSM | PL-003 | M1 to M4 | Implemented for `reserve`; milestone sign-off pending | AF-006, AF-007, AF-010 |
+| **MS-4** | Engine Simulation UI Integration | PL-004 | M8, M9 | Implemented and exercised in headless Edge; baseline, contrast and queue position not done | AF-001, AF-003, AF-004, AF-005 |
+| **MS-5** | AI Failure Audit Reporting | PL-005 | M10 | Report complete; four findings open | AF-001 to AF-010 (report) |
+
+**Cumulative automated evidence (current):** `node --test` over four suites reports 186 passing, 0 failing (44 timer, 80 FSM, 40 engine, 22 simulator), Node v24.13.1. Mutation audits (A3) caught 8 of 8 (timer), 19 of 19 (FSM) and 18 of 18 (engine) planted defects after test gaps were closed. `Hw_3/package.json` is absent (AF-005), so the suites are run directly:
+
+`node --test test/anti-drift-timer.test.js test/inventory-fsm.test.js test/flash-sale-engine.test.js test/traffic-simulator.test.js`
+
+**Open findings:** AF-005, AF-006, AF-009, AF-010. No run in this project has violated a stock invariant.
+
+---
+
+## 3. Milestone Log
+
+### MS-1 — Project Architecture Initialization
+
+Establishes the governance documents, the twelve domain invariants, the concurrency defect catalogue, the audit framework, and the stack constraints that every later milestone must satisfy.
+
+#### PL-001 | 2026-10-29 | M0 - Workspace Governance Documents
 - **Agent / Model:** Claude Code (claude-sonnet-5-5)
 - **Intent:** Initialise the HW 3 workspace documents with strict agentic governance, concurrency milestones and an audit framework.
 - **Prompt (summary):** Initialise the project workspace structure for Hw 3: High-Concurrency Flash-Sale E-Commerce Engine. Generate `TASK_DECOMPOSITION.md` and `PROJECT_RULE.md`, establishing governance, concurrency milestones and audit frameworks.
@@ -36,7 +54,11 @@ This log records every substantive prompt given to an AI agent on this project: 
 
 ---
 
-### PL-002 | 2026-10-29 | M9 (added task) - Anti-Drift Countdown Timer
+### MS-2 — Zero-Drift Timer Module
+
+Implements the countdown that does not accumulate error from late or skipped frames, tolerates background-tab throttling, and can be aligned with a server clock.
+
+#### PL-002 | 2026-10-29 | M9 (added task) - Anti-Drift Countdown Timer
 - **Agent / Model:** Claude Code (claude-sonnet-5-5)
 - **Intent:** A countdown timer module for the Vietnam mega-sale scenario (Shopee / Lazada 11.11 midnight flash sale) that does not drift and survives background-tab throttling.
 - **Prompt (summary):** Act as a Frontend Performance Engineer. Implement `anti-drift-timer.js` in pure JavaScript (ES modules) using `requestAnimationFrame` and `Date.now()` delta calculation instead of drift-prone `setInterval`, for an 11.11 midnight flash sale, with millisecond accuracy and JSDoc types. (The request first named a `.ts` file, then was restated as `.js`; the restated request was followed.)
@@ -73,7 +95,11 @@ This log records every substantive prompt given to an AI agent on this project: 
 
 ---
 
-### PL-003 | 2026-10-29 | M1-M4 - Inventory Finite State Machine
+### MS-3 — Optimistic Inventory Lock FSM
+
+Implements the reservation state machine, the synchronous atomic stock sections, optimistic version checking, lazy and timer-driven expiry with rollback, idempotent holds, bounded memory and the journal.
+
+#### PL-003 | 2026-10-29 | M1-M4 - Inventory Finite State Machine
 - **Agent / Model:** Claude Code (claude-sonnet-5-5)
 - **Intent:** An FSM that holds, expires, rolls back and confirms stock reservations with optimistic locking, so a high-concurrency flash sale cannot oversell.
 - **Prompt (summary):** Develop an FSM module named `inventory-fsm.js` in pure JavaScript (ES modules) to handle optimistic inventory locking during high-concurrency flash sales. Explicitly handle state transitions for stock reservation, lock-expiry countdowns, automatic rollback on expiration, and final checkout confirmation, to prevent race conditions and overselling.
@@ -112,7 +138,11 @@ This log records every substantive prompt given to an AI agent on this project: 
 
 ---
 
-### PL-004 | 2026-10-29 | M8-M9 - Flash-Sale Engine and Simulation Dashboard
+### MS-4 — Engine Simulation UI Integration
+
+Integrates the timer and the FSM behind one engine whose sale phase follows the server clock, adds the seeded Southeast Asian traffic simulator, and presents live stock, checkout actions and reservation timers in a responsive dashboard.
+
+#### PL-004 | 2026-10-29 | M8-M9 - Flash-Sale Engine and Simulation Dashboard
 - **Agent / Model:** Claude Code (claude-sonnet-5-5)
 - **Intent:** The core engine that coordinates the anti-drift countdown and the optimistic inventory FSM, plus a responsive vanilla dashboard that simulates Southeast Asian peak-load traffic with live stock, checkout actions and reservation timers.
 - **Prompt (summary):** Build the core Flash-Sale Engine module (`flash-sale-engine.js`) coordinating the zero-drift countdown timer and the optimistic inventory lock FSM using ES modules. Create a responsive Vanilla JavaScript / HTML / CSS simulation dashboard mirroring peak-load traffic conditions in Southeast Asian e-commerce platforms, including real-time stock status, checkout action triggers and active reservation timers.
@@ -159,4 +189,110 @@ This log records every substantive prompt given to an AI agent on this project: 
 
 ---
 
-<!-- Next entry: PL-005 -->
+### MS-5 — AI Failure Audit Reporting
+
+Audits the AI-generated code by measurement and records the findings, including the hazards that were tested and found harmless.
+
+#### PL-005 | 2026-10-29 | M10 (audit) - AI Failure and Audit Report
+- **Agent / Model:** Claude Code (claude-sonnet-5-5)
+- **Intent:** Produce the mandatory `AI_FAILURE_AUDIT.md` report with at least three critical AI-generated flaws, covering simultaneous stock reservations, animation-frame handling at unmount, and client versus server clock drift.
+- **Prompt (summary):** Generate the `AI_FAILURE_AUDIT.md` report documenting at least 3 critical AI-generated flaws, detailing race conditions during simultaneous stock reservations, `requestAnimationFrame` memory leaks during timer unmounting, and clock drift between client local time and server timestamps.
+- **Approach:** Each topic was tested before it was written up, and the report records what the tests showed. Where a topic did not produce a flaw, the report says so.
+- **Output:**
+  - `Hw_3/docs/AI_FAILURE_AUDIT.md`: rewritten as a report (purpose and method, summary table, the three themes, checked-and-clean, causes, recommended actions, reproduction), with the five existing entries kept word for word and five new ones, AF-006 to AF-010.
+  - `Hw_3/test/audit/`: five runnable scripts that reproduce the evidence (`check-then-act.mjs`, `contention.mjs`, `clock-steps.mjs`, `frame-loop.mjs`, `idempotency-eviction.mjs`). They are not part of the test run.
+- **Findings (see the report for the evidence):**
+  - **AF-006 (P1, open):** the per-SKU optimistic version check collapses under load. With every buyer optimistic, 299 of 1,500 units sold and 1,201 were left unsold; 2,699 of 3,000 buyers gave up; no oversell.
+  - **AF-007 (P0 class, verified):** the check-then-act race reproduced: a naive reserve sold 60 units of 5; the shipped FSM sold 5.
+  - **AF-008 (P2, verified):** two frame loops and one stray callback after `dispose()` when the guard is absent. The page-level unmount audit found **no leak**.
+  - **AF-009 (P2, open):** the countdown follows wall-clock steps (a 10 s backward step moved it up 10 s; a 50 s forward step completed it with 40 s left). The server's decision was unaffected.
+  - **AF-010 (P2, open):** a retry after idempotency-key eviction sold one intent twice, and the invariant checker reported nothing.
+- **Verification:**
+  - All five scripts were run, and their output is in the report. Node v24.13.1.
+  - Page-level unmount audit: headless Microsoft Edge 155 over the DevTools protocol, counting outstanding frames, timeouts, intervals and `visibilitychange` listeners at 14 moments. All were zero after every Stop. The first run printed all zeros while "running"; that was checked and found to be a script error (a sale length below the form's minimum), so the run had never started. It was fixed and rerun.
+  - Four statements in the first draft of the report went beyond the evidence and were corrected before this entry (the "no safety failure" claim, an event count inside one latency window, the latency range, and what the 20-seed race test checked).
+  - `node --test` over the four suites: 186 pass, 0 fail. No source or test file was changed in this entry.
+- **Not verified:**
+  - Heap size, detached DOM nodes and growth over a long run. Only handle counts were measured.
+  - A real hidden tab, Safari, Firefox, a physical phone.
+  - The page-level audit script is not saved in the repository.
+  - Every fix in the report's Section 6 is a proposal. None was applied or tested.
+- **Human decision:** Pending review.
+- **Notes:**
+  - **Supersedes a statement in PL-004.** PL-004 described the first browser observation (4,259 conflicts, 767 buyers giving up) as "the trade-off documented in the FSM". The measurements in AF-006 show an undersell of about 80%, which is a defect and not a trade-off. The PL-004 wording stands as written; this entry corrects it.
+  - **Layout change to approve:** `Hw_3/test/audit/` is a new folder that `PROJECT_RULE.md` §10.1 does not list.
+  - **The dashboard's defaults sit in the bad regime for AF-006:** the optimistic-lock checkbox is on, and the simulator sends the version for 50% of buyers.
+  - Nothing was committed.
+
+---
+
+## 4. Corrections Register
+
+Entries above are not edited. Where a later finding changes how an earlier statement should be read, the correction is recorded here.
+
+| ID | Entry | Statement as written | Correction | Basis |
+|---|---|---|---|---|
+| C-1 | PL-003, PL-004 | The strict optimistic version check turning buyers away is "stated in the docs" (PL-003) and "the trade-off documented in the FSM" (PL-004) | The effect is an undersell of about 80% when every buyer sends a version (299 of 1,500 units sold, 1,201 unsold), which is a defect. Read as superseded by AF-006 | `test/audit/contention.mjs`; PL-005 |
+| C-2 | PL-002, PL-003, PL-004, PL-005 | "Nothing was committed", and "the new files in this entry are not committed" | True when each was written. The Human Lead has since committed the governance documents (`8c2d065`), the timer (`85364ff`), and the FSM, engine, simulator, dashboard, tests and the earlier versions of the documents (`8e29bd4`). Still uncommitted as of this log: the rewritten `AI_FAILURE_AUDIT.md` (AF-006 to AF-010 and the report sections), this log with PL-005, and `test/audit/` | `git log`, `git status` |
+| C-3 | PL-002 | "43 tests" for the timer | The timer suite now has 44 tests. The extra test is the AF-002 regression test added in PL-004. The 186-test total in Section 2 reflects it | PL-004 |
+| C-4 | PL-002, PL-003, PL-004 | `Hw_3/package.json` and an `npm test` script exist | The file is absent (AF-005). The suites are run with `node --test` and an explicit file list. Read the `npm test` references in these entries as that command | AF-005 |
+| C-5 | PL-004 | `AI_FAILURE_AUDIT.md` contains AF-001 to AF-005 | The report now contains AF-001 to AF-010 (PL-005). AF-001 to AF-005 are unchanged | PL-005 |
+
+---
+
+## 5. Open Decisions Register
+
+Decisions raised by entries that need the Human Lead before the affected milestone can close.
+
+| ID | Raised in | Decision | Affected milestone | Status |
+|---|---|---|---|---|
+| OD-1 | PL-001 | Confirm the stack: vanilla ES2022+ JavaScript, no build step, no dependencies. It has been followed throughout | MS-1 | Open (followed, not confirmed) |
+| OD-2 | AF-005 | Should `Hw_3/package.json` exist? If not, update `PROJECT_RULE.md` §10.1 and the logged test command | MS-1, MS-4 | Open, P1 |
+| OD-3 | AF-006 | Approve a change to optimistic locking (advisory version or an availability precondition, capped retries) and decide the default of the dashboard checkbox and the simulator share | MS-3 | Open, P1 |
+| OD-4 | AF-009 | Approve step detection and a monotonic anchor for the countdown, with periodic re-sync | MS-2 | Open, P2 |
+| OD-5 | AF-010 | Approve time-based retention for idempotency keys and an I-6 checker | MS-3 | Open, P2 |
+| OD-6 | PL-003, PL-004 | Approve the plan changes: `commit` renamed `confirm`; a `CHECKOUT` state; the journal and hook in place of the full ledger for now; the timer and engine placed under M8 and M9; the device-clock skew demo | MS-3, MS-4 | Open |
+| OD-7 | PL-005 | Approve the new `Hw_3/test/audit/` folder (not in `PROJECT_RULE.md` §10.1) | MS-5 | Open |
+| OD-8 | PL-002, PL-004 | Check countdown behaviour in a real hidden tab, in a headed browser | MS-2, MS-4 | Open |
+| OD-9 | PL-004 | Record a throughput baseline and run a profile at 100 times stock (M8) | MS-4 | Open |
+| OD-10 | PL-004 | Measure contrast and run Lighthouse; add a queue position, which needs admission control (M5) | MS-4 | Open |
+| OD-11 | PL-005 | Measure heap and detached DOM nodes over a long run, and save the page-level audit script | MS-5 | Open |
+| OD-12 | PL-002 to PL-005 | Commit the rewritten `AI_FAILURE_AUDIT.md`, this log and `test/audit/` (if approved under OD-7), and add a `.gitignore` | All | Open |
+
+---
+
+## Appendix A — Entry Template
+
+```markdown
+#### PL-<NNN> | <YYYY-MM-DD> | <Milestone identifier> - <Title>
+
+- **Agent / Model:** <name and model ID>
+- **Intent:** <one sentence: outcome sought>
+- **Prompt (summary):** <faithful summary>
+- **Output:** <files created or changed>
+- **Design decisions:** <material choices and their rationale>
+- **Verification:** <commands run and their actual results>
+- **Not verified:** <explicitly listed gaps>
+- **Human decision:** <accepted | accepted with edits | rejected | pending review>
+- **Notes:** <deviations, open questions, cross-references>
+```
+
+## Appendix B — Verification Commands
+
+Node v24.13.1, run from `Hw_3/`.
+
+| Purpose | Command |
+|---|---|
+| All suites | `node --test test/anti-drift-timer.test.js test/inventory-fsm.test.js test/flash-sale-engine.test.js test/traffic-simulator.test.js` |
+| Check-then-act race (AF-007) | `node test/audit/check-then-act.mjs` |
+| Optimistic-lock contention (AF-006) | `node test/audit/contention.mjs` |
+| Clock steps (AF-009) | `node test/audit/clock-steps.mjs` |
+| Frame-loop guard (AF-002, AF-008) | `node test/audit/frame-loop.mjs` |
+| Idempotency-key eviction (AF-010) | `node test/audit/idempotency-eviction.mjs` |
+| Dashboard | Open `Hw_3/index.html` with Live Server |
+
+Mutation audits and the real-browser checks used scratch scripts that are not in the repository. Headless Microsoft Edge 155 was driven through the DevTools protocol.
+
+---
+
+<!-- Next entry: PL-006 -->
