@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Concurrent FIFO Audio Visualizer</title>
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --fg: #0f172a;
+        --muted: #334155;
+        --panel: #ffffff;
+        --border: #cbd5e1;
+        --accent: #0f766e;
+        --accent-fg: #ffffff;
+        --focus: #1d4ed8;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme='light']) {
+          --bg: #0f172a;
+          --fg: #f1f5f9;
+          --muted: #cbd5e1;
+          --panel: #1e293b;
+          --border: #475569;
+          --accent: #2dd4bf;
+          --accent-fg: #0f172a;
+          --focus: #93c5fd;
+        }
+      }
+
+      :root[data-theme='dark'] {
+        --bg: #0f172a;
+        --fg: #f1f5f9;
+        --muted: #cbd5e1;
+        --panel: #1e293b;
+        --border: #475569;
+        --accent: #2dd4bf;
+        --accent-fg: #0f172a;
+        --focus: #93c5fd;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 16px;
+        background: var(--bg);
+        color: var(--fg);
+        font: 16px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif;
+      }
+
+      main {
+        max-width: 880px;
+        margin: 0 auto;
+        display: grid;
+        gap: 16px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin: 8px 0 0;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      button,
+      .file-button {
+        font: inherit;
+        min-height: 44px;
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--panel);
+        color: var(--fg);
+        cursor: pointer;
+      }
+
+      button.primary,
+      .file-button {
+        background: var(--accent);
+        color: var(--accent-fg);
+        border-color: var(--accent);
+      }
+
+      button:disabled,
+      .file-button[aria-disabled='true'] {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      button:focus-visible,
+      .file-button:focus-within,
+      input[type='file']:focus-visible {
+        outline: 3px solid var(--focus);
+        outline-offset: 2px;
+      }
+
+      input[type='file'] {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+      }
+
+      #visualizer {
+        display: block;
+        width: 100%;
+        height: 220px;
+        border-radius: 6px;
+        background: var(--bg);
+      }
+
+      #status {
+        margin: 0;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+      }
+
+      #log {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        max-height: 220px;
+        overflow-y: auto;
+        font-size: 0.9375rem;
+      }
+
+      #log li {
+        padding: 4px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Concurrent FIFO Audio Visualizer</h1>
+
+      <section class="panel" aria-labelledby="controls-heading">
+        <h2 id="controls-heading" class="visually-hidden" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Controls</h2>
+        <div class="controls">
+          <button type="button" id="enable" class="primary">Enable audio</button>
+
+          <label class="file-button" id="add-label" aria-disabled="true">
+            Add tracks
+            <input type="file" id="files" accept="audio/*" multiple disabled />
+          </label>
+
+          <button type="button" id="stop" disabled>Stop</button>
+          <button type="button" id="reset" disabled>Cancel pending loads</button>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="viz-heading">
+        <h2 id="viz-heading" style="font-size:1.125rem;margin:0 0 8px">Spectrum</h2>
+        <canvas id="visualizer" role="img" aria-label="Live frequency spectrum of the playing track"></canvas>
+      </section>
+
+      <section class="panel" aria-labelledby="status-heading">
+        <h2 id="status-heading" style="font-size:1.125rem;margin:0 0 8px">Queue status</h2>
+        <p id="status" role="status" aria-live="polite">Audio is off. Select “Enable audio” to start.</p>
+      </section>
+
+      <section class="panel" aria-labelledby="log-heading">
+        <h2 id="log-heading" style="font-size:1.125rem;margin:0 0 8px">Activity</h2>
+        <ol id="log" aria-live="polite" aria-relevant="additions"></ol>
+      </section>
+    </main>
+
+    <script type="module">
+      import { AudioEngine } from './js/audio-engine.js';
+      import { AudioTrackPipeline } from './js/audio-track-pipeline.js';
+      import { SpectrumVisualizer } from './js/spectrum-visualizer.js';
+
+      const MAX_LOG_ENTRIES = 50;
+      const QUEUE_CAPACITY = 16;
+      const MAX_CONCURRENCY = 3;
+
+      const enableButton = document.getElementById('enable');
+      const fileInput = document.getElementById('files');
+      const addLabel = document.getElementById('add-label');
+      const stopButton = document.getElementById('stop');
+      const resetButton = document.getElementById('reset');
+      const canvas = document.getElementById('visualizer');
+      const statusText = document.getElementById('status');
+      const logList = document.getElementById('log');
+
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      /** Created on the first "Enable audio" click, so the AudioContext never starts before a user gesture. */
+      let runtime = null;
+      /** Bumped by Stop, Cancel and unmount. Playback items queued under an older value are skipped. */
+      let generation = 0;
+      /** Tail of the FIFO playback chain. Each queued track plays only after the one before it. */
+      let playbackTail = Promise.resolve();
+      let nextTrackId = 0;
+
+      function log(message) {
+        const item = document.createElement('li');
+        item.textContent = message;
+        logList.prepend(item);
+        while (logList.childElementCount > MAX_LOG_ENTRIES) {
+          logList.lastElementChild.remove();
+        }
+      }
+
+      function renderStatus() {
+        if (!runtime) {
+          statusText.textContent = 'Audio is off. Select “Enable audio” to start.';
+          return;
+        }
+        statusText.textContent =
+          `Context: ${runtime.engine.state} · Queued: ${runtime.pipeline.queuedCount} · ` +
+          `In flight: ${runtime.pipeline.inFlightCount}`;
+      }
+
+      function reasonOf(error) {
+        return error?.cause?.message ?? error?.message ?? String(error);
+      }
+
+      function setRunningControls(running) {
+        stopButton.disabled = !running;
+        resetButton.disabled = !running;
+        fileInput.disabled = !running;
+        addLabel.setAttribute('aria-disabled', String(!running));
+      }
+
+      enableButton.addEventListener('click', async () => {
+        if (!runtime) {
+          const engine = new AudioEngine({ onStateChange: renderStatus });
+          const pipeline = new AudioTrackPipeline({
+            engine,
+            capacity: QUEUE_CAPACITY,
+            maxConcurrency: MAX_CONCURRENCY,
+          });
+          const visualizer = new SpectrumVisualizer({ canvas, source: engine, reducedMotion });
+          runtime = { engine, pipeline, visualizer };
+        }
+        try {
+          await runtime.engine.resume();
+        } catch (error) {
+          log(`Could not start audio: ${reasonOf(error)}`);
+          return;
+        }
+        enableButton.disabled = true;
+        setRunningControls(true);
+        log('Audio enabled');
+        renderStatus();
+      });
+
+      fileInput.addEventListener('change', () => {
+        const files = [...fileInput.files];
+        // Clear the input so selecting the same file again still fires "change".
+        fileInput.value = '';
+        for (const file of files) enqueueTrack(file);
+      });
+
+      function enqueueTrack(file) {
+        const id = `track-${++nextTrackId}`;
+        const gen = generation;
+        const objectUrl = URL.createObjectURL(file);
+
+        // A rejected load (full queue, duplicate id) becomes a failed outcome, so the playback chain never breaks.
+        const outcome = runtime.pipeline
+          .load(id, objectUrl)
+          .catch((error) => ({ ok: false, id, error }))
+          .finally(() => URL.revokeObjectURL(objectUrl));
+        renderStatus();
+
+        playbackTail = playbackTail
+          .then(async () => {
+            const result = await outcome;
+            if (!runtime || gen !== generation) return;
+            renderStatus();
+            if (!result.ok) {
+              log(`${file.name}: not loaded (${reasonOf(result.error)})`);
+              return;
+            }
+            log(`${file.name}: decoded, playing`);
+            runtime.visualizer.start();
+            const end = await runtime.pipeline.play(result.value);
+            if (end === 'ended') log(`${file.name}: finished`);
+            if (gen === generation) runtime.visualizer.stop();
+            renderStatus();
+          })
+          .catch((error) => log(`Playback error: ${reasonOf(error)}`));
+      }
+
+      stopButton.addEventListener('click', () => {
+        if (!runtime) return;
+        generation++;
+        runtime.pipeline.stopPlayback();
+        runtime.visualizer.stop();
+        log('Playback stopped');
+        renderStatus();
+      });
+
+      resetButton.addEventListener('click', () => {
+        if (!runtime) return;
+        generation++;
+        runtime.pipeline.stopPlayback();
+        runtime.visualizer.stop();
+        runtime.pipeline.reset();
+        log('Pending loads cancelled');
+        renderStatus();
+      });
+
+      /** Unmount path. Visualizer goes first, so its frame loop cannot read a disposed engine. */
+      function unmount() {
+        if (!runtime) return;
+        generation++;
+        runtime.visualizer.dispose();
+        runtime.pipeline.dispose();
+        runtime = null;
+        setRunningControls(false);
+      }
+
+      window.addEventListener('pagehide', unmount);
+    </script>
+  </body>
+</html>
