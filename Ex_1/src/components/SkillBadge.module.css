@@ -1,0 +1,42 @@
+/* src/components/SkillBadge.module.css */
+
+.badge {
+  --badge-bg: linear-gradient(145deg, #f5d77a, #c9a227);
+  --badge-fg: #2b1d00;
+  --badge-border: #f5d77a;
+  --badge-radius: 999px;
+
+  box-sizing: border-box;
+  display: inline-block;
+  max-inline-size: 100%;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--badge-fg);
+  background: var(--badge-bg);
+  border: 1px solid var(--badge-border);
+  border-radius: var(--badge-radius);
+  overflow-wrap: anywhere;
+}
+
+/* Core = gold */
+.core {
+  --badge-bg: linear-gradient(145deg, #f5d77a, #c9a227);
+  --badge-fg: #2b1d00;
+  --badge-border: #f5d77a;
+}
+
+/* Awareness = silver */
+.awareness {
+  --badge-bg: linear-gradient(145deg, #f1f5f9, #9ca3af);
+  --badge-fg: #111827;
+  --badge-border: #e5e7eb;
+}
+
+/* Later = bronze */
+.later {
+  --badge-bg: linear-gradient(145deg, #e8b07f, #a8642f);
+  --badge-fg: #2a1405;
+  --badge-border: #e8b07f;
+}

@@ -1,0 +1,49 @@
+/* src/App.module.css */
+
+:global(body) {
+  margin: 0;
+  background: #0b1120;
+}
+
+.page {
+  --page-bg: radial-gradient(circle at 50% 0%, #1e3a5f 0%, #0b1120 60%);
+  --page-fg: #f8fafc;
+  --page-gold: #d4af37;
+  --page-gutter: 16px;
+  --page-gap: 1.5rem;
+  --page-max: 1200px;
+
+  box-sizing: border-box;
+  min-block-size: 100vh;
+  padding: var(--page-gap) var(--page-gutter);
+  color: var(--page-fg);
+  background: var(--page-bg);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.title {
+  max-inline-size: var(--page-max);
+  margin: 0 auto var(--page-gap);
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--page-gold);
+  overflow-wrap: anywhere;
+}
+
+/* 1 column at 375px, 2 at tablet, up to 4 on desktop */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  gap: var(--page-gap);
+  max-inline-size: var(--page-max);
+  margin-inline: auto;
+}
+
+@media (min-width: 768px) {
+  .page {
+    --page-gutter: 2rem;
+    --page-gap: 2rem;
+  }
+}
