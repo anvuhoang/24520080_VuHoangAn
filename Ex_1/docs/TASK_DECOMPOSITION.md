@@ -94,7 +94,7 @@ Run from the repo root in Git Bash.
 - [ ] **Avatar fallback:** changing `avatarUrl` to a broken `https://` URL renders the initials, still 64×64.
 - [ ] **375px:** DevTools device toolbar → iPhone SE (375×667). `document.documentElement.scrollWidth <= window.innerWidth` returns `true`, and there's no horizontal scrollbar.
 - [ ] **1440px:** the layout is centered with no overflow.
-- [ ] **Git history:** `git log --oneline` lists exactly these, oldest at the bottom:
+- [ ] **Git history:** `git log --oneline` contains the three planned commits, plus follow-up commits for avatars, fixes and docs:
   ```
   style(ex1): add responsive 375px CSS module
   feat(ex1): implement semantic DeveloperCard and SkillBadge
