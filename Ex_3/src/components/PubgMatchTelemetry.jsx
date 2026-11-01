@@ -2,6 +2,8 @@
 import { useEffect, useState } from 'react';
 import { fetchKraftonPubgTelemetry } from '../api/fetchKraftonPubgTelemetry.js';
 import TelemetryCard from './TelemetryCard.jsx';
+import TelemetrySkeleton from './TelemetrySkeleton.jsx';
+import TelemetryAlert from './TelemetryAlert.jsx';
 import styles from './PubgMatchTelemetry.module.css';
 
 export default function PubgMatchTelemetry({ squadId = 'te' }) {
@@ -25,15 +27,10 @@ export default function PubgMatchTelemetry({ squadId = 'te' }) {
 
   return (
     <section className={styles.region} aria-live="polite">
-      {view.status === 'LOADING' && <p>Syncing KRAFTON radar…</p>}
+      {view.status === 'LOADING' && <TelemetrySkeleton />}
 
       {view.status === 'ERROR' && (
-        <>
-          <p role="alert">{view.error}</p>
-          <button type="button" onClick={() => setRetryTick((t) => t + 1)}>
-            Reconnect Satellite (Retry)
-          </button>
-        </>
+        <TelemetryAlert message={view.error} onRetry={() => setRetryTick((t) => t + 1)} />
       )}
 
       {view.status === 'SUCCESS' && <TelemetryCard squad={view.data} />}

@@ -1,0 +1,56 @@
+/* src/components/TelemetrySkeleton.module.css */
+
+/* Same border, padding and radius as TelemetryCard; height fixed at 220px (matches .region) */
+.skeleton {
+  box-sizing: border-box;
+  display: grid;
+  align-content: start;
+  gap: var(--space-md);
+  block-size: 220px;
+  padding: var(--space-lg) 1.25rem;
+  color: var(--color-muted);
+  background: linear-gradient(160deg, var(--color-surface-raised), var(--color-surface));
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.label {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+
+.skeleton ul {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bar {
+  block-size: 1.25rem;
+  background: var(--color-accent-soft);
+  border-radius: var(--radius-field);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    animation: none;
+  }
+}

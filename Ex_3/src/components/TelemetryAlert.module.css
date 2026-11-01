@@ -1,0 +1,49 @@
+/* src/components/TelemetryAlert.module.css */
+
+/* Same 220px height, padding and radius as TelemetrySkeleton, so error and loading views don't shift the layout */
+.alert {
+  box-sizing: border-box;
+  display: grid;
+  align-content: center;
+  gap: var(--space-md);
+  block-size: 220px;
+  padding: var(--space-lg) 1.25rem;
+  color: var(--color-text);
+  background: var(--color-danger-bg);
+  border: 2px solid var(--color-danger);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.message {
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* Mobile-first: full-width button; shrinks to its content from 480px */
+.retry {
+  box-sizing: border-box;
+  min-block-size: var(--tap-target);
+  max-inline-size: 100%;
+  padding: var(--space-sm) var(--space-lg);
+  font: inherit;
+  font-weight: 700;
+  color: var(--color-bg-deep);
+  background: var(--color-danger);
+  border: 0;
+  border-radius: var(--radius-field);
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.retry:focus-visible {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+@media (min-width: 480px) {
+  .retry {
+    justify-self: start;
+  }
+}
