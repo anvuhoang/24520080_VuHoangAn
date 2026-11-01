@@ -45,7 +45,7 @@
   ```
 - **Bug**: **Rule 2.1** says "Do not use `<div>` or `<span>` for structure". `<span>` is also not in the allowed-tag list (Rule 2.2). The AI followed the prompt over the rules file and only warned about it in chat. The Checkpoint 1 `grep '<div'` passes, so this check does not catch it.
 - **DevTools Proof**: Static check: `grep -rn "<span" src` → 2 hits (lines above). **TODO screenshot:** Elements panel showing `<li><span class="_badge_…">` and the Accessibility pane showing the initials node as role `img`.
-- **Engineering Fix (Commit `5d200c6`)**: Applied.
+- **Engineering Fix (Commit `80e8271`)**: Applied.
   ```jsx
   // SkillBadge returns the list item itself (as planned in task 1.1)
   export default function SkillBadge({ name = 'Unnamed Skill', tier = 'Core' }) {
@@ -73,7 +73,7 @@
   ```
 - **Bug**: **Rule 9.7** requires mobile-first `min-width` media queries. Here the 3-column layout is the default, and the 375px layout is an override layered on top.
 - **DevTools Proof**: Static check: `grep -rn "max-width" src` → 1 hit. **TODO screenshot:** Device Toolbar at 375px with the Styles pane showing the `@media (max-width: 400px)` override applied.
-- **Engineering Fix (Commit `644df84`)**: Applied. Make key-value rows the default and add the 3-column grid from 401px. The visual result is the same and the query becomes mobile-first.
+- **Engineering Fix (Commit `297e55d`)**: Applied. Make key-value rows the default and add the 3-column grid from 401px. The visual result is the same and the query becomes mobile-first.
   ```css
   .metrics { grid-template-columns: minmax(0, 1fr) auto; }   /* base = 375px */
 
@@ -100,7 +100,7 @@
   ```
 - **Bug**: ES6 defaults (**Rule 4.3**) only apply when a prop is `undefined`. With `tier={null}`, `fullName={null}` or `avatarUrl={null}` (common when data comes from an API), the component throws during render and the whole tree unmounts.
 - **DevTools Proof**: **TODO screenshot:** temporarily set `tier: null` on one skill in `App.jsx`. The Console should show `TypeError: Cannot read properties of null (reading 'toLowerCase')`, and the page goes blank.
-- **Engineering Fix (Commit `5d200c6`)**: Applied. Coerce before calling string methods.
+- **Engineering Fix (Commit `80e8271`)**: Applied. Coerce before calling string methods.
   ```jsx
   const tierClass = styles[String(tier ?? 'Core').toLowerCase()] ?? styles.core;
   const words = String(fullName ?? '').trim().split(/\s+/);
@@ -126,7 +126,7 @@
   ```
 - **Bug**: The code and the contract no longer match on three points: the prop name (`fullName` vs `name`), the tier values, and which component renders the `<li>`. The AI pointed out each mismatch in chat but never updated the contract. This breaks **Rule 11.6** (self-check before output), and anyone reading TASK_DECOMPOSITION.md would pass props that do nothing.
 - **DevTools Proof**: **TODO screenshot:** React DevTools → Components → `DeveloperCard` props panel showing `fullName`, not `name`.
-- **Engineering Fix (Commit `dab7dcb`)**: Updated `TASK_DECOMPOSITION.md` (props contract and tasks 1.1–1.8) to match the shipped code.
+- **Engineering Fix (Commit `d34427e`)**: Updated `TASK_DECOMPOSITION.md` (props contract and tasks 1.1–1.8) to match the shipped code.
   ```ts
   type SkillTier = 'Core' | 'Awareness' | 'Later';
   interface DeveloperCardProps { fullName: string; role?: string; avatarUrl: string; … }
@@ -149,7 +149,7 @@
   ```
 - **Bug**: **Rule 9.2** puts design tokens on `:root`, and **Rule 9.4** forbids hardcoded colors in component modules. The two component modules contain 18 hex literals, and `.initials` uses `#2b1d00` directly instead of a token.
 - **DevTools Proof**: Static check: `grep -n "#[0-9a-fA-F]\{6\}" src/components/*.css | wc -l` → `18`. **TODO screenshot:** Elements → `:root` showing no custom properties in the Computed pane.
-- **Engineering Fix (Commit `644df84`)**: Applied. Move the palette to a global `src/index.css` on `:root`, import it in `main.jsx`, and keep only `var(--…)` references in the modules.
+- **Engineering Fix (Commit `297e55d`)**: Applied. Move the palette to a global `src/index.css` on `:root`, import it in `main.jsx`, and keep only `var(--…)` references in the modules.
   ```css
   /* src/index.css */
   :root { --gold: #d4af37; --gold-light: #f5d77a; --ink-on-gold: #2b1d00; /* … */ }
@@ -166,8 +166,8 @@
 | # | Failure | Rule violated | Commit |
 |---|---------|---------------|--------|
 | 01 | Import of a CSS Module that was never created | 11.3 | `a60fd29` (Fixed) |
-| 02 | `<span>` used for badge and initials fallback | 2.1, 2.2 | `5d200c6` (Fixed) |
-| 03 | Desktop-first `max-width` media query | 9.7 | `644df84` (Fixed) |
-| 04 | Default parameters don't guard `null` props | 4.3 | `5d200c6` (Fixed) |
-| 05 | Code drifted away from the props contract | 11.6 | `dab7dcb` (Fixed) |
-| 06 | Hardcoded colors inside component CSS Modules | 9.2, 9.4 | `644df84` (Fixed) |
+| 02 | `<span>` used for badge and initials fallback | 2.1, 2.2 | `80e8271` (Fixed) |
+| 03 | Desktop-first `max-width` media query | 9.7 | `297e55d` (Fixed) |
+| 04 | Default parameters don't guard `null` props | 4.3 | `80e8271` (Fixed) |
+| 05 | Code drifted away from the props contract | 11.6 | `d34427e` (Fixed) |
+| 06 | Hardcoded colors inside component CSS Modules | 9.2, 9.4 | `297e55d` (Fixed) |

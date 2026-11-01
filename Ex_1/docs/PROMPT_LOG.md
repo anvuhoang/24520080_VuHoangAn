@@ -19,8 +19,8 @@
 | 11 | 2026-10-30 | 2.1–2.2 | Screenshot of the Vite overlay: "Failed to resolve import './App.module.css' from 'src/App.jsx'." | Accepted | None. AI created `App.module.css` and `SkillBadge.module.css` (see Audit #01). | `style(ex1): add responsive 375px CSS module` — `a60fd29` |
 | 12 | 2026-10-30 | 0.1 | "create .gitignore" | Accepted | A copy also exists at the repo root. | `chore: init react19 vite & rules` — `46179f2` |
 | 13 | 2026-10-30 | 1.8, 2.2–2.6 | "Restyle Exercise 1 as football player cards… 4 players, DiceBear HTTPS avatars, one broken URL, FUT-style card, 96px avatar with glow ring, tier pills gold/silver/bronze, hover lift, 1→4 column grid." | Accepted | None. Stats in `App.jsx` are sample values, not real statistics. | `style(ex1): add responsive 375px CSS module` — `2d6eb3b`, `a60fd29`, `ce48050` |
-| 14 | 2026-10-30 | — (docs) | "next write PROMPT_LOG.md and AI_FAILURE_AUDIT.md" | Accepted | Fill in commit hashes and DevTools screenshots. | `f4a360f`, `dab7dcb` |
-| 15 | 2026-11-01 | 1.1, 1.5, 1.7, 2.1–2.3 | "yes" (apply the proposed fixes for Audit #02, #03, #04, #06) | Accepted | None. | `style(ex1): add responsive 375px CSS module` — `5d200c6`, `644df84` |
+| 14 | 2026-10-30 | — (docs) | "next write PROMPT_LOG.md and AI_FAILURE_AUDIT.md" | Accepted | Fill in commit hashes and DevTools screenshots. | `f4a360f`, `d34427e` |
+| 15 | 2026-11-01 | 1.1, 1.5, 1.7, 2.1–2.3 | "yes" (apply the proposed fixes for Audit #02, #03, #04, #06) | Accepted | None. | `style(ex1): add responsive 375px CSS module` — `80e8271`, `297e55d` |
 
 > The question "what is the purpose of Ex_1\dist\" (asked between #12 and #13) produced no code and is not numbered.
 
