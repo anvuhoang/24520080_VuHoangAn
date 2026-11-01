@@ -4,7 +4,7 @@ import SkillBadge from './SkillBadge.jsx';
 import styles from './DeveloperCard.module.css';
 
 function getInitials(fullName) {
-  const words = fullName.trim().split(/\s+/);
+  const words = String(fullName ?? '').trim().split(/\s+/);
   const first = words.at(0)?.[0] ?? '';
   const last = words.length > 1 ? words.at(-1)[0] : '';
   return (first + last).toUpperCase() || '?';
@@ -12,7 +12,8 @@ function getInitials(fullName) {
 
 // Remote images must be HTTPS; root-relative paths ("/avatars/x.jpg") load from our own public/ folder
 function isAllowedImageSrc(src) {
-  return src.startsWith('https://') || (src.startsWith('/') && !src.startsWith('//'));
+  const value = String(src ?? '');
+  return value.startsWith('https://') || (value.startsWith('/') && !value.startsWith('//'));
 }
 
 export default function DeveloperCard({
@@ -41,13 +42,9 @@ export default function DeveloperCard({
               onError={() => setFailedUrl(avatarUrl)}
             />
           ) : (
-            <span
-              className={styles.initials}
-              role="img"
-              aria-label={`Avatar of ${fullName}`}
-            >
+            <abbr className={styles.initials} title={fullName}>
               {getInitials(fullName)}
-            </span>
+            </abbr>
           )}
         </figure>
         <hgroup className={styles.identity}>
@@ -69,9 +66,7 @@ export default function DeveloperCard({
 
       <ul className={styles.skills} aria-label="Engineered Skills">
         {skills.map(({ id, name, tier }) => (
-          <li key={id} className={styles.skill}>
-            <SkillBadge name={name} tier={tier} />
-          </li>
+          <SkillBadge key={id} name={name} tier={tier} />
         ))}
       </ul>
     </article>

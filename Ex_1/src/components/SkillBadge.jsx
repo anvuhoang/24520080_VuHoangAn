@@ -2,11 +2,13 @@
 import styles from './SkillBadge.module.css';
 
 export default function SkillBadge({ name = 'Unnamed Skill', tier = 'Core' }) {
-  const tierClass = styles[tier.toLowerCase()] ?? styles.core;
+  // Defaults only cover undefined, so coerce null before string methods
+  const safeTier = String(tier ?? 'Core');
+  const tierClass = styles[safeTier.toLowerCase()] ?? styles.core;
 
   return (
-    <span className={`${styles.badge} ${tierClass}`}>
-      {name} ({tier})
-    </span>
+    <li className={`${styles.badge} ${tierClass}`}>
+      {name ?? 'Unnamed Skill'} ({safeTier})
+    </li>
   );
 }
