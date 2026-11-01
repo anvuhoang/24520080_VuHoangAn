@@ -1,19 +1,8 @@
 /* src/components/DeveloperCard.module.css */
 
 .card {
-  --card-bg: linear-gradient(160deg, #1f2a44 0%, #0f172a 55%, #05080f 100%);
-  --card-fg: #f8fafc;
-  --card-muted: #cbd5e1;
-  --card-gold: #d4af37;
-  --card-gold-light: #f5d77a;
-  --card-gold-glow: rgb(212 175 55 / 0.5);
-  --card-divider: rgb(212 175 55 / 0.35);
-  --card-shadow: 0 10px 25px rgb(0 0 0 / 0.45);
-  --card-shadow-hover: 0 20px 40px rgb(0 0 0 / 0.55), 0 0 24px var(--card-gold-glow);
-  --card-radius: 1.25rem;
-  --card-gap: 1rem;
+  --card-gap: var(--space-md);
   --card-lift: -6px;
-  --avatar-size: 96px;
 
   box-sizing: border-box;
   display: grid;
@@ -22,12 +11,17 @@
   inline-size: 100%;
   max-inline-size: 24rem;
   margin-inline: auto;
-  padding: 1.5rem 1.25rem;
-  color: var(--card-fg);
-  background: var(--card-bg);
-  border: 2px solid var(--card-gold);
-  border-radius: var(--card-radius);
-  box-shadow: var(--card-shadow);
+  padding: var(--space-lg) 1.25rem;
+  color: var(--color-text);
+  background: linear-gradient(
+    160deg,
+    var(--color-card-top) 0%,
+    var(--color-card-mid) 55%,
+    var(--color-card-bottom) 100%
+  );
+  border: 2px solid var(--color-gold);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
   overflow-wrap: anywhere;
   transition:
     transform 200ms ease,
@@ -37,7 +31,7 @@
 .card:hover,
 .card:focus-within {
   transform: translateY(var(--card-lift));
-  box-shadow: var(--card-shadow-hover);
+  box-shadow: var(--shadow-card-hover);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -82,8 +76,8 @@
   block-size: var(--avatar-size);
   border-radius: 50%;
   box-shadow:
-    0 0 0 3px var(--card-gold),
-    0 0 18px 4px var(--card-gold-glow);
+    0 0 0 3px var(--color-gold),
+    0 0 18px 4px var(--color-gold-glow);
 }
 
 .avatar {
@@ -97,8 +91,10 @@
   font-size: 2rem;
   font-weight: 800;
   letter-spacing: 0.05em;
-  color: #2b1d00;
-  background: linear-gradient(145deg, var(--card-gold-light), var(--card-gold));
+  text-decoration: none;
+  cursor: default;
+  color: var(--color-ink-on-gold);
+  background: linear-gradient(145deg, var(--color-gold-light), var(--color-gold));
 }
 
 .identity {
@@ -115,22 +111,21 @@
 }
 
 .role {
-  margin: 0.25rem 0 0;
+  margin: var(--space-xs) 0 0;
   font-size: 0.875rem;
-  color: var(--card-gold-light);
+  color: var(--color-gold-light);
 }
 
-/* Metrics: 3 columns, small uppercase label above a large number */
+/* Metrics (mobile-first): label on the left, large number on the right */
 
 .metrics {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-flow: row dense;
-  gap: 0.25rem var(--card-gap);
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--space-sm) var(--card-gap);
   margin: 0;
   padding-block: 0.75rem;
-  border-block: 1px solid var(--card-divider);
-  text-align: center;
+  border-block: 1px solid var(--color-gold-divider);
 }
 
 .metricLabel,
@@ -144,67 +139,58 @@
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--card-muted);
+  color: var(--color-muted);
 }
 
 .metricValue {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 800;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
-  color: var(--card-gold-light);
+  text-align: end;
+  color: var(--color-gold-light);
 }
 
-/* Pin each dt/dd pair to the same column; dense packing stacks dd under its dt */
-.metricLabel:nth-of-type(3n + 1),
-.metricValue:nth-of-type(3n + 1) {
-  grid-column: 1;
-}
-
-.metricLabel:nth-of-type(3n + 2),
-.metricValue:nth-of-type(3n + 2) {
-  grid-column: 2;
-}
-
-.metricLabel:nth-of-type(3n),
-.metricValue:nth-of-type(3n) {
-  grid-column: 3;
-}
-
-/* Skills: wrapping, centered pill list */
+/* Skills: wrapping, centered pill list (each <li> is a SkillBadge) */
 
 .skills {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.5rem;
+  gap: var(--space-sm);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.skill {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-}
+/* Wider than 400px: 3 columns, small uppercase label above each number */
 
-/* Narrow screens: metrics become key-value rows */
-
-@media (max-width: 400px) {
+@media (min-width: 401px) {
   .metrics {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: baseline;
-    row-gap: 0.5rem;
-    text-align: start;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-flow: row dense;
+    row-gap: var(--space-xs);
+    text-align: center;
   }
 
-  .metricLabel:nth-of-type(n) {
+  .metricValue {
+    font-size: 1.75rem;
+    text-align: center;
+  }
+
+  /* Pin each dt/dd pair to the same column; dense packing stacks dd under its dt */
+  .metricLabel:nth-of-type(3n + 1),
+  .metricValue:nth-of-type(3n + 1) {
     grid-column: 1;
   }
 
-  .metricValue:nth-of-type(n) {
+  .metricLabel:nth-of-type(3n + 2),
+  .metricValue:nth-of-type(3n + 2) {
     grid-column: 2;
-    font-size: 1.5rem;
-    text-align: end;
+  }
+
+  .metricLabel:nth-of-type(3n),
+  .metricValue:nth-of-type(3n) {
+    grid-column: 3;
   }
 }

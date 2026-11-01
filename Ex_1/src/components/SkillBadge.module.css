@@ -1,42 +1,42 @@
 /* src/components/SkillBadge.module.css */
 
 .badge {
-  --badge-bg: linear-gradient(145deg, #f5d77a, #c9a227);
-  --badge-fg: #2b1d00;
-  --badge-border: #f5d77a;
-  --badge-radius: 999px;
+  --badge-bg: linear-gradient(145deg, var(--color-gold-light), var(--color-gold-dark));
+  --badge-fg: var(--color-ink-on-gold);
+  --badge-border: var(--color-gold-light);
 
   box-sizing: border-box;
   display: inline-block;
   max-inline-size: 100%;
-  padding: 0.25rem 0.75rem;
+  min-inline-size: 0;
+  padding: var(--space-xs) 0.75rem;
   font-size: 0.8125rem;
   font-weight: 700;
   line-height: 1.4;
   color: var(--badge-fg);
   background: var(--badge-bg);
   border: 1px solid var(--badge-border);
-  border-radius: var(--badge-radius);
+  border-radius: var(--radius-pill);
   overflow-wrap: anywhere;
 }
 
 /* Core = gold */
 .core {
-  --badge-bg: linear-gradient(145deg, #f5d77a, #c9a227);
-  --badge-fg: #2b1d00;
-  --badge-border: #f5d77a;
+  --badge-bg: linear-gradient(145deg, var(--color-gold-light), var(--color-gold-dark));
+  --badge-fg: var(--color-ink-on-gold);
+  --badge-border: var(--color-gold-light);
 }
 
 /* Awareness = silver */
 .awareness {
-  --badge-bg: linear-gradient(145deg, #f1f5f9, #9ca3af);
-  --badge-fg: #111827;
-  --badge-border: #e5e7eb;
+  --badge-bg: linear-gradient(145deg, var(--color-silver-light), var(--color-silver-dark));
+  --badge-fg: var(--color-ink-on-silver);
+  --badge-border: var(--color-silver-border);
 }
 
 /* Later = bronze */
 .later {
-  --badge-bg: linear-gradient(145deg, #e8b07f, #a8642f);
-  --badge-fg: #2a1405;
-  --badge-border: #e8b07f;
+  --badge-bg: linear-gradient(145deg, var(--color-bronze-light), var(--color-bronze-dark));
+  --badge-fg: var(--color-ink-on-bronze);
+  --badge-border: var(--color-bronze-light);
 }

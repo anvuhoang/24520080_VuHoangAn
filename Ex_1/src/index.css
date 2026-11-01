@@ -1,0 +1,56 @@
+/* src/index.css — global design tokens (Rule 9.2). Component modules use var(--token) only. */
+
+:root {
+  /* Surface */
+  --color-bg-deep: #0b1120;
+  --color-bg-glow: #1e3a5f;
+  --color-card-top: #1f2a44;
+  --color-card-mid: #0f172a;
+  --color-card-bottom: #05080f;
+
+  /* Text */
+  --color-text: #f8fafc;
+  --color-muted: #cbd5e1;
+
+  /* Tier: gold (Core) */
+  --color-gold: #d4af37;
+  --color-gold-light: #f5d77a;
+  --color-gold-dark: #c9a227;
+  --color-ink-on-gold: #2b1d00;
+  --color-gold-glow: rgb(212 175 55 / 0.5);
+  --color-gold-divider: rgb(212 175 55 / 0.35);
+
+  /* Tier: silver (Awareness) */
+  --color-silver-light: #f1f5f9;
+  --color-silver-dark: #9ca3af;
+  --color-silver-border: #e5e7eb;
+  --color-ink-on-silver: #111827;
+
+  /* Tier: bronze (Later) */
+  --color-bronze-light: #e8b07f;
+  --color-bronze-dark: #a8642f;
+  --color-ink-on-bronze: #2a1405;
+
+  /* Shadow */
+  --shadow-card: 0 10px 25px rgb(0 0 0 / 0.45);
+  --shadow-card-hover: 0 20px 40px rgb(0 0 0 / 0.55), 0 0 24px var(--color-gold-glow);
+
+  /* Space, radius, size */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --radius-card: 1.25rem;
+  --radius-pill: 999px;
+  --avatar-size: 96px;
+  --page-gutter: 16px;
+
+  /* Type */
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg-deep);
+}
