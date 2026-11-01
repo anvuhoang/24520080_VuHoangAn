@@ -1,4 +1,4 @@
-# PROJECT_RULE.md 
+# project-rules.md 
 
 > Stack: React 19 · Vite · ES2024 · plain JSX (no TypeScript).
 > These rules are mandatory. Any generated code that breaks a rule is invalid and must be regenerated.
