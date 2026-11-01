@@ -1,6 +1,7 @@
 /* src/components/PubgMatchTelemetry.module.css */
 
-/* Loading, error and result views share this height, so switching between them causes no layout shift */
+/* Reserve the tallest view (the result card is up to 315px), so the 220px skeleton and alert
+   never change the height of this region while switching between loading, error and result */
 .region {
-  min-block-size: 220px;
+  min-block-size: 320px;
 }
