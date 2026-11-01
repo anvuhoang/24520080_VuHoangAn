@@ -1,0 +1,49 @@
+/* src/index.css — global design tokens (Rule 9.2). Component modules use var(--token) only. */
+
+:root {
+  /* Surface */
+  --color-bg-deep: #0b1120;
+  --color-bg-glow: #1e3a5f;
+  --color-surface: #111b30;
+  --color-surface-raised: #17233d;
+  --color-field: #0b1426;
+
+  /* Text */
+  --color-text: #f8fafc;
+  --color-muted: #cbd5e1;
+
+  /* Accent */
+  --color-gold: #d4af37;
+  --color-gold-light: #f5d77a;
+  --color-ink-on-gold: #2b1d00;
+  --color-gold-glow: rgb(212 175 55 / 0.5);
+  --color-gold-divider: rgb(212 175 55 / 0.35);
+  --color-border: #334155;
+
+  /* Danger */
+  --color-danger: #f87171;
+  --color-danger-bg: rgb(248 113 113 / 0.12);
+
+  /* Shadow */
+  --shadow-card: 0 8px 20px rgb(0 0 0 / 0.4);
+  --shadow-card-hover: 0 16px 32px rgb(0 0 0 / 0.5), 0 0 20px var(--color-gold-glow);
+
+  /* Space, radius, size */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --radius-card: 1rem;
+  --radius-field: 0.5rem;
+  --tap-target: 2.75rem;
+  --page-gutter: 16px;
+
+  /* Type */
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg-deep);
+}
