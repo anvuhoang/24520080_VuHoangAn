@@ -1,0 +1,6 @@
+/* src/components/PubgMatchTelemetry.module.css */
+
+/* Loading, error and result views share this height, so switching between them causes no layout shift */
+.region {
+  min-block-size: 220px;
+}

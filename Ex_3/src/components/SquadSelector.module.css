@@ -1,0 +1,55 @@
+/* src/components/SquadSelector.module.css */
+
+/* A fieldset defaults to min-content width, which can force horizontal scroll at 375px */
+.fieldset {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  min-inline-size: 0;
+  margin: 0;
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.legend {
+  padding-inline: var(--space-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.button {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  min-block-size: var(--tap-target);
+  max-inline-size: 100%;
+  padding: var(--space-sm) var(--space-md);
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-field);
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.button:hover {
+  border-color: var(--color-accent);
+}
+
+.button[aria-pressed='true'] {
+  color: var(--color-ink-on-accent);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.button:focus-visible {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 2px;
+}

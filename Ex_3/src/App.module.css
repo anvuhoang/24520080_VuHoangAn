@@ -1,0 +1,25 @@
+/* src/App.module.css */
+
+.page {
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--space-lg);
+  align-content: start;
+  inline-size: 100%;
+  max-inline-size: 900px;
+  min-block-size: 100vh;
+  margin-inline: auto;
+  padding: var(--space-lg) var(--page-gutter);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  overflow-wrap: anywhere;
+}

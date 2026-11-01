@@ -1,0 +1,54 @@
+/* src/index.css — global design tokens. Component modules use var(--token) only. */
+
+:root {
+  /* Surface (dark navy) */
+  --color-bg-deep: #0b1120;
+  --color-surface: #111b30;
+  --color-surface-raised: #17233d;
+
+  /* Text */
+  --color-text: #f8fafc;
+  --color-muted: #cbd5e1;
+
+  /* Accent: blue zone */
+  --color-accent: #38bdf8;
+  --color-accent-soft: rgb(56 189 248 / 0.18);
+  --color-ink-on-accent: #06202e;
+
+  /* Accent: gold */
+  --color-gold: #d4af37;
+  --color-gold-light: #f5d77a;
+
+  /* Danger */
+  --color-danger: #f87171;
+  --color-danger-bg: rgb(248 113 113 / 0.12);
+
+  /* Border */
+  --color-border: #334155;
+
+  /* Shadow */
+  --shadow-card: 0 8px 20px rgb(0 0 0 / 0.4);
+
+  /* Space */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+
+  /* Radius */
+  --radius-card: 1rem;
+  --radius-field: 0.5rem;
+
+  /* Size */
+  --tap-target: 2.75rem;
+  --page-gutter: 16px;
+
+  /* Type */
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg-deep);
+}
