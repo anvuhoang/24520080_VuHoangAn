@@ -30,11 +30,12 @@ export async function fetchKraftonPubgTelemetry(
   squadId,
   { signal, delayMs = 1200, lossRate = 0.35 } = {}
 ) {
-  await waitWithAbort(delayMs, signal);
-
-  const response = await fetch(`/telemetry/squads.json?squad=${encodeURIComponent(squadId)}`, {
-    signal,
-  });
+  // Start the request immediately and hold the result for `delayMs`: aborting a squad switch
+  // then cancels a real in-flight request instead of one that never started.
+  const [response] = await Promise.all([
+    fetch(`/telemetry/squads.json?squad=${encodeURIComponent(squadId)}`, { signal }),
+    waitWithAbort(delayMs, signal),
+  ]);
   if (!response.ok) {
     throw new Error('Telemetry request failed');
   }
