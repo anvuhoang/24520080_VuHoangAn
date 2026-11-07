@@ -17,6 +17,7 @@ Reuses the Exercise 3 toolchain; no new dependencies. Done by copying config fil
 | 0.2 | Copy `src/main.jsx` (`createRoot` + `<StrictMode>`, throws if `#root` is missing) and `docs/project-rules.md`. |
 | 0.3 | Add placeholder `src/App.jsx` and `src/index.css` so the project builds before any feature exists. |
 | 0.4 | Run `npm install` and `npm run build`. |
+| 0.5 | Add test tooling as dev dependencies (`vitest`, `jsdom`, `@testing-library/react`, `@testing-library/user-event`, `@testing-library/jest-dom`), a `test` block in `vite.config.js`, `tests/setup.js` and the `npm test` script. |
 
 ---
 
@@ -106,6 +107,21 @@ Each row is one prompt and one file. `P` numbers are the prompt order used in [P
 | 3.3 | P13 | `src/App.module.css` | Page column, title, gutters. | `feat(hw1): assemble the drum kit with shortcut toggle and responsive layout` |
 | 3.4 | P14 | `src/App.jsx` | Replace the placeholder: `<main>` → `<h1>` → `<DrumKit />`. | `feat(hw1): assemble the drum kit with shortcut toggle and responsive layout` |
 
+### Commit 4 — `test(hw1): add unit and integration tests`
+
+| ID  | File | What it covers | Commit message |
+| --- | ---- | -------------- | -------------- |
+| 4.1 | `tests/pads.test.js` | 7 pads, physical key codes, immutability, the read-only lookup map. | `test(hw1): add unit and integration tests` |
+| 4.2 | `tests/useDrumKeyboard.test.jsx` | Press/release, IME-safe key codes, auto-repeat guard, form-field isolation, Ctrl/Meta/Alt, `preventDefault` only for mapped keys, switching off, blur release, listener cleanup, latest callbacks. | `test(hw1): add unit and integration tests` |
+| 4.3 | `tests/drumKitAudio.test.js` | Lazy `AudioContext`, unknown ids, all 7 voices, click-free envelopes, node cleanup, `dispose()` twice, no console output (Web Audio faked). | `test(hw1): add unit and integration tests` |
+| 4.4 | `tests/DrumPad.test.jsx` | Markup, `aria-pressed`, click / `Enter` / `Space`, defaults. | `test(hw1): add unit and integration tests` |
+| 4.5 | `tests/HitLog.test.jsx` | Empty state, newest first, `limit`, live region vs history, stable keys, repeated hit re-announced. | `test(hw1): add unit and integration tests` |
+| 4.6 | `tests/LevelMeter.test.jsx` | Label tied to the meter, whole-number percent, clamping, invalid levels. | `test(hw1): add unit and integration tests` |
+| 4.7 | `tests/DrumKit.test.jsx` | The assembled kit with a fake audio kit: keyboard, mouse, `Enter`/`Space`, meter decay, hit-log cap, shortcut toggle, cleanup of timers and audio, StrictMode. | `test(hw1): add unit and integration tests` |
+| 4.8 | `tests/App.test.jsx` | Landmark, heading order, no `<div>`/`<span>`. | `test(hw1): add unit and integration tests` |
+
+Tests for a known defect are written as `it.fails(...)`: they describe the behaviour that should hold, they pass the suite while the defect exists, and they start failing as soon as the defect is fixed, which is the signal to change `it.fails` to `it`. Each one is linked to its entry in [AI_FAILURE_AUDIT.md](AI_FAILURE_AUDIT.md).
+
 ---
 
 ## Checkpoint HW1 — Verification
@@ -126,4 +142,5 @@ Run from `Hw_1/` in Git Bash, with `npm run dev` for the browser checks.
 - [ ] **Lighthouse:** Accessibility = **100** (desktop and mobile).
 - [ ] **375px:** `document.documentElement.scrollWidth <= window.innerWidth` → `true`; 1440px has no overflow.
 - [ ] **Console:** no errors or warnings.
-- [ ] **Git history:** `git log --oneline` shows the three HW1 commits above.
+- [ ] **Tests:** `npm test` → every test file passes; the tests marked `it.fails` are the known defects of the audit (6 at the time of writing).
+- [ ] **Git history:** `git log --oneline` shows the four HW1 commits above.
