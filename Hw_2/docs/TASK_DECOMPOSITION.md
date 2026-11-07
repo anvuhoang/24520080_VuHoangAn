@@ -81,6 +81,15 @@ interface PianoProps {        // src/components/Piano.jsx
   onNoteOn(midi: number): void;         // must keep the same identity between renders (memoized keys)
   onNoteOff(midi: number): void;
 }
+
+interface TransportProps {    // src/components/Transport.jsx
+  mode?: 'idle' | 'recording' | 'playing';   // default: 'idle'; anything else counts as 'idle'
+  eventCount?: number;                       // default: 0 → notes recorded; Play is disabled at 0
+  speed?: 0.5 | 1 | 2;                       // default: 1; any other value shows 1x
+  onRecord(): void; onPlay(): void; onStop(): void;
+  onSpeedChange(speed: number): void;        // sent as a number
+}
+// Record: enabled when idle · Play: idle and eventCount > 0 · Stop: recording or playing · Speed: not while playing
 ```
 
 Defaults are set with ES6 default parameters in the destructured signature. `defaultProps` is banned.
@@ -133,6 +142,7 @@ One flat `tests/` folder (no sub-folders), `npm test`. Tests for a known defect 
 | 4.3 | `tests/fifoQueue.test.js` | Order, empty queue, copy from `toArray`, `clear`. |
 | 4.4 | `tests/replay.test.js` | Timing at 0.5×, 1×, 2×, order, abort in the middle, no callbacks after an abort, notes released, timers cleared, queue disposed. |
 | 4.10 | `tests/audioTaskQueue.test.js` | The reused Lab 2 queue: FIFO start order, `maxConcurrency`, `cancel`, `reset`, `dispose`, duplicate ids, capacity (the Lab 2 tests ported from `node:test` to Vitest). |
+| 4.11 | `tests/fakeAudio.js` | Not a test: a small fake of the Web Audio API used by the synth and piano tests. |
 | 4.5 | `tests/PianoKey.test.jsx` | Markup, `aria-pressed`, pointer and keyboard, no stuck note, only a changed key re-renders. |
 | 4.6 | `tests/Piano.test.jsx` | 88 buttons, 52 white and 36 black, one render for the key that changes, accessible scroll region. |
 | 4.7 | `tests/Transport.test.jsx` | Buttons, speed, status message, disabled states. |
