@@ -1,8 +1,12 @@
-// src/App.jsx (placeholder from setup; replaced in the last prompt)
+// src/App.jsx
+import DrumKit from './components/DrumKit.jsx';
+import styles from './App.module.css';
+
 export default function App() {
   return (
-    <main>
-      <h1>Studio Drum Kit</h1>
+    <main className={styles.page}>
+      <h1 className={styles.title}>Studio Drum Kit</h1>
+      <DrumKit />
     </main>
   );
 }
