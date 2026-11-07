@@ -1,0 +1,112 @@
+/* src/components/PianoKey.module.css */
+
+/* Shared by both kinds of key. touch-action: manipulation lets a finger drag the keyboard
+   sideways (which cancels the press) and removes the double-tap-to-zoom delay. */
+.key {
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin: 0;
+  padding: 0 0 var(--space-sm);
+  font: inherit;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid var(--color-key-edge);
+  border-radius: 0 0 var(--radius-key) var(--radius-key);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition:
+    transform 60ms ease-out,
+    box-shadow 60ms ease-out;
+}
+
+/* White key: at least a finger wide */
+.white {
+  position: relative;
+  inline-size: 100%;
+  min-inline-size: var(--tap-target);
+  block-size: 11rem;
+  font-size: 0.75rem;
+  color: var(--color-ink-on-key-white);
+  background: var(--color-key-white);
+}
+
+/* Black key: sits on the right edge of the white key before it (its cell is position: relative),
+   half over that key and half over the next one */
+.black {
+  --black-key-width: 1.75rem;
+
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: calc(100% - var(--black-key-width) / 2);
+  z-index: 2;
+  inline-size: var(--black-key-width);
+  block-size: 7rem;
+  font-size: 0.6875rem;
+  color: var(--color-ink-on-key-black);
+  background: var(--color-key-black);
+}
+
+/* Pressed: color plus a thick inner ring and a small shift down, so it is not color alone
+   (the gold is only 1.45:1 against a white key) */
+.key[aria-pressed='true'] {
+  color: var(--color-ink-on-pressed);
+  background: var(--color-pressed);
+  box-shadow: inset 0 0 0 4px var(--color-ink-on-pressed);
+  transform: translateY(2px);
+}
+
+/* Focus: a dark ring right next to the key and a bright ring outside it,
+   so it shows on a white key and on the dark page */
+.key:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--color-focus-contrast);
+}
+
+/* The focused key rises above its neighbours, but a white key stays below the black keys
+   (z-index 2) so it never covers them; a focused black key goes above everything */
+.white:focus-visible {
+  z-index: 1;
+}
+
+.black:focus-visible {
+  z-index: 3;
+}
+
+.key[aria-pressed='true']:focus-visible {
+  box-shadow:
+    inset 0 0 0 4px var(--color-ink-on-pressed),
+    0 0 0 2px var(--color-focus-contrast);
+}
+
+@media (hover: hover) {
+  .white:hover {
+    border-color: var(--color-accent);
+  }
+}
+
+@media (min-width: 768px) {
+  .white {
+    block-size: 14rem;
+  }
+
+  .black {
+    block-size: 9rem;
+  }
+}
+
+/* No motion for users who ask for less of it; the ring and the color still show the pressed state */
+@media (prefers-reduced-motion: reduce) {
+  .key {
+    transition: none;
+  }
+
+  .key[aria-pressed='true'] {
+    transform: none;
+  }
+}

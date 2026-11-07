@@ -1,0 +1,49 @@
+/* src/components/Piano.module.css */
+
+/* The scroll region: the 2.2k px keyboard scrolls sideways in here and nowhere else.
+   min-inline-size: 0 and max-inline-size: 100% keep the page itself from growing wider.
+   The padding leaves room for the focus ring of the outermost keys (5px) so it is not clipped. */
+.region {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  padding: var(--space-sm);
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: var(--space-lg);
+  scrollbar-color: var(--color-border) var(--color-bg-deep);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+/* The region itself is reachable with Tab and scrolls with the arrow keys: show when it has focus */
+.region:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--color-focus-contrast);
+}
+
+/* 52 white keys in a row; max-content makes the list as wide as its keys so the region scrolls */
+.keys {
+  display: flex;
+  inline-size: max-content;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* One white key wide (at least a finger). Each cell is position: relative, which is what places
+   the black key that follows the white key (see PianoKey.module.css). */
+.cell {
+  position: relative;
+  flex: none;
+  inline-size: var(--tap-target);
+}
+
+/* Neighbouring keys share one border line instead of showing two */
+.cell + .cell {
+  margin-inline-start: -1px;
+}
