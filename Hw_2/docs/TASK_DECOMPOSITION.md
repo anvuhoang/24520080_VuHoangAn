@@ -50,19 +50,36 @@ createPolyphonicSynth({ maxVoices = 8 } = {}): {
 // src/sequencer/fifoQueue.js
 createFifoQueue(): { enqueue(item): void; dequeue(): item | undefined; size: number; toArray(): item[]; clear(): void }
 
-// src/sequencer/replay.js
+// src/sequencer/audioTaskQueue.js — the concurrent FIFO queue from Lab 2 HW2, reused unchanged
+//   (lab-2 branch: Hw_2/js/audio-task-queue.js), as the slide asks ("Lab 2 HW 2's FIFO AudioTaskQueue")
+new AudioTaskQueue({ capacity, maxConcurrency, execute(task, signal), onBackpressure? })
+  enqueue(task: { id, signal?, ... }): Promise<{ ok: true, id, value } | { ok: false, id, error }>
+  cancel(id), reset(), pause(), resume(), drain(), dispose()   // reset/dispose cancel running and waiting tasks
+  state, queuedCount, inFlightCount
+// - tasks start in the order they were enqueued; at most `maxConcurrency` run at once
+// - every task gets its own AbortController; `execute` receives its signal
+// - `capacity` counts the tasks that are WAITING for a permit
+
+// src/sequencer/replay.js  (runs on the AudioTaskQueue: one task per recorded note, maxConcurrency 1)
 interface SequenceEvent { midi: number; freqHz: number; durationMs: number; deltaMs: number }
 // deltaMs = time from the start of the previous event (0 for the first); durationMs = how long the key was held
 replaySequence(
   events: readonly SequenceEvent[],
   options: { speed?: 0.5 | 1 | 2; signal?: AbortSignal; onNoteOn(e): void; onNoteOff(e): void }
 ): Promise<'completed' | 'aborted'>
-// - waits deltaMs / speed between events; aborting stops at once, releases the notes in flight and clears timers
+// - a note starts at (sum of the previous deltaMs) / speed counted from the start of the replay, so timer delays do not add up
+// - aborting cancels the waiting tasks, releases the notes still sounding and clears every timer
 
 interface PianoKeyProps {      // React.memo — props are primitives and stable callbacks only
   midi: number; noteName: string; isBlack: boolean;
   isPressed?: boolean;         // default: false → aria-pressed
   onNoteOn(midi: number): void; onNoteOff(midi: number): void;
+}
+
+interface PianoProps {        // src/components/Piano.jsx
+  pressedNotes?: ReadonlySet<number>;   // default: an empty Set; replaced by a new Set on every change
+  onNoteOn(midi: number): void;         // must keep the same identity between renders (memoized keys)
+  onNoteOff(midi: number): void;
 }
 ```
 
@@ -81,7 +98,8 @@ Each row is one prompt and one file. `P` numbers are the prompt order used in [P
 | 1.1 | P1 | `src/music/keys.js` | Generate the 88 keys from MIDI 21 to 108 with the frequency formula; no hand-written list. | `feat(hw2): generate the 88 keys, polyphonic synth, FIFO queue and replay` |
 | 1.2 | P2 | `src/audio/polyphonicSynth.js` | 8 voices, FIFO voice stealing, click-free envelopes, lazy `AudioContext`, `dispose()`. | `feat(hw2): generate the 88 keys, polyphonic synth, FIFO queue and replay` |
 | 1.3 | P3 | `src/sequencer/fifoQueue.js` | A first-in-first-out queue for the recorded events. | `feat(hw2): generate the 88 keys, polyphonic synth, FIFO queue and replay` |
-| 1.4 | P4 | `src/sequencer/replay.js` | Abortable replay at 0.5×, 1× and 2×. | `feat(hw2): generate the 88 keys, polyphonic synth, FIFO queue and replay` |
+| 1.4 | — | `src/sequencer/audioTaskQueue.js` | Reuse the Lab 2 `AudioTaskQueue` (copied from the `lab-2` branch, unchanged), as slide 27 asks. Not a prompt. | `feat(hw2): generate the 88 keys, polyphonic synth, FIFO queue and replay` |
+| 1.5 | P4 | `src/sequencer/replay.js` | Replay on the `AudioTaskQueue`: one task per recorded note, abortable, at 0.5×, 1× and 2×. | `feat(hw2): generate the 88 keys, polyphonic synth, FIFO queue and replay` |
 
 ### Commit 2 — `feat(hw2): add the memoized piano keys and the keyboard`
 
@@ -113,7 +131,8 @@ One flat `tests/` folder (no sub-folders), `npm test`. Tests for a known defect 
 | 4.1 | `tests/keys.test.js` | 88 keys, 52 white and 36 black, A0 27.5 Hz, A4 440 Hz, C8 ≈ 4186 Hz, names, immutability. |
 | 4.2 | `tests/polyphonicSynth.test.js` | Lazy context, 8 voices, FIFO stealing, repeated note, `noteOff`, `stopAll`, node cleanup, `dispose()` twice (Web Audio faked). |
 | 4.3 | `tests/fifoQueue.test.js` | Order, empty queue, copy from `toArray`, `clear`. |
-| 4.4 | `tests/replay.test.js` | Timing at 0.5×, 1×, 2×, abort in the middle, no callbacks after an abort, notes released, timers cleared. |
+| 4.4 | `tests/replay.test.js` | Timing at 0.5×, 1×, 2×, order, abort in the middle, no callbacks after an abort, notes released, timers cleared, queue disposed. |
+| 4.10 | `tests/audioTaskQueue.test.js` | The reused Lab 2 queue: FIFO start order, `maxConcurrency`, `cancel`, `reset`, `dispose`, duplicate ids, capacity (the Lab 2 tests ported from `node:test` to Vitest). |
 | 4.5 | `tests/PianoKey.test.jsx` | Markup, `aria-pressed`, pointer and keyboard, no stuck note, only a changed key re-renders. |
 | 4.6 | `tests/Piano.test.jsx` | 88 buttons, 52 white and 36 black, one render for the key that changes, accessible scroll region. |
 | 4.7 | `tests/Transport.test.jsx` | Buttons, speed, status message, disabled states. |
@@ -132,6 +151,7 @@ Run from `Hw_2/` in Git Bash, with `npm run dev` for the browser checks.
 - [ ] **Polyphony:** hold 8 notes → 8 voices; a 9th note stops the first one pressed (FIFO), the other 7 keep sounding.
 - [ ] **No clicks:** released notes fade out (about 40 ms) instead of cutting off.
 - [ ] **Render isolation:** React DevTools Profiler, press one key → only that key re-renders (the automated test counts renders of all 88).
+- [ ] **Lab 2 queue reused:** `src/sequencer/audioTaskQueue.js` is the Lab 2 file (`diff` against `lab-2:Hw_2/js/audio-task-queue.js` shows only the added first line) and `replay.js` imports it.
 - [ ] **Recorder and replay:** record a short phrase, replay at 0.5×, 1× and 2× (the duration halves and doubles), press **Stop** during playback → sound and callbacks stop at once.
 - [ ] **Cleanup:** unmounting stops the replay and closes the `AudioContext`; no timers keep running.
 - [ ] **No `<div>` / `<span>` / `alert(` / inline `style=` / `http://` / `keyCode`:** each `grep -rn … src | wc -l` → `0`.
