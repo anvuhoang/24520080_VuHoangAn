@@ -1,0 +1,133 @@
+/* src/components/Transport.module.css */
+
+/* Mobile-first: the controls wrap onto as many rows as the screen needs.
+   min-inline-size: 0 stops the fieldset's default min-content width from forcing a sideways scroll. */
+.transport {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  inline-size: 100%;
+  min-inline-size: 0;
+  margin: 0;
+  padding: var(--space-md);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+.legend {
+  padding-inline: var(--space-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* On a phone the three buttons share a row and each is well over 44px wide and high */
+.button {
+  box-sizing: border-box;
+  flex: 1 1 5.5rem;
+  min-block-size: var(--tap-target);
+  min-inline-size: var(--tap-target);
+  padding: var(--space-sm) var(--space-md);
+  font: inherit;
+  font-weight: 700;
+  color: var(--color-ink-on-accent);
+  background: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-field);
+  cursor: pointer;
+}
+
+.button:disabled {
+  color: var(--color-muted);
+  background: var(--color-surface-raised);
+  border-color: var(--color-border);
+  cursor: not-allowed;
+}
+
+@media (hover: hover) {
+  .button:not(:disabled):hover {
+    border-color: var(--color-pressed);
+  }
+}
+
+/* The speed choice: label and select side by side, wrapping to its own row when needed */
+.field {
+  display: flex;
+  flex: 1 1 100%;
+  align-items: center;
+  gap: var(--space-sm);
+  min-inline-size: 0;
+  margin: 0;
+}
+
+.field label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.select {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  min-block-size: var(--tap-target);
+  min-inline-size: 0;
+  padding: var(--space-sm) 0.75rem;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--color-text);
+  background: var(--color-bg-deep);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-field);
+}
+
+.select:disabled {
+  color: var(--color-muted);
+  background: var(--color-surface-raised);
+  cursor: not-allowed;
+}
+
+/* A dark ring next to the control and a bright one outside it, as on the keys */
+.button:focus-visible,
+.select:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--color-focus-contrast);
+}
+
+/* Its own row; two lines of room so the layout does not jump between messages */
+.status {
+  flex: 1 1 100%;
+  min-block-size: calc(2 * 1.4em);
+  line-height: 1.4;
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+
+/* Wider screens: one row, buttons no longer stretched */
+@media (min-width: 768px) {
+  .transport {
+    gap: var(--space-md);
+  }
+
+  .button {
+    flex: 0 0 auto;
+    min-inline-size: 6rem;
+  }
+
+  .field {
+    flex: 0 0 auto;
+  }
+
+  .select {
+    flex: 0 0 auto;
+  }
+
+  .status {
+    flex: 1 1 14rem;
+  }
+}

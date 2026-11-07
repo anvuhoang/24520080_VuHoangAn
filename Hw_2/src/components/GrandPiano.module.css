@@ -1,0 +1,27 @@
+/* src/components/GrandPiano.module.css */
+
+/* Transport above the keyboard, one column. minmax(0, 1fr) keeps the column as wide as the page,
+   so the 2.2k px keyboard cannot widen it: the keyboard scrolls inside its own region instead. */
+.grandPiano {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-md);
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.heading {
+  margin: 0;
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 768px) {
+  .grandPiano {
+    gap: var(--space-lg);
+  }
+}

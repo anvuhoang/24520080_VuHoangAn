@@ -1,0 +1,36 @@
+/* src/App.module.css */
+
+/* Mobile-first: full width with the page gutter, then a centered column that stops growing at 1100px.
+   The column is wide because the keyboard needs room; it scrolls inside its own region beyond that. */
+.page {
+  box-sizing: border-box;
+  display: grid;
+  align-content: start;
+  gap: var(--space-lg);
+  inline-size: 100%;
+  max-inline-size: 1100px;
+  min-block-size: 100vh;
+  margin-inline: auto;
+  padding: var(--space-lg) var(--page-gutter);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.75rem, 6vw, 3rem);
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--color-pressed);
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 768px) {
+  .page {
+    gap: var(--space-xl);
+    padding-block: var(--space-xl);
+    padding-inline: var(--space-lg);
+  }
+}
