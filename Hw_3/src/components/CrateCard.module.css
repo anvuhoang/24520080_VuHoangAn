@@ -1,0 +1,167 @@
+/* src/components/CrateCard.module.css — mobile-first, tokens only */
+
+.card {
+  box-sizing: border-box;
+  min-inline-size: 0;
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-divider);
+  border-inline-start-width: 6px;
+  border-radius: var(--radius-card);
+}
+
+/* One look per phase: the edge changes in colour AND in line style, next to the text label of the badge */
+.card[data-phase='WARMUP'] {
+  border-inline-start-style: dashed;
+  border-inline-start-color: var(--color-accent);
+}
+
+.card[data-phase='AIRDROP_LIVE'] {
+  border-inline-start-style: solid;
+  border-inline-start-color: var(--color-success);
+}
+
+.card[data-phase='LOOTED_OUT'] {
+  border-inline-start-style: double;
+  border-inline-start-color: var(--color-danger);
+}
+
+.card[data-phase='EXPIRED'] {
+  border-inline-start-style: dotted;
+  border-inline-start-color: var(--color-border);
+}
+
+.header {
+  display: grid;
+  gap: var(--space-sm);
+  min-inline-size: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+/* The phase badge: a glyph, a word and a colour */
+.phase {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  inline-size: fit-content;
+  margin: 0;
+  padding: var(--space-xs) var(--space-sm);
+  border: 2px solid currentcolor;
+  border-radius: var(--radius-pill);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.phase::before {
+  content: '◔' / '';
+}
+
+.card[data-phase='WARMUP'] .phase {
+  color: var(--color-accent);
+}
+
+.card[data-phase='AIRDROP_LIVE'] .phase {
+  background: var(--color-success);
+  color: var(--color-ink-on-success);
+}
+
+.card[data-phase='AIRDROP_LIVE'] .phase::before {
+  content: '●' / '';
+}
+
+.card[data-phase='LOOTED_OUT'] .phase {
+  background: var(--color-danger);
+  color: var(--color-ink-on-danger);
+}
+
+.card[data-phase='LOOTED_OUT'] .phase::before {
+  content: '✕' / '';
+}
+
+.card[data-phase='EXPIRED'] .phase {
+  color: var(--color-muted);
+}
+
+.card[data-phase='EXPIRED'] .phase::before {
+  content: '–' / '';
+}
+
+/* Two columns, term then value. Room for three rows is always kept, so the card keeps its height in every phase */
+.facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-content: start;
+  gap: var(--space-xs) var(--space-md);
+  min-block-size: calc(3 * 1.5em + 2 * var(--space-xs));
+  margin: 0;
+  line-height: 1.5;
+}
+
+.facts dt {
+  color: var(--color-muted);
+}
+
+.facts dd {
+  margin: 0;
+  min-inline-size: 0;
+  text-align: end;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* Digits of equal width and a fixed box, so changing digits never moves anything */
+.countdown {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  min-inline-size: 9ch;
+}
+
+.claim {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: var(--tap-target);
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-field);
+  background: var(--color-accent);
+  color: var(--color-ink-on-accent);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.claim[aria-disabled='true'] {
+  border-style: dashed;
+  border-color: var(--color-border);
+  background: var(--color-surface-raised);
+  color: var(--color-muted);
+  cursor: not-allowed;
+}
+
+.claim:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--color-focus-contrast);
+}
+
+@media (min-width: 30rem) {
+  .header {
+    grid-template-columns: 1fr auto;
+    align-items: start;
+  }
+}
+
+@media (min-width: 48rem) {
+  .card {
+    padding: var(--space-lg);
+  }
+}
