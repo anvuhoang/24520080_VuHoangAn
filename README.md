@@ -14,17 +14,18 @@ Deliverables of Lab 3 (React 19 + Vite, plain JSX): three in-class exercises and
 | [`Hw_1/`](Hw_1) | Homework 1 | Studio drum kit: `e.code` keys, hit log, level meter | 99 (93 pass, 6 expected failures) |
 | [`Hw_2/`](Hw_2) | Homework 2 | 88-key piano: generated keys, 8-voice synth with FIFO voice stealing, recorder and replay on the Lab 2 `AudioTaskQueue` | 149 (144 pass, 5 expected failures) |
 | [`Hw_3/`](Hw_3) | Homework 3 | PUBG VN arena: zero-drift airdrop countdown, optimistic claim with rollback on 409, filterable leaderboard | 145 (143 pass, 2 expected failures) |
+| [`Bonus/`](Bonus) | Bonus Exercise (Slides 31–32) | "Hẹn Hò Nhưng Không Yêu" situationship analyzer: Wendy Thảo domain simulation, 5-state FSM, 5s "seen không rep" AbortController timer, derived effort asymmetry | 37 (36 pass, 1 expected failure) |
 
 The slide for the final submission draws one project with `src/homeworks/…`. Here every exercise and homework is a separate project with the same toolchain instead, so that each one builds and runs alone and keeps its own documents and history.
 
 ## Run a project
 
 ```bash
-cd Hw_3            # or Ex_1, Ex_2, Ex_3, Hw_1, Hw_2
+cd Bonus            # or Ex_1, Ex_2, Ex_3, Hw_1, Hw_2, Hw_3
 npm install
 npm run dev        # development server
 npm run build      # production build into dist/
-npm test           # Hw_1, Hw_2 and Hw_3 only (Vitest + Testing Library, jsdom)
+npm test           # Hw_1, Hw_2, Hw_3 and Bonus only (Vitest + Testing Library, jsdom)
 ```
 
 Node 22.12 or newer (Vitest 5 needs it; Vite 7 alone needs 20.19). Stack: React 19, Vite 7, CSS Modules, no UI library.
@@ -46,6 +47,7 @@ Node 22.12 or newer (Vitest 5 needs it; Vite 7 alone needs 20.19). Stack: React 
 | Hw_1 | 15 | 7 |
 | Hw_2 | 17 | 6 |
 | Hw_3 | 18 | 13 |
+| Bonus | 12 | 5 |
 
 ## How the work was checked
 
