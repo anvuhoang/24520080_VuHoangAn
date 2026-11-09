@@ -149,14 +149,14 @@ useGhostingTimer({
 
 ## Commit plan
 
-| Commit | Content |
-| ------ | ------- |
-| 1 | `chore(bonus): scaffold project and add docs rules and decomposition` |
-| 2 | `feat(bonus): add constants, effort metrics and FSM reducer` |
-| 3 | `feat(bonus): add abortable message service and ghosting timer hook` |
-| 4 | `feat(bonus): add design tokens and effort card component` |
-| 5 | `feat(bonus): add situationship analyzer and app` |
-| 6 | `test(bonus): add unit and integration tests` |
-| 7 | `docs(bonus): add prompt log, failure audit and lessons learned` |
-| 8 | `docs(bonus): record commit hashes` |
+| Commit | Hash | Content |
+| ------ | ---- | ------- |
+| 1 | `01bf236` | `chore(bonus): scaffold project and add docs rules and decomposition` |
+| 2 | `38cc5ec` | `feat(bonus): add constants, effort metrics and FSM reducer` |
+| 3 | `e31f31b` | `feat(bonus): add ghosting timer hook with AbortController` |
+| 4 | `f0ca569` | `feat(bonus): add design tokens and effort card component` |
+| 5 | `d5071e0` | `feat(bonus): add situationship analyzer and app` |
+| 6 | `aa383c8` | `test(bonus): add unit and integration tests` |
+| 7 | `7d150b3` | `docs(bonus): add prompt log, failure audit and lessons learned` |
+| 8 | pending | `docs(bonus): record commit hashes` |
 
