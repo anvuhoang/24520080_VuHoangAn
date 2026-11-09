@@ -1,0 +1,173 @@
+/* src/components/Leaderboard.module.css — mobile-first, tokens only */
+
+.leaderboard {
+  display: grid;
+  gap: var(--space-md);
+  min-inline-size: 0;
+}
+
+.heading {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: clamp(1.25rem, 1rem + 1.5vw, 1.75rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Filters: one column on a phone */
+.filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-md);
+}
+
+.field {
+  display: grid;
+  gap: var(--space-xs);
+  min-inline-size: 0;
+  margin: 0;
+}
+
+.field label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.control {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: var(--tap-target);
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-field);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  color-scheme: dark;
+  font: inherit;
+}
+
+.control:focus-visible,
+.scroll:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--color-focus-contrast);
+}
+
+.count {
+  display: block;
+  min-block-size: 1.5em;
+  color: var(--color-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The only place that may scroll sideways. The table is wider than a phone, so the region scrolls, not the page. */
+.scroll {
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  margin: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+/* Fixed layout: the column widths come from the header, so filtering rows never makes columns jump */
+.table {
+  table-layout: fixed;
+  inline-size: 100%;
+  min-inline-size: 28rem;
+  border-collapse: collapse;
+}
+
+.caption {
+  padding: var(--space-md);
+  color: var(--color-muted);
+  font-size: 0.875rem;
+  text-align: start;
+}
+
+.table th,
+.table td {
+  padding: var(--space-sm) var(--space-xs);
+  text-align: start;
+}
+
+.table thead th {
+  border-block-end: 2px solid var(--color-border);
+  background: var(--color-surface-raised);
+  font-size: 0.8125rem;
+}
+
+.table tbody tr + tr {
+  border-block-start: 1px solid var(--color-divider);
+}
+
+.table th:first-child {
+  inline-size: 30%;
+}
+
+/* The squad name stays in view while the numbers scroll */
+.table tbody th:first-child {
+  position: sticky;
+  inset-inline-start: 0;
+  background: var(--color-surface);
+}
+
+.table thead th:first-child {
+  position: sticky;
+  inset-inline-start: 0;
+}
+
+/* Numbers: right-aligned, digits of equal width, never wrapped */
+.table .num {
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  white-space: nowrap;
+}
+
+.table td.num {
+  font-weight: 600;
+}
+
+/* The sorted column: a colour AND an arrow */
+.table th[aria-sort='descending'] {
+  color: var(--color-accent);
+}
+
+.table th[aria-sort='descending']::after {
+  content: ' ▼' / '';
+}
+
+.table td.empty {
+  padding: var(--space-lg);
+  color: var(--color-muted);
+  text-align: center;
+}
+
+@media (min-width: 40rem) {
+  .filters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-lg);
+  }
+
+  .table th,
+  .table td {
+    padding: var(--space-sm);
+  }
+
+  .table thead th {
+    font-size: 0.875rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .table th,
+  .table td {
+    padding: var(--space-sm) var(--space-md);
+  }
+}

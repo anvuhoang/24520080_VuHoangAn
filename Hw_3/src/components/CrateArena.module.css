@@ -1,0 +1,104 @@
+/* src/components/CrateArena.module.css — mobile-first, tokens only */
+
+.arena {
+  display: grid;
+  gap: var(--space-md);
+  min-inline-size: 0;
+}
+
+.heading {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: clamp(1.25rem, 1rem + 1.5vw, 1.75rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* The notice keeps room for the longest message (four lines on the narrowest phones, fewer on wider
+   screens), so a message appearing never pushes the list down. While it is empty it shows nothing. */
+.notice {
+  box-sizing: border-box;
+  display: block;
+  min-block-size: calc(4 * 1.5em + 2 * var(--space-md) + 4px);
+  padding: var(--space-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-field);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.notice:empty {
+  border-color: transparent;
+  background: transparent;
+}
+
+/* Each kind: a colour, a line style and a glyph, next to the words of the message itself */
+.notice[data-kind='ok'] {
+  border-style: solid;
+  border-color: var(--color-success);
+}
+
+.notice[data-kind='ok']::before {
+  content: '✓ ' / '';
+}
+
+.notice[data-kind='conflict'] {
+  border-style: dashed;
+  border-color: var(--color-warning);
+}
+
+.notice[data-kind='conflict']::before {
+  content: '⚠ ' / '';
+}
+
+.notice[data-kind='error'] {
+  border-style: double;
+  border-color: var(--color-danger);
+}
+
+.notice[data-kind='error']::before {
+  content: '✕ ' / '';
+}
+
+.list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The card fills its list item, so the cards of one row are equally tall */
+.item {
+  display: grid;
+  min-inline-size: 0;
+}
+
+@media (min-width: 22.5rem) {
+  .notice {
+    min-block-size: calc(3 * 1.5em + 2 * var(--space-md) + 4px);
+  }
+}
+
+@media (min-width: 30rem) {
+  .notice {
+    min-block-size: calc(2 * 1.5em + 2 * var(--space-md) + 4px);
+  }
+}
+
+@media (min-width: 40rem) {
+  .list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-lg);
+  }
+}
+
+@media (min-width: 80rem) {
+  .list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
