@@ -1,0 +1,318 @@
+/* src/components/SituationshipAnalyzer.module.css */
+.analyzer {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border-block-end: 1px solid var(--color-border-subtle);
+  padding-block-end: var(--space-3);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+/* Phase Badges with distinct border styles, icons, and text (never color alone) */
+.phaseBadge {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  align-self: flex-start;
+  box-sizing: border-box;
+}
+
+.phaseBadge[data-phase='FRIENDS'] {
+  background-color: var(--color-surface-raised);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+.phaseBadge[data-phase='FRIENDS']::before {
+  content: '🤝 ';
+}
+
+.phaseBadge[data-phase='DATING_NO_LOVE'] {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger);
+  border: 2px dashed var(--color-danger);
+}
+.phaseBadge[data-phase='DATING_NO_LOVE']::before {
+  content: '💔 ';
+}
+
+.phaseBadge[data-phase='COMMITTED'] {
+  background-color: var(--color-surface-raised);
+  color: var(--color-success);
+  border: 2px solid var(--color-success);
+}
+.phaseBadge[data-phase='COMMITTED']::before {
+  content: '💍 ';
+}
+
+.phaseBadge[data-phase='GHOSTED_EXIT'] {
+  background-color: var(--color-surface-raised);
+  color: var(--color-warning);
+  border: 2px dotted var(--color-warning);
+}
+.phaseBadge[data-phase='GHOSTED_EXIT']::before {
+  content: '👻 ';
+}
+
+.phaseBadge[data-phase='SELF_RESPECT_EXIT'] {
+  background-color: var(--color-surface-raised);
+  color: var(--color-primary);
+  border: 2px double var(--color-primary);
+}
+.phaseBadge[data-phase='SELF_RESPECT_EXIT']::before {
+  content: '🛡️ ';
+}
+
+/* WCAG 2.2 Live Region Alert Box */
+.statusSection {
+  margin: 0;
+}
+
+.alertBox {
+  display: block;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.4;
+  box-sizing: border-box;
+}
+
+.alertRedFlag {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+}
+
+.alertStable {
+  background-color: var(--color-surface-raised);
+  color: var(--color-success);
+  border: 1px solid var(--color-success);
+}
+
+/* Ping & Ghosting Simulation Section */
+.pingSection {
+  background-color: var(--color-surface-raised);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.pingHeader h3 {
+  margin: 0 0 var(--space-1) 0;
+  font-size: 1.0625rem;
+  color: var(--color-text);
+}
+
+.pingSubtitle {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.pingForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.pingInput {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--tap-target);
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  outline: none;
+}
+
+.pingActions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.pingActions li {
+  margin: 0;
+  padding: 0;
+}
+
+.sendBtn,
+.abortBtn,
+.unbindBtn,
+.resetBtn {
+  min-height: var(--tap-target);
+  min-width: var(--tap-target);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sendBtn {
+  background-color: var(--color-primary);
+  color: var(--color-primary-ink);
+  border: 1px solid var(--color-primary);
+}
+
+.sendBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.abortBtn {
+  background-color: var(--color-danger);
+  color: var(--color-danger-ink);
+  border: 1px solid var(--color-danger);
+}
+
+.sendBtn:focus-visible,
+.abortBtn:focus-visible,
+.unbindBtn:focus-visible,
+.resetBtn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--color-focus-contrast);
+}
+
+/* Pulsing Countdown */
+.countdownSection {
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.countdownText {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-warning);
+}
+
+.progressBar {
+  width: 100%;
+  height: 0.5rem;
+  border-radius: var(--radius-pill);
+  appearance: none;
+  border: none;
+  background-color: var(--color-surface-raised);
+}
+
+.progressBar::-webkit-progress-bar {
+  background-color: var(--color-surface-raised);
+  border-radius: var(--radius-pill);
+}
+
+.progressBar::-webkit-progress-value {
+  background-color: var(--color-warning);
+  border-radius: var(--radius-pill);
+}
+
+.progressBar::-moz-progress-bar {
+  background-color: var(--color-warning);
+  border-radius: var(--radius-pill);
+}
+
+/* Footer Controls */
+.footerControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  border-block-start: 1px solid var(--color-border-subtle);
+  padding-block-start: var(--space-3);
+}
+
+.unbindBtn {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+}
+
+.unbindBtn:hover:not(:disabled) {
+  background-color: var(--color-danger);
+  color: var(--color-danger-ink);
+}
+
+.unbindBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.resetBtn {
+  background-color: var(--color-surface-raised);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.resetBtn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+@media (min-width: 48rem) {
+  .header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .phaseBadge {
+    align-self: auto;
+  }
+
+  .footerControls {
+    justify-content: flex-end;
+  }
+}
