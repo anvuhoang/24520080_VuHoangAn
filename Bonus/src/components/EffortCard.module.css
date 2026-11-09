@@ -1,0 +1,205 @@
+/* src/components/EffortCard.module.css */
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.header {
+  margin-block-end: var(--space-3);
+  border-block-end: 1px solid var(--color-border-subtle);
+  padding-block-end: var(--space-2);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.subtitle {
+  margin-block-start: var(--space-1);
+  margin-block-end: 0;
+  font-size: 0.875rem;
+  color: var(--color-primary);
+  font-style: italic;
+}
+
+.form {
+  margin: 0;
+}
+
+.fieldset {
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.actorSection {
+  background-color: var(--color-surface-raised);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+}
+
+.actorHeader h4 {
+  margin: 0 0 var(--space-2) 0;
+  font-size: 0.9375rem;
+  color: var(--color-text);
+}
+
+.label {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-block-end: var(--space-1);
+}
+
+.input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--tap-target);
+  padding: var(--space-2) var(--space-3);
+  font-size: 1rem;
+  font-family: var(--font-mono);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  outline: none;
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--color-focus-contrast);
+}
+
+.quickActions {
+  list-style: none;
+  margin: var(--space-2) 0 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.quickActions li {
+  margin: 0;
+  padding: 0;
+}
+
+.quickBtn,
+.quickBtnRival {
+  min-height: var(--tap-target);
+  min-width: var(--tap-target);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+.quickBtn:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.quickBtnRival {
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+}
+
+.quickBtnRival:hover:not(:disabled) {
+  background-color: var(--color-warning);
+  color: var(--color-warning-ink);
+}
+
+.quickBtn:focus-visible,
+.quickBtnRival:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--color-focus-contrast);
+}
+
+.quickBtn:disabled,
+.quickBtnRival:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.metricsList {
+  margin: var(--space-4) 0 0 0;
+  padding: var(--space-3);
+  background-color: var(--color-surface-raised);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-subtle);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  row-gap: var(--space-2);
+  column-gap: var(--space-3);
+  align-items: center;
+}
+
+.metricsList dt {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.metricsList dd {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-align: right;
+}
+
+.myMetric {
+  color: var(--color-primary);
+}
+
+.rivalMetric {
+  color: var(--color-warning);
+}
+
+.ratioMetric {
+  color: var(--color-danger);
+}
+
+@media (min-width: 48rem) {
+  .fieldset {
+    flex-direction: row;
+  }
+
+  .actorSection {
+    flex: 1;
+  }
+}
