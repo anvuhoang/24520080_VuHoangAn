@@ -1,0 +1,13 @@
+/* src/index.css */
+:root {
+  --color-bg: #0f172a;
+  --color-text: #f8fafc;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
