@@ -133,15 +133,17 @@ useCrateClaims(crates, server): { stock, inFlight, notice, claim(crateId) }
 
 ## Block 6 — Tests (after the code, one flat `tests/` folder)
 
-| ID  | Task | Output |
-| --- | ---- | ------ |
-| 5.1 | `formatVnd`, `formatCountdown`, `getDropPhase` | `tests/format.test.js`, `tests/dropPhase.test.js` |
-| 5.2 | `selectStandings` (filter, sort, no mutation) | `tests/leaderboard.test.js` |
-| 5.3 | Timer: no drift when ticks are late, resync on `visibilitychange`, cleanup | `tests/usePubgAirdropTimer.test.jsx` |
-| 5.4 | Mock server: latency, abort, 409 | `tests/mockServer.test.js` |
-| 5.5 | Reducer: optimistic deduction, lock, rollback, stale answers | `tests/claimReducer.test.js` |
-| 5.6 | Hook and `CrateArena`: double click, 409 rollback, unmount abort | `tests/useCrateClaims.test.jsx`, `tests/CrateArena.test.jsx` |
-| 5.7 | `CrateCard`, `Leaderboard`, `App` (landmarks, labels, no `<div>`) | `tests/CrateCard.test.jsx`, `tests/Leaderboard.test.jsx`, `tests/App.test.jsx` |
+12 files, 145 tests: 143 pass and 2 are expected failures (`it.fails`) for open defects of the audit.
+
+| ID  | File | What it covers |
+| --- | ---- | -------------- |
+| 5.1 | `tests/format.test.js`, `tests/dropPhase.test.js` | The vi-VN price with its no-break space, the countdown rounded up, invalid input shown as zero; the four phases and their border moments (one millisecond before the drop, exactly at the drop, exactly at the end of the window), sold out after the window. |
+| 5.2 | `tests/leaderboard.test.js`, `tests/arenaData.test.js` | Search, minimum, four sort keys with four different orders, ties by name, no change to the input; the frozen sample data, ids, integers, drop times counted from the load. |
+| 5.3 | `tests/usePubgAirdropTimer.test.jsx` | A late tick shows the right time, resync on `visibilitychange`, zero and stop, a past target starts no interval, offset, restart and cleanup, StrictMode, and the deck's own hook compared with ours when the target changes. |
+| 5.4 | `tests/mockServer.test.js` | Latency, 409 for the last unit, 404, abort during the wait, an aborted signal, no timer left. |
+| 5.5 | `tests/claimReducer.test.js` | Optimistic deduction, in-flight lock, stale answers, 409 rollback to 0, failure gives the unit back, ignored input, 800,000 random actions. |
+| 5.6 | `tests/useCrateClaims.test.jsx`, `tests/CrateArena.test.jsx` | One request for quick clicks, 409 rollback, errors, a foreign `AbortError`, abort on unmount, one `claim` identity; the conflict notice and the sold-out card; two expected failures (a new list of crates, two claims ending together). |
+| 5.7 | `tests/CrateCard.test.jsx`, `tests/Leaderboard.test.jsx`, `tests/App.test.jsx` | Markup and landmarks, phases that change by themselves, focus kept while claiming, typing renders once, labels with `useId`, heading order, six polite live regions, no `<div>`/`<span>`, timers cleaned up. |
 
 ## Checkpoint (after each prompt)
 
