@@ -1,0 +1,42 @@
+/* src/components/NotFoundState.module.css — mobile-first, tokens only */
+
+.notFound {
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border: 2px dashed var(--color-danger);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.message {
+  margin: 0;
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+
+.back {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-block-size: var(--tap-target);
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-field);
+  color: var(--color-accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.back:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--color-focus-contrast);
+}

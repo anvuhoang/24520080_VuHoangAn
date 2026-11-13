@@ -1,0 +1,45 @@
+/* src/components/PersonDetail.module.css — mobile-first, tokens only */
+
+/* The detail card, the "nothing selected" card and the loading skeleton share this height, so nothing jumps */
+.card {
+  box-sizing: border-box;
+  display: grid;
+  align-content: start;
+  gap: var(--space-md);
+  min-block-size: 14rem;
+  padding: var(--space-lg);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.name {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.hint {
+  margin: 0;
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-sm) var(--space-md);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.details dt {
+  color: var(--color-muted);
+}
+
+.details dd {
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
