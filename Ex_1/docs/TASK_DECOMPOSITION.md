@@ -152,5 +152,6 @@ useForumMessages(forum, refreshKey): { status: 'loading' | 'success' | 'error', 
 | 10 | `99ebdcb` | `test(ex1)` forum UI, routes, deck reference code, known defects as expected failures |
 | 11 | `7adabac` | `docs(ex1)` rewritten task decomposition, prompt log, failure audit and lessons learned |
 | 12 | `cba9288` | `chore` remove the root `.gitignore` |
-| 13 | `TODO` | `chore(ex1)` add the server `.env.example` and let `npm start` read `.env` |
-| 14 | `TODO` | `docs(ex1)` Slow 3G verification log, updated audit, prompt log and task decomposition |
+| 13 | `cb149fb` | `chore(ex1)` add the server `.env.example` and let `npm start` read `.env` |
+| 14 | `266cb5e` | `docs(ex1)` Slow 3G verification log, updated audit, prompt log and task decomposition |
+| 15 | — | `docs(ex1)` record the last commit hashes |
