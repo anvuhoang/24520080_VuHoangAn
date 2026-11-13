@@ -1,0 +1,94 @@
+/* src/forum/MessageForm.module.css — mobile-first, tokens only */
+
+.panel {
+  display: grid;
+  gap: var(--space-md);
+  min-inline-size: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.form {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.field {
+  display: grid;
+  gap: var(--space-xs);
+  min-inline-size: 0;
+  margin: 0;
+}
+
+.field label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.input {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: var(--tap-target);
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-field);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font: inherit;
+  resize: vertical;
+}
+
+.input[aria-invalid='true'] {
+  border-style: dashed;
+  border-color: var(--color-danger);
+}
+
+.input:focus-visible,
+.submit:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--color-focus-contrast);
+}
+
+.error {
+  color: var(--color-danger);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.error::before {
+  content: '✕ ' / '';
+}
+
+.submit {
+  box-sizing: border-box;
+  justify-self: start;
+  min-block-size: var(--tap-target);
+  padding: var(--space-sm) var(--space-lg);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-field);
+  background: var(--color-accent);
+  color: var(--color-ink-on-accent);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.submit[aria-disabled='true'] {
+  border-style: dashed;
+  border-color: var(--color-border);
+  background: var(--color-surface-raised);
+  color: var(--color-muted);
+  cursor: wait;
+}
+
+.status {
+  display: block;
+  min-block-size: 1.5em;
+  color: var(--color-muted);
+  font-weight: 600;
+  line-height: 1.5;
+}

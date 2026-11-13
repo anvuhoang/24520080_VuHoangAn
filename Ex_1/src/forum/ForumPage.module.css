@@ -1,0 +1,13 @@
+/* src/forum/ForumPage.module.css — mobile-first, tokens only */
+
+.page {
+  display: grid;
+  gap: var(--space-lg);
+  max-inline-size: 44rem;
+  min-inline-size: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+}
