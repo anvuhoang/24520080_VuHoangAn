@@ -1,0 +1,42 @@
+HW1 browser verification: Chrome Chrome/157.0.8103.51, prod server http://localhost:4174 (production build)
+
+1. Deep link
+   open at load                                   {"url":"/gallery?category=chat&photoId=c2","dialog":{"open":true,"modal":true,"title":"Lobby chat during the match"},"hist":2,"focus":"BUTTON \"Close\" [inside dialog]"}
+2. Esc closes, keeps the category, adds no history entry
+   after Esc                                      {"url":"/gallery?category=chat","dialog":null,"hist":2,"focus":"BODY \"Evidence GalleryAllMatchChatRe\" [outside]"}
+   history length unchanged: true
+3. Keyboard: Enter on a thumbnail opens; focus is trapped; Esc returns focus to the thumbnail
+   after Enter                                    {"url":"/gallery?category=chat&photoId=c2","dialog":{"open":true,"modal":true,"title":"Lobby chat during the match"},"hist":3,"focus":"BUTTON \"Close\" [inside dialog]"}
+   12 x Tab: focus never reached a link or button of the page behind: true (3 stops on BODY = the slot where focus leaves to the browser UI)
+   point (5,5) is on DIALOG (inside dialog)
+   after Esc                                      {"url":"/gallery?category=chat","dialog":null,"hist":3,"focus":"A \"Lobby chat during the matchCha\" [outside]"}
+4. Mouse: open, backdrop click closes
+   after click                                    {"url":"/gallery?category=chat&photoId=c1","dialog":{"open":true,"modal":true,"title":"Team chat before the match"},"hist":4,"focus":"BUTTON \"Close\" [inside dialog]"}
+   after backdrop click                           {"url":"/gallery?category=chat","dialog":null,"hist":4,"focus":"A \"Team chat before the matchChat\" [outside]"}
+5. Arrow keys replace the entry; Back leaves the lightbox in one step; Forward opens it again
+   ArrowRight                                     {"url":"/gallery?category=match&photoId=m2","dialog":{"open":true,"modal":true,"title":"Final scoreboard"},"hist":6,"focus":"BUTTON \"Close\" [inside dialog]"}
+   ArrowRight x2 more (wraps to the first)        {"url":"/gallery?category=match&photoId=m1","dialog":{"open":true,"modal":true,"title":"Round 1 scoreboard"},"hist":6,"focus":"BUTTON \"Close\" [inside dialog]"}
+   history grew by 0 (0 expected)
+   Back                                           {"url":"/gallery?category=match","dialog":null,"hist":6,"focus":"A \"Round 1 scoreboardMatch\" [outside]"}
+   Forward                                        {"url":"/gallery?category=match&photoId=m1","dialog":{"open":true,"modal":true,"title":"Round 1 scoreboard"},"hist":6,"focus":"BUTTON \"Close\" [inside dialog]"}
+6. Filter and missing photo
+   {"url":"?category=replay","count":"3 photos in Replay","cards":3,"current":"Replay"}
+   unknown photo: alert "Photo “nope” is not in this view. Close this message", dialog present: false
+7. Layout: no sideways scroll, dialog fits the viewport
+    375 px  lightbox {"scrollW":375,"innerW":375,"dialog":[19,140,356,560],"inside":true}  grid {"scrollW":375,"innerW":375,"h1":1,"main":1,"div":0,"span":0}
+    768 px  lightbox {"scrollW":768,"innerW":768,"dialog":[19,121,749,779],"inside":true}  grid {"scrollW":768,"innerW":768,"h1":1,"main":1,"div":0,"span":0}
+   1440 px  lightbox {"scrollW":1440,"innerW":1440,"dialog":[240,82,1200,818],"inside":true}  grid {"scrollW":1440,"innerW":1440,"h1":1,"main":1,"div":0,"span":0}
+8. axe-core (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa and best-practice), including colour contrast
+   grid (all)                 violations: 0  rules passed: 33  needs manual review: []
+   grid (category=chat)       violations: 0  rules passed: 33  needs manual review: []
+   lightbox open              violations: 0  rules passed: 22  needs manual review: []
+   missing photo alert        violations: 0  rules passed: 34  needs manual review: []
+   404 page                   violations: 0  rules passed: 22  needs manual review: []
+
+Console errors, warnings and failed requests: none
+
+(The run above was made on the production build. The same script ran first on the dev server with React StrictMode on:
+ every line of sections 1-8 gave the same result, with 0 axe violations on the 5 pages and no console message.
+ Section 3 first printed "stayed inside the dialog: false". The focus order is Close, Previous photo, Next photo,
+ then one stop on BODY, then Close again: that stop is where Chrome moves focus to its own UI. No link or button of
+ the page behind was reached, so the check was corrected to test exactly that.)
