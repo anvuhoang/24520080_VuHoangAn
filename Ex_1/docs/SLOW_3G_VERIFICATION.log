@@ -1,0 +1,38 @@
+SLOW_3G_VERIFICATION.log — Lab 4 · Exercise 1
+Chrome (headless, puppeteer-core + CDP Network.emulateNetworkConditions), production build served by `vite preview`, API on port 3001, cache off, viewport 375 px.
+Throttling = the "Slow 3G" preset of DevTools: latency 400 ms, download 500 kbit/s, upload 500 kbit/s.
+
+A. Cold load of /forum/nasa
+   skeleton ("Loading messages…", aria-busy="true") seen while waiting: true; its height 256 px, the list's height after loading 256 px
+   messages on screen after 2837 ms; layout shift (CLS) so far: 0.0000
+   API requests:
+    2358 ms  GET  /api/messages/nasa               2778 ms  finished 200
+
+B. Rapid switching: Esports Tribunal -> NASA -> (150 ms later) Not NASA
+   API requests:
+      46 ms  GET  /api/messages/nasa                211 ms  FAILED net::ERR_ABORTED
+     211 ms  GET  /api/messages/notNasa             640 ms  finished 200
+   open channel: Not NASA; shown: "No messages in this channel yet."
+
+B2. Four clicks in a row: NASA, Esports Tribunal, Not NASA, Esports Tribunal (about 100 ms apart)
+   API requests:
+      15 ms  GET  /api/messages/nasa                134 ms  FAILED net::ERR_ABORTED
+     133 ms  GET  /api/messages/esports-tribunal    266 ms  FAILED net::ERR_ABORTED
+     266 ms  GET  /api/messages/notNasa             296 ms  FAILED net::ERR_ABORTED
+     296 ms  GET  /api/messages/esports-tribunal    729 ms  finished 200
+   open channel: Esports Tribunal; authors shown: Referee (the Esports Tribunal seed message is by "Referee")
+
+C. Leaving the forum (to /people) 100 ms after choosing NASA
+   API requests:
+      21 ms  GET  /api/messages/nasa                138 ms  FAILED net::ERR_ABORTED
+   page now: /people; unmounted without console errors so far: true
+
+D. Posting a message, three clicks on Send while the first request is on its way
+   while waiting: button "Sending…", aria-disabled=true, status "Sending…", focus on BUTTON
+   the message is in the list after 899 ms
+   API requests:
+      82 ms  POST /api/messages/notNasa             531 ms  finished 201
+     532 ms  GET  /api/messages/notNasa             952 ms  finished 200
+
+Console errors or warnings during the whole run: none
+Layout shift (CLS) of the last page: 0.0000

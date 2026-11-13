@@ -2,7 +2,7 @@
 
 > Defects in AI-generated code and in the deck's reference code, checked against [project-rules.md](project-rules.md) and the Lab 4 deck (slides 5, 13, 16, 22, 25–27, 29).
 > Prompt numbers refer to [PROMPT_LOG.md](PROMPT_LOG.md).
-> **How the evidence was collected:** after each batch a `grep` check, a Vitest run (jsdom, fake `fetch`, supertest for the API), and a run of the whole app in headless Chrome (`puppeteer-core`) with the Express server running. The numbers below are what those runs printed. Where the evidence is the deck's code, that code is copied unchanged into a test (`client/tests/deckReference.test.jsx`, `server/tests/deckReference.test.js`) so that anybody can run it.
+> **How the evidence was collected:** after each batch a `grep` check, a Vitest run (jsdom, fake `fetch`, supertest for the API), and a run of the whole app in headless Chrome (`puppeteer-core`) with the Express server running, including the Slow 3G profile of DevTools (`SLOW_3G_VERIFICATION.log`). The numbers below are what those runs printed. Where the evidence is the deck's code, that code is copied unchanged into a test (`client/tests/deckReference.test.jsx`, `server/tests/deckReference.test.js`) so that anybody can run it.
 > **Status:** Fixed = corrected before it was committed or in the commit named · Avoided = the deck's reference code has the defect and this project does not copy it · Open = reproduced and left in the code on purpose, written as `it.fails` (it passes the suite while the defect exists and starts failing once it is fixed; then change `it.fails` to `it`).
 > **Test suite:** client `npm test` 13 files, 126 tests (124 pass, 2 expected failures); server `npm test` 2 files, 25 tests. Together **15 files, 151 tests: 149 pass and 2 are those expected failures.**
 > **Do the tests catch real breakage?** 32 deliberate breakages of the source, one at a time: **29 were caught** by the first run; 1 real hole was found (NavLink style, in 3 components) and closed with tests, so **those are caught too**; the last 2 are *equivalent* changes (see the end of this file).
@@ -117,7 +117,7 @@
 - **AI Code**: `className={({ isActive }) => (isActive ? \`${styles.link} ${styles.active}\` : styles.link)}` in `PeopleLayout`, `ChannelSwitcher` and `AppNav`.
 - **Bug**: The tests checked `aria-current="page"`, which NavLink adds by itself. Replacing the callback by a plain `styles.link` removed the visible marking of the open item (thick edge, bold, fill) and every test still passed.
 - **DevTools Proof**: mutation run: "PeopleLayout: no NavLink active state → 118 passed" (survived). After adding one test per component that the open link's class matches `/active/` and the others' do not, the same three breakages fail 1 test each.
-- **Engineering Fix (Commit `TODO`, test commit)**: `PeopleLayout.test.jsx`, `forumParts.test.jsx` (`ChannelSwitcher`) and `appRoutes.test.jsx` (`AppNav`).
+- **Engineering Fix (Commits `1835241` and `99ebdcb`)**: `PeopleLayout.test.jsx`, `forumParts.test.jsx` (`ChannelSwitcher`) and `appRoutes.test.jsx` (`AppNav`).
 - **Status**: Fixed.
 
 ---
@@ -153,7 +153,7 @@
   ```
 - **Bug**: A user types in a field and then clicks "Submit" with the mouse. Pressing the button first takes the focus away from the field, so the field's error line appears and pushes everything under it down; the button has moved away from the pointer before the mouse is released, no click is made, and nothing is submitted. The user has to click again. jsdom has no layout, so no unit test can see it.
 - **DevTools Proof**: headless Chrome at 375 px, the form at `/form`: type `ada` in Email, focus Password (Email's error appears), click Submit with the mouse. Before: the Submit button went from y = 552 to y = 576 (**24 px**), the status line stayed empty and there were **2** alerts. After: y = 634 → 634 (**0 px**), status `4 fields need attention.` and **4** alerts. Leaving one wrong field moved the button by 24 px before and by 0 px after. (I first read the empty status and `alerts 2` as a normal result; it was found by comparing with the unit test, which expects 4.)
-- **Engineering Fix (Commit `TODO`)**: the field is a grid of three rows (label, input, one line kept free for the error): `grid-template-rows: auto auto minmax(1.4em, auto)`.
+- **Engineering Fix (Commit `1835241`)**: the field is a grid of three rows (label, input, one line kept free for the error): `grid-template-rows: auto auto minmax(1.4em, auto)`.
   ```css
   .field { display: grid; grid-template-rows: auto auto minmax(1.4em, auto); gap: var(--space-xs); }
   ```
@@ -172,16 +172,16 @@
 | 05 | Deck Express handler: client chooses the id, anything is stored | 14.3, 14.4 | `9c2ef4e` (Avoided) |
 | 06 | Three slides, three addresses for one API | contract first | `9c2ef4e` (Avoided) |
 | 07 | Deck layout: two `<main>`, `<div>`s, a dead-end 404 | 2.1, 2.4, 12.2 | `6b40c17` (Avoided) |
-| 08 | No test noticed the loss of the open link's style | tests must be able to fail | `TODO` (Fixed) |
+| 08 | No test noticed the loss of the open link's style | tests must be able to fail | `1835241`, `99ebdcb` (Fixed) |
 | 09 | The message form is offered for a channel that does not exist | UX / contract | — (Open, `it.fails`) |
 | 10 | The inspector keeps old values after an edit | UX | — (Open, `it.fails`) |
-| 11 | Leaving a wrong field moves Submit and the click is lost | layout stability | `TODO` (Fixed) |
+| 11 | Leaving a wrong field moves Submit and the click is lost | layout stability | `1835241` (Fixed) |
 
 ## The breakages that the tests did not catch, and what has not been verified
 
 **Two equivalent changes.** In `useForumMessages` (a) keeping the previous forum's messages in the state when the forum changes and (b) accepting the answer of an old request leave every test green, because the hook protects itself twice: the state records which forum it belongs to, and the value returned is empty while the state belongs to another forum. Removing one layer cannot be seen from outside; both stay for correctness. (In a browser an aborted request rejects, so the `aborted` check of the success branch only matters for an answer that arrives in the very microtask of the abort.)
 
 **Not verified (do not claim these):**
-- No Lighthouse run for Lab 4 yet; no screenshots.
-- The Slow 3G profile of DevTools was not used: slow answers were made by holding one request for 1.5 s with request interception, which shows the same cancellation (`net::ERR_ABORTED`).
+- No Lighthouse run for Lab 4 yet, and no screenshots.
 - Only Chrome was used. The data of the API is in memory and is lost when the server stops; the MongoDB/Mongoose 8 part belongs to the homework.
+- The script that drove Chrome for the Slow 3G run is not in the repository; its output (`SLOW_3G_VERIFICATION.log`) is. That run did show the cancellation that slide 17 asks for: the requests of a channel that was left end with `net::ERR_ABORTED`, and only the last channel's answer reaches the screen.

@@ -106,7 +106,7 @@ useForumMessages(forum, refreshKey): { status: 'loading' | 'success' | 'error', 
 | 3.1 | Message rules shared by browser and server. | `client/src/sprint3-forum/messageRules.js` |
 | 3.2 | In-memory store behind an async interface (a Mongoose store replaces it in the homework). | `server/src/store.js` |
 | 3.3 | Express app: CORS, JSON limit, GET, POST with validation, 404, error handler. | `server/src/app.js` |
-| 3.4 | Entry point (`PORT`, clean shutdown). | `server/src/index.js` |
+| 3.4 | Entry point (`PORT`, clean shutdown) and the template of its settings. | `server/src/index.js`, `server/.env.example` |
 | 3.5 | Channels, fetch client with `ApiError`, and the hook with `AbortController`. | `channels.js`, `forumApi.js`, `useForumMessages.js` |
 | 3.6 | Channel switcher (NavLinks), message list (`<dl>`, `<time>`), message form (same rules as the server). | `ChannelSwitcher.jsx`, `MessageList.jsx`, `MessageForm.jsx` + styles |
 | 3.7 | The page that joins them. | `ForumPage.jsx`, `.module.css` |
@@ -134,6 +134,7 @@ useForumMessages(forum, refreshKey): { status: 'loading' | 'success' | 'error', 
 - Run it: Vitest (jsdom) for components and hooks, supertest for the API, headless Chrome with the API running for the whole page.
 - `npm run build`; no sideways scroll at 375, 768 and 1440 px.
 - Break the source on purpose and check that a test fails (mutation run); restore and `diff`.
+- Slow 3G (DevTools preset: 400 ms, 500 kbit/s) with quick channel switching: the old requests must end `net::ERR_ABORTED` (log in `SLOW_3G_VERIFICATION.log`).
 
 ## Commit plan
 
@@ -147,7 +148,9 @@ useForumMessages(forum, refreshKey): { status: 'loading' | 'success' | 'error', 
 | 6 | `9c2ef4e` | `feat(ex1)` Sprint 3 Express API and channels |
 | 7 | `7557af2` | `feat(ex1)` Sprint 3 hook, forum UI, navigation and root app |
 | 8 | `183af87` | `test(ex1)` first test suite (100 tests) |
-| 9 | `TODO` | `refactor(ex1)` split into `client/` (sprint1-router, sprint2-form, sprint3-forum) and `server/` |
-| 10 | `TODO` | `test(ex1)` forum UI, routes, deck reference code, known defects as expected failures |
-| 11 | `TODO` | `docs(ex1)` rewritten task decomposition, prompt log, failure audit and lessons learned |
-| 12 | `TODO` | `docs(ex1)` record commit hashes |
+| 9 | `1835241` | `refactor(ex1)` split into `client/` (sprint1-router, sprint2-form, sprint3-forum) and `server/`; keeps a free row for each field error |
+| 10 | `99ebdcb` | `test(ex1)` forum UI, routes, deck reference code, known defects as expected failures |
+| 11 | `7adabac` | `docs(ex1)` rewritten task decomposition, prompt log, failure audit and lessons learned |
+| 12 | `cba9288` | `chore` remove the root `.gitignore` |
+| 13 | `TODO` | `chore(ex1)` add the server `.env.example` and let `npm start` read `.env` |
+| 14 | `TODO` | `docs(ex1)` Slow 3G verification log, updated audit, prompt log and task decomposition |
