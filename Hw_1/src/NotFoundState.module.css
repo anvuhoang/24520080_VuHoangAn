@@ -1,0 +1,15 @@
+.page {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--page-gutter);
+}
+
+.title {
+  margin: 0 0 var(--space-sm);
+  font-size: 1.75rem;
+}
+
+.message {
+  margin: 0 0 var(--space-md);
+  color: var(--color-muted);
+}
