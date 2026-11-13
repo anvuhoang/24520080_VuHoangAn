@@ -1,113 +1,153 @@
 # TASK_DECOMPOSITION.md — Lab 4 · Exercise 1 (WBS)
 
-> Goal: Multi-Route Single Page Application with React Router v7, Synchronous Context Form Validation Engine, and Full-Stack Express REST API.
-> Stack: React 19 · Vite 7 · React Router 7 · Express 5 · plain JSX. All work follows [project-rules.md](project-rules.md).
-> Source: Lab 4 deck, slides 7–17 & 22–27.
-> Working rule: **one prompt per row, one file per prompt**. Each prompt and its result is recorded in [PROMPT_LOG.md](PROMPT_LOG.md).
+> Goal: one multi-route single-page app with three sprints: a React Router v7 master-detail directory (Sprint 1), a Context form engine with synchronous validation (Sprint 2), and a forum with channel switching on top of an Express REST API (Sprint 3).
+> Stack: React 19 · Vite 7 · React Router 7 · Express 5 · plain JSX. All work follows [project-rules.md](project-rules.md) (sections 12–14 are new for Lab 4).
+> Source: Lab 4 deck, slides 9–17 (exercises), 22–27 (code contracts), 29 (AI hallucinations).
+> Working rule: one file per step. The student was away during the build, so the steps were generated in **batches per sprint** by the assistant; [PROMPT_LOG.md](PROMPT_LOG.md) says what was actually done, in order.
 
 ---
 
-## Block 1 — Setup & Scaffolding
+## Layout
+
+```
+Ex_1/
+  docs/                    project-rules.md · TASK_DECOMPOSITION.md · PROMPT_LOG.md · AI_FAILURE_AUDIT.md
+  client/                  Vite app (own package.json, `npm test`, `npm run dev`, `npm run build`)
+    src/
+      sprint1-router/      PeopleLayout · PersonDetail · NoSelection · NotFoundState · DetailSkeleton · people.js
+      sprint2-form/        SimpleForm · FormContext · InputField · ShowData · validateForm
+      sprint3-forum/       ForumPage · ChannelSwitcher · MessageList · MessageForm · useForumMessages · forumApi · channels · messageRules
+      App.jsx · AppNav.jsx · main.jsx · index.css
+    tests/                 one flat folder
+  server/                  Express API (own package.json, `npm start`, `npm test`)
+    src/                   app.js · store.js · index.js
+    tests/                 one flat folder
+```
+
+The server imports `messageRules.js` from `client/src/sprint3-forum`, so the form in the browser and the API apply the same rules (one source, no copy to keep in step).
+
+---
+
+## Block 1 — Setup
 
 | ID  | Task | Output |
 | --- | ---- | ------ |
-| 0.1 | Initialize React 19 + Vite 7 + React Router v7 project with Vitest and Supertest tooling. | `package.json`, `vite.config.js`, `index.html` |
-| 0.2 | Setup test harness and design tokens (:root tokens, zero div-soup, WCAG 2.2 AA). | `tests/setup.js`, `src/index.css`, `src/main.jsx` |
-| 0.3 | Define team coding rules, accessibility standards, and Lab 4 constraints. | `docs/project-rules.md` |
+| 0.1 | Project with the Lab 3 toolchain (Vite 7, Vitest 5, jsdom, Testing Library) plus `react-router@7`; later split into `client/` and `server/`. | `client/package.json`, `client/vite.config.js` (proxy `/api` to port 3001), `server/package.json`, `server/vitest.config.js` |
+| 0.2 | Design tokens and mounting (`createRoot` + `StrictMode` + `BrowserRouter`). | `client/src/index.css`, `client/src/main.jsx`, `client/tests/setup.js` |
+| 0.3 | Rules of the generation: the Lab 3 rules plus routing, forms/context and data/API (sections 12–14). | `docs/project-rules.md` |
 
 ---
 
-## Block 2 — Sprint 1: React Router v7 & Master-Detail Dossier
+## Contract
 
-| ID  | Prompt | Task | Output |
-| --- | ------ | ---- | ------ |
-| 1.1 | P1 | Frozen static dataset for dossier entities (`PEOPLE`). | `src/data/people.js` |
-| 1.2 | P2 | Accessible dimension-matched skeleton fallback (`aria-busy="true"`, `aria-live="polite"`). | `src/components/DetailSkeleton.jsx` |
-| 1.3 | P3 | Style for `DetailSkeleton` (CLS = 0). | `src/components/DetailSkeleton.module.css` |
-| 1.4 | P4 | Explicit 404 error boundary state (`role="alert"`). | `src/components/NotFoundState.jsx` |
-| 1.5 | P5 | Style for `NotFoundState`. | `src/components/NotFoundState.module.css` |
-| 1.6 | P6 | Empty selection placeholder view. | `src/components/NoSelection.jsx` |
-| 1.7 | P7 | Semantic detail dossier view using `useParams()` and `<dl>/<dt>/<dd>`. | `src/components/PersonDetail.jsx` |
-| 1.8 | P8 | Responsive card styling for `PersonDetail`. | `src/components/PersonDetail.module.css` |
-| 1.9 | P9 | Nested master-detail layout using React Router v7 `<Outlet />` and `<NavLink>`. | `src/components/PeopleLayout.jsx` |
-| 1.10 | P10 | Responsive CSS Grid layout for `PeopleLayout` (`minmax(280px, 1fr) 2fr`). | `src/components/PeopleLayout.module.css` |
+Documentation only. The project uses plain JSX, so this block is not compiled.
 
----
+```ts
+// Routes (client/src/App.jsx): one <main>, one <h1>, a main <nav aria-label="Main">
+/                         -> redirect to /people
+/people                   -> PeopleLayout (nav of people + <Outlet/>)
+  index                   -> NoSelection
+  :id                     -> PersonDetail, lazy (React.lazy + Suspense fallback DetailSkeleton)
+/form                     -> SimpleForm
+/forum                    -> redirect to /forum/nasa
+/forum/:channelId         -> ForumPage
+*                         -> NotFoundState (role="alert")
 
-## Block 3 — Sprint 2: Context Form Engine & Synchronous Validation
+// sprint1-router
+PersonDetail({ people = PEOPLE }): reads `id` with useParams(); unknown id -> NotFoundState, never throws
+PeopleLayout({ people = PEOPLE }): NavLink per person (key = person.id), className callback for the open one
 
-| ID  | Prompt | Task | Output |
-| --- | ------ | ---- | ------ |
-| 2.1 | P11 | Pure synchronous validation function for form inputs (zero `useEffect`). | `src/form/validateForm.js` |
-| 2.2 | P12 | Form context provider and strict `useFormContext()` hook. | `src/form/FormContext.js` |
-| 2.3 | P13 | Accessible input primitive with `useId()` binding, `aria-invalid`, and `aria-describedby`. | `src/form/InputField.jsx` |
-| 2.4 | P14 | Responsive styling for `InputField`. | `src/form/InputField.module.css` |
-| 2.5 | P15 | Semantic `<dl>` JSON state inspector with masked passwords. | `src/form/ShowData.jsx` |
-| 2.6 | P16 | Responsive styling for `ShowData`. | `src/form/ShowData.module.css` |
-| 2.7 | P17 | Single render pass form container eliminating multi-layer `useEffect` cascades. | `src/form/SimpleForm.jsx` |
-| 2.8 | P18 | Styling for `SimpleForm`. | `src/form/SimpleForm.module.css` |
+// sprint2-form (no useEffect anywhere)
+validateForm(values): { [field]: message }         // pure; fields name, email, password, confirmPassword
+//   name >= 2 chars (trimmed) · email pattern · password >= 8 chars · confirmPassword equals password (cross-field)
+FormContext value: { values, errors, touched, setValue(name, v), touch(name) }
+useFormContext(): throws outside a provider
+InputField({ name, label, type, autoComplete }): label htmlFor (useId), aria-invalid, aria-describedby -> its error
+// an error is shown once the field was left or the form was submitted
+ShowData({ data, title }): <dl>, passwords masked
 
----
-
-## Block 4 — Sprint 3: Full-Stack Express REST API & Forum Custom Hook
-
-| ID  | Prompt | Task | Output |
-| --- | ------ | ---- | ------ |
-| 3.1 | P19 | In-memory message store with `crypto.randomUUID()` and defensive copying. | `server/store.js` |
-| 3.2 | P20 | Express REST API server with CORS, payload validation, and secure error handler. | `server/app.js` |
-| 3.3 | P21 | Server entrypoint script. | `server/index.js` |
-| 3.4 | P22 | Static forum channel definitions (`nasa`, `esports-tribunal`, `notNasa`). | `src/forum/channels.js` |
-| 3.5 | P23 | Message validation rules and character length limits. | `src/forum/messageRules.js` |
-| 3.6 | P24 | Fetch client wrapper with status-aware error extraction. | `src/forum/forumApi.js` |
-| 3.7 | P25 | Custom data fetching hook `useForumMessages` with `AbortController` cancellation. | `src/forum/useForumMessages.js` |
-| 3.8 | P26 | Channel navigation switcher with active link highlights. | `src/forum/ChannelSwitcher.jsx` |
-| 3.9 | P27 | Styling for `ChannelSwitcher`. | `src/forum/ChannelSwitcher.module.css` |
-| 3.10 | P28 | New message submission form with synchronous field validation. | `src/forum/MessageForm.jsx` |
-| 3.11 | P29 | Styling for `MessageForm`. | `src/forum/MessageForm.module.css` |
-| 3.12 | P30 | Accessible message timeline rendered inside semantic `<dl>` list. | `src/forum/MessageList.jsx` |
-| 3.13 | P31 | Styling for `MessageList`. | `src/forum/MessageList.module.css` |
-| 3.14 | P32 | Unified forum page combining channel switcher, message list, and message form. | `src/forum/ForumPage.jsx` |
-| 3.15 | P33 | Styling for `ForumPage`. | `src/forum/ForumPage.module.css` |
+// sprint3-forum + server
+GET  /api/messages/:forum   -> 200 [{ id, author, text, timestamp }] | 404 { error }
+POST /api/messages/:forum   -> 201 message | 400 { error, details } | 404 | 413
+//   body { author <= 40, text <= 280 }, trimmed; the server makes id (crypto.randomUUID) and timestamp
+//   CORS: one explicit origin (CLIENT_ORIGIN); express.json({ limit: '10kb' }); one error handler, no stack in answers
+messageRules.validateMessage(body): { author?, text? }  // used by MessageForm AND the server
+useForumMessages(forum, refreshKey): { status: 'loading' | 'success' | 'error', messages, error }
+//   AbortController per request; only the hook's own abort is ignored; messages of another forum are never shown
+```
 
 ---
 
-## Block 5 — Root App Integration & Navigation
+## Block 2 — Sprint 1: router (`client/src/sprint1-router/`)
 
-| ID  | Prompt | Task | Output |
-| --- | ------ | ---- | ------ |
-| 4.1 | P34 | Accessible top navigation header with active indicator. | `src/components/AppNav.jsx` |
-| 4.2 | P35 | Styling for `AppNav`. | `src/components/AppNav.module.css` |
-| 4.3 | P36 | Root `App` component with lazy-loaded `PersonDetail` route inside `<Suspense>`. | `src/App.jsx` |
-| 4.4 | P37 | Page layout and container styling for `App`. | `src/App.module.css` |
+| ID  | Task | Output |
+| --- | ---- | ------ |
+| 1.1 | Sample people with fixed ids (frozen). | `people.js` |
+| 1.2 | Not-found state (`role="alert"`, link back) and its style. | `NotFoundState.jsx`, `.module.css` |
+| 1.3 | Detail card from `useParams()` with a description list, and its style. | `PersonDetail.jsx`, `.module.css` |
+| 1.4 | "Nothing selected" view. | `NoSelection.jsx` |
+| 1.5 | Skeleton of the same size as the card (`aria-busy`, `aria-live`), reduced-motion aware. | `DetailSkeleton.jsx`, `.module.css` |
+| 1.6 | Nested layout: NavLink list + `<Outlet/>`, grid `minmax(280px, 1fr) 2fr` from 48rem. | `PeopleLayout.jsx`, `.module.css` |
 
----
+## Block 3 — Sprint 2: form (`client/src/sprint2-form/`)
 
-## Block 6 — Automated Test Suite (Flat `tests/`)
+| ID  | Task | Output |
+| --- | ---- | ------ |
+| 2.1 | Pure validation. | `validateForm.js` |
+| 2.2 | Context and hook. | `FormContext.js` |
+| 2.3 | Accessible field and its style. | `InputField.jsx`, `.module.css` |
+| 2.4 | Semantic inspector with masked passwords and its style. | `ShowData.jsx`, `.module.css` |
+| 2.5 | Form container: state, derived errors, submit, reset, status line; and its style. | `SimpleForm.jsx`, `.module.css` |
 
-| ID  | Test File | Verification Target |
-| --- | --------- | ------------------- |
-| 5.1 | `tests/DetailSkeleton.test.jsx` | Accessibility attributes (`aria-busy`, `aria-live`) and semantic elements. |
-| 5.2 | `tests/PersonDetail.test.jsx` | Detail rendering, semantic `<dl>`, 404 state when ID not found. |
-| 5.3 | `tests/PeopleLayout.test.jsx` | Master list navigation, active link classes, `<Outlet />` integration. |
-| 5.4 | `tests/validateForm.test.js` | Pure validation logic, email format, password matching, required fields. |
-| 5.5 | `tests/formParts.test.jsx` | Unique `useId()` binding, `aria-invalid`, `aria-describedby`, masked passwords in inspector. |
-| 5.6 | `tests/SimpleForm.test.jsx` | Single render pass validation, blur-triggered error visibility, clean reset. |
-| 5.7 | `tests/messageRules.test.js` | Message length constraints (40 chars author, 280 chars text). |
-| 5.8 | `tests/useForumMessages.test.jsx` | `AbortController` cancellation on unmount and channel switch, error handling. |
-| 5.9 | `tests/server.test.js` | Express endpoints (GET /api/messages/:forum, POST /api/messages/:forum, CORS, 400/404/413 handling). |
-| 5.10 | `tests/App.test.jsx` | Deep linking, lazy route loading, 404 catch-all route, zero `<div>`/`<span>`. |
+## Block 4 — Sprint 3: server and forum
 
----
+| ID  | Task | Output |
+| --- | ---- | ------ |
+| 3.1 | Message rules shared by browser and server. | `client/src/sprint3-forum/messageRules.js` |
+| 3.2 | In-memory store behind an async interface (a Mongoose store replaces it in the homework). | `server/src/store.js` |
+| 3.3 | Express app: CORS, JSON limit, GET, POST with validation, 404, error handler. | `server/src/app.js` |
+| 3.4 | Entry point (`PORT`, clean shutdown). | `server/src/index.js` |
+| 3.5 | Channels, fetch client with `ApiError`, and the hook with `AbortController`. | `channels.js`, `forumApi.js`, `useForumMessages.js` |
+| 3.6 | Channel switcher (NavLinks), message list (`<dl>`, `<time>`), message form (same rules as the server). | `ChannelSwitcher.jsx`, `MessageList.jsx`, `MessageForm.jsx` + styles |
+| 3.7 | The page that joins them. | `ForumPage.jsx`, `.module.css` |
 
-## Commit Plan
+## Block 5 — Assembly
 
-| Commit | Scope | Description |
-| ------ | ----- | ----------- |
-| 1 | `chore(ex1)` | scaffold react19 vite project with test tooling and project rules |
-| 2 | `docs(ex1)` | add task decomposition and prompt log |
-| 3 | `feat(ex1)` | add React Router v7 layout and people master-detail view |
-| 4 | `feat(ex1)` | add context form engine with synchronous validation |
-| 5 | `feat(ex1)` | add Express REST API server and forum channels |
-| 6 | `feat(ex1)` | add useForumMessages hook and forum page UI |
-| 7 | `test(ex1)` | add unit and integration test suite (100 tests passing) |
-| 8 | `docs(ex1)` | add failure audit, lessons learned and record commit hashes |
+| ID  | Task | Output |
+| --- | ---- | ------ |
+| 4.1 | Main navigation and the route tree with the lazy detail route. | `AppNav.jsx`, `App.jsx`, `.module.css` |
+
+## Block 6 — Tests (one flat `tests/` folder in each package)
+
+| ID  | File | What it covers |
+| --- | ---- | -------------- |
+| 5.1 | `client/tests/DetailSkeleton`, `PersonDetail`, `PeopleLayout`, `App` | Skeleton as a Suspense fallback, `useParams`, 404, NavLink current and style, deep link, lazy loading, catch-all. |
+| 5.2 | `client/tests/validateForm`, `formParts`, `SimpleForm` | Every rule and its border, context hook, field ARIA, masked inspector, one render per keystroke, no `useEffect` in the form files. |
+| 5.3 | `client/tests/messageRules`, `useForumMessages` | Limits 40/280, abort on switch and unmount, out-of-order answers, refresh without flashing, StrictMode. |
+| 5.4 | `client/tests/forumParts`, `ForumPage`, `appRoutes` | Switcher, list states, message form (sending, refused, network failure, unmount), channel switching with cancelled requests, post then reload, main navigation, `/form` and `/forum`. |
+| 5.5 | `client/tests/deckReference`, `server/tests/deckReference` | The reference code of slides 22, 25, 26 and 27 copied as it is, to show its defects (see AI_FAILURE_AUDIT). |
+| 5.6 | `server/tests/server` | GET/POST, 400/404/413, CORS, forged fields, errors without a leak, store copies. |
+
+## Checkpoint (after each step)
+
+- `grep` for banned things: `<div`, `<span`, `keyCode`, `alert(`, `console.`, `style={`, `<Switch`, `<Redirect`, `activeClassName`, `defaultProps`, `Math.random`.
+- Run it: Vitest (jsdom) for components and hooks, supertest for the API, headless Chrome with the API running for the whole page.
+- `npm run build`; no sideways scroll at 375, 768 and 1440 px.
+- Break the source on purpose and check that a test fails (mutation run); restore and `diff`.
+
+## Commit plan
+
+| Commit | Hash | Scope |
+| ------ | ---- | ----- |
+| 1 | `9298d47` | `chore: add root gitignore` |
+| 2 | `2a56f33` | `chore(ex1)` scaffold with test tooling and project rules (flat layout) |
+| 3 | `de42a57` | `docs(ex1)` first task decomposition and prompt log (replaced by this version) |
+| 4 | `6b40c17` | `feat(ex1)` Sprint 1 router layout and master-detail view |
+| 5 | `ad4d90a` | `feat(ex1)` Sprint 2 context form engine |
+| 6 | `9c2ef4e` | `feat(ex1)` Sprint 3 Express API and channels |
+| 7 | `7557af2` | `feat(ex1)` Sprint 3 hook, forum UI, navigation and root app |
+| 8 | `183af87` | `test(ex1)` first test suite (100 tests) |
+| 9 | `TODO` | `refactor(ex1)` split into `client/` (sprint1-router, sprint2-form, sprint3-forum) and `server/` |
+| 10 | `TODO` | `test(ex1)` forum UI, routes, deck reference code, known defects as expected failures |
+| 11 | `TODO` | `docs(ex1)` rewritten task decomposition, prompt log, failure audit and lessons learned |
+| 12 | `TODO` | `docs(ex1)` record commit hashes |
