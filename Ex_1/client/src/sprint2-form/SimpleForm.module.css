@@ -1,0 +1,65 @@
+/* client/src/sprint2-form/SimpleForm.module.css — mobile-first, tokens only */
+
+.page {
+  display: grid;
+  gap: var(--space-lg);
+  max-inline-size: 36rem;
+  min-inline-size: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.form {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.submit,
+.reset {
+  box-sizing: border-box;
+  min-block-size: var(--tap-target);
+  padding: var(--space-sm) var(--space-lg);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-field);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.submit {
+  background: var(--color-accent);
+  color: var(--color-ink-on-accent);
+}
+
+.reset {
+  background: transparent;
+  color: var(--color-accent);
+}
+
+.submit:focus-visible,
+.reset:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--color-focus-contrast);
+}
+
+/* The status keeps its height while it is empty, so a message appearing never moves the page */
+.status {
+  display: block;
+  min-block-size: 1.5em;
+  color: var(--color-muted);
+  font-weight: 600;
+  line-height: 1.5;
+}

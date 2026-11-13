@@ -1,0 +1,53 @@
+/* client/src/sprint1-router/PeopleLayout.module.css — mobile-first, tokens only */
+
+.frame {
+  display: grid;
+  gap: var(--space-lg);
+  min-inline-size: 0;
+}
+
+.sidebar,
+.content {
+  min-inline-size: 0;
+}
+
+.list {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  min-block-size: var(--tap-target);
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-field);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+/* The current person: a thick edge, bold text and a different fill, not colour alone */
+.active {
+  border-color: var(--color-accent);
+  border-inline-start-width: 8px;
+  background: var(--color-surface-raised);
+  font-weight: 700;
+}
+
+.link:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--color-focus-contrast);
+}
+
+@media (min-width: 48rem) {
+  .frame {
+    grid-template-columns: minmax(280px, 1fr) 2fr;
+    align-items: start;
+  }
+}
