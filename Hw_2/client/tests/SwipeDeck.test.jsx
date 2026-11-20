@@ -184,6 +184,19 @@ describe('keyboard', () => {
     expect(api.posts()).toHaveLength(1);
   });
 
+  it('a held key stays one swipe even when the server answers fast (the repeats arrive after the answer, so the lock is not what stops them)', async () => {
+    setup();
+    await ready();
+    press('ArrowRight');
+    await waitFor(() => expect(score()).toBe('10'));
+    await act(async () => {});
+    press('ArrowRight', { repeat: true });
+    press('ArrowRight', { repeat: true });
+    await act(async () => {});
+    expect(api.posts()).toHaveLength(1);
+    expect(score()).toBe('10');
+  });
+
   it('handled keys stop the page from scrolling or going back (default prevented), other keys are left alone', async () => {
     setup();
     await ready();
@@ -370,6 +383,17 @@ describe('buttons', () => {
       expect(screen.getByRole('button', { name })).toBeInTheDocument();
     }
     expect(screen.getByRole('button', { name: /^Undo/ })).toHaveTextContent('Backspace');
+  });
+
+  it('the key hints are hidden from screen readers and the same keys are declared with aria-keyshortcuts', async () => {
+    setup();
+    await ready();
+    const keys = { Pass: 'ArrowLeft', Like: 'ArrowRight', 'Super like': 'ArrowUp', Undo: 'Backspace' };
+    for (const [name, key] of Object.entries(keys)) {
+      const button = screen.getByRole('button', { name: new RegExp(`^${name}$`) });
+      expect(button).toHaveAttribute('aria-keyshortcuts', key);
+      expect(button.querySelector('kbd')).toHaveAttribute('aria-hidden', 'true');
+    }
   });
 
   it('Like, Pass and Super like save the same actions as the keys', async () => {
