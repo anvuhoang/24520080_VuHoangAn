@@ -1,0 +1,15 @@
+.box {
+  padding: var(--space-lg);
+  border: 2px solid var(--color-danger);
+  border-radius: var(--radius-card);
+}
+
+.title {
+  margin: 0 0 var(--space-sm);
+  font-size: 1.5rem;
+}
+
+.message {
+  margin: 0 0 var(--space-md);
+  color: var(--color-muted);
+}
