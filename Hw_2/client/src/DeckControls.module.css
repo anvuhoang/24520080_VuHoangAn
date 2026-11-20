@@ -1,0 +1,49 @@
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.button,
+.buttonLike,
+.restart {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: var(--tap-target);
+  min-width: var(--tap-target);
+  padding: 0 var(--space-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-field);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.buttonLike {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-ink-on-accent);
+}
+
+.restart {
+  border-style: dashed;
+}
+
+.button[aria-disabled='true'],
+.buttonLike[aria-disabled='true'],
+.restart[aria-disabled='true'] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.key {
+  padding: 0 var(--space-xs);
+  border: 1px solid currentcolor;
+  border-radius: var(--radius-field);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+}

@@ -1,0 +1,21 @@
+.list {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-sm) var(--space-lg);
+  margin: 0;
+  padding: var(--space-md);
+  border: 2px solid var(--color-divider);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.label {
+  color: var(--color-muted);
+}
+
+.value {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-align: right;
+}

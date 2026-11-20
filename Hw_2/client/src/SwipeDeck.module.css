@@ -1,0 +1,111 @@
+/* The page is the grid: one column on a phone, the deck beside the score from 48rem */
+.page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'title'
+    'hint'
+    'deck'
+    'side'
+    'notice';
+  gap: var(--space-md);
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: var(--space-lg) var(--page-gutter) var(--space-xl);
+}
+
+@media (min-width: 48rem) {
+  .page {
+    grid-template-columns: minmax(0, 3fr) minmax(16rem, 2fr);
+    grid-template-areas:
+      'title title'
+      'hint hint'
+      'deck side'
+      'notice notice';
+    align-items: start;
+  }
+}
+
+.title {
+  grid-area: title;
+  margin: 0;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+}
+
+.hint {
+  grid-area: hint;
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.deck {
+  grid-area: deck;
+  min-height: 18rem;
+  border-radius: var(--radius-card);
+}
+
+.side {
+  grid-area: side;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.notice {
+  grid-area: notice;
+  margin: 0;
+  min-height: 1.5em; /* reserved, so the page does not move when the message appears */
+  color: var(--color-muted);
+}
+
+.loading {
+  grid-area: deck;
+  margin: 0;
+  min-height: 18rem; /* the size of the card it stands for: no jump when the deck arrives */
+  padding: var(--space-lg);
+  border: 2px solid var(--color-divider);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  color: var(--color-muted);
+}
+
+.error {
+  grid-area: deck;
+  padding: var(--space-lg);
+  border: 2px solid var(--color-danger);
+  border-radius: var(--radius-card);
+}
+
+.errorText {
+  margin: 0 0 var(--space-md);
+  color: var(--color-danger);
+}
+
+.retry {
+  min-height: var(--tap-target);
+  padding: 0 var(--space-md);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-field);
+  background: var(--color-accent);
+  color: var(--color-ink-on-accent);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.empty {
+  min-height: 18rem;
+  padding: var(--space-lg);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+.emptyTitle {
+  margin: 0 0 var(--space-sm);
+  font-size: 1.5rem;
+}
+
+.emptyText {
+  margin: 0;
+  color: var(--color-muted);
+}
