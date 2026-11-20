@@ -61,6 +61,13 @@ describe('routes', () => {
     expect(await screen.findByRole('heading', { level: 2, name: 'TanVuu' })).toBeInTheDocument();
   });
 
+  it('styles the link of the open player as the open one (the class, not only the attribute)', async () => {
+    setup('/dossier/himass');
+    await screen.findByRole('heading', { level: 2, name: 'Himass' });
+    expect(screen.getByRole('link', { name: 'Himass' }).className).toMatch(/active/);
+    expect(screen.getByRole('link', { name: 'TanVuu' }).className).not.toMatch(/active/);
+  });
+
   it('marks the open player in the navigation with aria-current', async () => {
     setup('/dossier/himass');
     await screen.findByRole('heading', { level: 2, name: 'Himass' });

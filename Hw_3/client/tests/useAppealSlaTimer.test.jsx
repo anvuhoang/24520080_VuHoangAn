@@ -185,6 +185,28 @@ describe('the tab is hidden and shown', () => {
     expect(vi.getTimerCount()).toBe(1);
   });
 
+  it('when shown again it recomputes AT ONCE, before the answer of the server arrives', async () => {
+    let slow = false;
+    const fetchServerNow = vi.fn(() => (slow ? new Promise(() => {}) : Promise.resolve(Date.now())));
+    const { result } = await mount(DEADLINE, fetchServerNow);
+    await act(async () => setVisibility('hidden'));
+    setClock(NINETY_S_BEFORE + 40 * S);
+    slow = true; // the new request never answers
+    await act(async () => setVisibility('visible'));
+    expect(result.current.text).toBe('00:00:50');
+  });
+
+  it('uses the newest fetch function, not the one it was mounted with', async () => {
+    const first = vi.fn(async () => Date.now());
+    const second = vi.fn(async () => Date.now() + 5 * S);
+    const { rerender } = await mount(DEADLINE, first);
+    rerender({ d: DEADLINE, f: second });
+    await act(async () => setVisibility('hidden'));
+    await act(async () => setVisibility('visible'));
+    expect(second).toHaveBeenCalledTimes(1);
+    expect(first).toHaveBeenCalledTimes(1);
+  });
+
   it('a hidden event does not ask the server', async () => {
     const { fetchServerNow } = await mount();
     await act(async () => setVisibility('hidden'));
@@ -355,6 +377,12 @@ describe('the deadline', () => {
     rerender({ d: new Date(DEADLINE + 30 * S).toISOString(), f: fetchServerNow });
     expect(result.current.text).toBe('00:02:00');
     expect(vi.getTimerCount()).toBe(1);
+  });
+
+  it('a deadline that is not a date is closed at once, without waiting for the server', () => {
+    const view = renderHook(() => useAppealSlaTimer('not a date', { fetchServerNow: serverClock() }));
+    expect(view.result.current.sync).toBe('syncing');
+    expect(view.result.current.expired).toBe(true);
   });
 
   it('treats a deadline that is not a date as closed, without throwing or planning anything', async () => {
