@@ -1,15 +1,8 @@
 // client/src/appeal/appealApi.js
-import { ApiError, readJson } from '../api.js';
+import { readJson } from '../api.js';
 
-// null when no appeal has been filed (the API answers 404 for that); every other failure is an ApiError
-export async function fetchAppeal(playerId, { signal } = {}) {
-  try {
-    return await fetch(`/api/appeals/${encodeURIComponent(playerId)}`, { signal }).then(readJson);
-  } catch (error) {
-    if (error instanceof ApiError && error.status === 404) return null;
-    throw error;
-  }
-}
+// The receipt, or null when no appeal has been filed (the API answers 200 with null). Every failure is an ApiError.
+export const fetchAppeal = (playerId, { signal } = {}) => fetch(`/api/appeals/${encodeURIComponent(playerId)}`, { signal }).then(readJson);
 
 export const postAppeal = (playerId, values, { signal } = {}) =>
   fetch(`/api/appeals/${encodeURIComponent(playerId)}`, {

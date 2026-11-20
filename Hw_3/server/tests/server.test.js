@@ -214,8 +214,10 @@ describe('one appeal per player', () => {
 });
 
 describe('GET /api/appeals/:playerId', () => {
-  it('answers 404 when nothing was filed, then the receipt after it was', async () => {
-    expect((await request(app).get('/api/appeals/himass')).status).toBe(404);
+  it('answers 200 with null when nothing was filed (not a 404), then the receipt after it was', async () => {
+    const none = await request(app).get('/api/appeals/himass');
+    expect(none.status).toBe(200);
+    expect(none.text).toBe('null');
     await file();
     const res = await request(app).get('/api/appeals/himass');
     expect(res.status).toBe(200);
@@ -223,8 +225,9 @@ describe('GET /api/appeals/:playerId', () => {
     expect(JSON.stringify(res.body)).not.toMatch(/himass@example|detection flagged|Himass"/);
   });
 
-  it('answers 400 for a bad id', async () => {
+  it('answers 400 for a bad id and 404 for a player that does not exist', async () => {
     expect((await request(app).get('/api/appeals/Bad_Id')).status).toBe(400);
+    expect((await request(app).get('/api/appeals/nobody')).status).toBe(404);
   });
 });
 

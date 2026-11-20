@@ -49,7 +49,8 @@ export function fakeApi({ hours, appeals = {}, now = () => Date.now() } = {}) {
       const playerId = decodeURIComponent(appealMatch[1]);
       const dossier = state.dossiers.find((d) => d.playerId === playerId);
       if (method === 'GET') {
-        return state.appeals[playerId] ? jsonResponse(state.appeals[playerId]) : jsonResponse({ error: 'No appeal has been filed.' }, 404);
+        if (!dossier) return jsonResponse({ error: 'Unknown player.' }, 404);
+        return jsonResponse(state.appeals[playerId] ?? null);
       }
       if (method === 'POST') {
         if (!dossier) return jsonResponse({ error: 'Unknown player.' }, 404);

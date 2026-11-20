@@ -47,9 +47,11 @@ export function createApp({ Dossier, Appeal, clientOrigin = DEV_CLIENT_ORIGIN, n
   app.get('/api/appeals/:playerId', async (req, res) => {
     const { playerId } = req.params;
     if (!PLAYER_ID.test(playerId)) return res.status(400).json({ error: 'Invalid player id.' });
+    // "Has an appeal been filed?" is a question with a normal answer "no": 200 with null, so a page that asks it
+    // on every visit does not put a 404 in the console of every visitor.
+    if (!(await Dossier.exists({ playerId }))) return res.status(404).json({ error: 'Unknown player.' });
     const appeal = await Appeal.findOne({ playerId }).lean().exec();
-    if (!appeal) return res.status(404).json({ error: 'No appeal has been filed.' });
-    res.json(toReceipt(appeal));
+    res.json(appeal ? toReceipt(appeal) : null);
   });
 
   app.post('/api/appeals/:playerId', async (req, res) => {
