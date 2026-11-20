@@ -1,0 +1,71 @@
+HW3 full-stack browser verification: Chrome Chrome/157.0.8103.79, production build + Express + Mongoose 8 + real MongoDB (in memory), http://localhost:4176
+
+1. Route /dossier/:playerID and the page
+   {"url":"/dossier/himass","h1":"Fair-Play Appeal Tribunal","h2":"Himass","nav":["Himass*","TanVuu"],"infractions":2,"matrixVerdicts":["Himass: Harsher than the others (index 1.56)","TanVuu: Lighter than the others (index 0.44)"]}
+2. The countdown against the server clock (displayed seconds minus the true seconds; 0 or 1 is exact, the display rounds up)
+   sample 1: shown 2d 23:59:59  true 259199 s  difference 0 s
+   sample 2: shown 2d 23:59:57  true 259197 s  difference 0 s
+   sample 3: shown 2d 23:59:54  true 259194 s  difference 0 s
+   sample 4: shown 2d 23:59:52  true 259192 s  difference 0 s
+3. A WRONG device clock: shifted one hour ahead and one hour behind (the page is told a different Date.now())
+   device +1 h: shown 2d 23:59:48  true 259188 s  difference 0 s   (counting from the device clock would say 255588 s, wrong by -3600 s)
+   device -1 h: shown 2d 23:59:47  true 259187 s  difference 0 s   (counting from the device clock would say 262787 s, wrong by 3600 s)
+4. Late timers: the main thread is blocked for 3 s, so the pending timers run late
+   before 259187 s, after the block 259183 s: dropped 4 s (3 s of blocking plus about 1.3 s of waiting; a counter that subtracts 1 per tick would have dropped about 1)
+   true now 259183 s, shown 259183 s, difference 0 s
+5. A hidden tab: no ticks while hidden, and one look at the server clock when it is shown again
+   visibilityState of the first tab: hidden; the countdown while hidden: 259183 -> 259183 (frozen display: true)
+   shown again: 2d 23:59:38, true 259178 s, difference 0 s; requests of /api/clock made by the page when it came back: 1
+6. The form: real-time validation, focus on the first error, a valid appeal
+   typed "H" in the name: {"name":"true","nameDesc":"Name must have at least 2 characters.","email":"false"}
+   typed "imass": {"name":"false","email":"false"}
+   leaving the empty email shows its error; the Send button moved by 0 px (0 expected: the error row is reserved)
+   Send with an invalid form: {"focus":"email","status":"4 fields need attention.","invalid":["email","category","statement","confirm"]}
+   category "Other" with 60 characters: {"invalid":"true","msg":"For \"Other\", the statement must have at least 100 characters."}
+   category changed to a named reason, statement untouched: invalid = false
+   evidence "javascript:alert(1)": invalid = true
+   three clicks in the same tick: POST requests sent: 1
+   receipt: Appeal receivedThe appeal for Himass was received on 20 Nov 2026, 14:19 UTC. Reference 6b0056db6bc6954d5d80e85d. It cannot be changed here.
+   after a reload the receipt is still there, and the form is not: form present = false
+   a second POST for the same player: 409; GET returns only ["id","playerId","category","status","createdAt"]
+   the API refuses evidence "javascript:alert(1)" itself: 400 {"evidenceUrl":"Evidence must be a link that starts with https://."}
+7. The deadline: the server decides
+   the server window was closed under the open page; the countdown still shows 1d 23:59:58
+   Send -> {"status":"The appeal window is closed. The form can no longer be sent.","button":"true"}
+   window of 7 s: countdown 00:00:06
+   one look per second: 00:00:06/critical  00:00:05/critical  00:00:04/critical  00:00:03/critical  00:00:02/critical  00:00:01/critical  00:00:00/expired  00:00:00/expired  00:00:00/expired
+   announced messages: ["Less than five minutes left to file an appeal.","The appeal window is closed."]
+   after expiry: button aria-disabled = true; POST requests sent by the page: 0; form status: The appeal window is closed. The form can no longer be sent.
+   a direct API call after the deadline: 403 {"error":"The appeal window is closed."}
+8. Routes
+   /dossier           -> /dossier  {"alert":null,"h1":1,"h2":"Choose a player"}
+   /dossier/nobody    -> /dossier/nobody  {"alert":"Player not foundThere is no dossier for this player.Back to ","h1":1,"h2":"Player not found"}
+   /no/such/page      -> /no/such/page  {"alert":"Page not foundThis address does not match anything here.Back","h1":1,"h2":null}
+   /                  -> /dossier  {"alert":null,"h1":1,"h2":"Choose a player"}
+9. Layout at three widths and axe-core
+    375 px {"scrollW":375,"innerW":375,"h1":1,"main":1,"div":0,"span":0,"smallest":44}
+    768 px {"scrollW":768,"innerW":768,"h1":1,"main":1,"div":0,"span":0,"smallest":44}
+   1440 px {"scrollW":1440,"innerW":1440,"h1":1,"main":1,"div":0,"span":0,"smallest":44}
+   index with the matrix            violations: 0  rules passed: 31  needs manual review: []
+   dossier with the form            violations: 0  rules passed: 45  needs manual review: []
+   form with every error shown      violations: 0  rules passed: 45  needs manual review: []
+   unknown player                   violations: 0  rules passed: 29  needs manual review: []
+   unknown address                  violations: 0  rules passed: 22  needs manual review: []
+   window closed                    violations: 0  rules passed: 45  needs manual review: []
+   receipt                          violations: 0  rules passed: 38  needs manual review: []
+
+Console errors and warnings (4):
+   error: Failed to load resource: the server responded with a status of 409 (Conflict) /api/appeals/himass
+   error: Failed to load resource: the server responded with a status of 400 (Bad Request) /api/appeals/tanvuu
+   error: Failed to load resource: the server responded with a status of 403 (Forbidden) /api/appeals/tanvuu
+   error: Failed to load resource: the server responded with a status of 403 (Forbidden) /api/appeals/tanvuu
+
+Notes on this run
+ - The four console lines are the answers that this script asks for on purpose: a second POST for the same player (409), the
+   evidence "javascript:alert(1)" sent straight to the API (400), the page sending an appeal after the server had closed the window
+   under it (403, shown to the user as "The appeal window is closed"), and a direct API call after the deadline (403). The page itself
+   produced no error, warning or failed request of its own.
+ - A first run of this script showed a 404 in the console on EVERY visit to a dossier: the page asks "has an appeal been filed?"
+   and the API answered 404 for "no". The API now answers 200 with null (see AI_FAILURE_AUDIT, entry #06).
+ - Section 3 changes what the page believes about the device clock (Date.now is shifted by one hour); it does not change the
+   operating system clock. Section 4 blocks the main thread of the page for 3 seconds. Section 5 uses a second tab to hide the first.
