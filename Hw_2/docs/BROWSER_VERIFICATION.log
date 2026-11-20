@@ -1,0 +1,56 @@
+HW2 full-stack browser verification: Chrome Chrome/157.0.8103.79, production build + Express + Mongoose 8 + real MongoDB (in memory), http://localhost:4175
+
+1. Load, focus and the keys
+   loaded                                     {"card":"Minh Anh, 26","score":"0","left":"8","notice":"","focus":"BODY"}  saved: (none)
+   after a click on the card, focus is on: SECTION "Swipe deck"
+   ArrowRight (like)                          {"card":"Quang Huy, 29","score":"10","left":"7","notice":"Liked Minh Anh. Score 10.","focus":"SECTION \"Swipe deck\""}  saved: LIKE
+   ArrowLeft (pass)                           {"card":"Thu Trang, 27","score":"5","left":"6","notice":"Passed Quang Huy. Score 5.","focus":"SECTION \"Swipe deck\""}  saved: LIKE,PASS
+   ArrowUp (super like)                       {"card":"Duc Long, 31","score":"30","left":"5","notice":"Super-liked Thu Trang. Score 30.","focus":"SECTION \"Swipe deck\""}  saved: LIKE,PASS,SUPER
+   Backspace (undo the super like)            {"card":"Thu Trang, 27","score":"5","left":"6","notice":"Undid super-liked Thu Trang. Score 5.","focus":"SECTION \"Swipe deck\""}  saved: LIKE,PASS
+   Backspace x2 more (all undone)             {"card":"Minh Anh, 26","score":"0","left":"8","notice":"Undid liked Minh Anh. Score 0.","focus":"SECTION \"Swipe deck\""}  saved: (none)
+2. The history survives a reload
+   after reload (2 likes saved)               {"card":"Thu Trang, 27","score":"20","left":"6","notice":"","focus":"BODY"}  saved: LIKE,LIKE
+3. A held key, a burst of keys and a double click are one swipe each
+   ArrowRight held (7 keydown events)         {"card":"Quang Huy, 29","score":"10","left":"7","notice":"Liked Minh Anh. Score 10.","focus":"SECTION \"Swipe deck\""}  saved: LIKE
+   3 keydown events in the same tick          {"card":"Quang Huy, 29","score":"10","left":"7","notice":"Liked Minh Anh. Score 10.","focus":"SECTION \"Swipe deck\""}  saved: LIKE
+   2 clicks on Like in the same tick          {"card":"Quang Huy, 29","score":"10","left":"7","notice":"Liked Minh Anh. Score 10.","focus":"BODY"}  saved: LIKE
+   Alt+ArrowLeft (the browser Back chord)     {"card":"Minh Anh, 26","score":"0","left":"8","notice":"","focus":"SECTION \"Swipe deck\""}  saved: (none)
+4. Mouse drag (pointer events)
+   drag right 120 px                          {"card":"Quang Huy, 29","score":"10","left":"7","notice":"Liked Minh Anh. Score 10.","focus":"SECTION \"Swipe deck\""}  saved: LIKE
+   drag left 120 px                           {"card":"Thu Trang, 27","score":"5","left":"6","notice":"Passed Quang Huy. Score 5.","focus":"SECTION \"Swipe deck\""}  saved: LIKE,PASS
+   drag up 120 px                             {"card":"Duc Long, 31","score":"30","left":"5","notice":"Super-liked Thu Trang. Score 30.","focus":"SECTION \"Swipe deck\""}  saved: LIKE,PASS,SUPER
+   drag down 150 px (nothing)                 {"card":"Duc Long, 31","score":"30","left":"5","notice":"Super-liked Thu Trang. Score 30.","focus":"SECTION \"Swipe deck\""}  saved: LIKE,PASS,SUPER
+   20 px jitter (nothing)                     {"card":"Duc Long, 31","score":"30","left":"5","notice":"Super-liked Thu Trang. Score 30.","focus":"SECTION \"Swipe deck\""}  saved: LIKE,PASS,SUPER
+5. Touch swipe (page must not scroll)
+   finger right                               {"card":"Quang Huy, 29","score":"10","left":"7","notice":"Liked Minh Anh. Score 10.","focus":"BODY"}  saved: LIKE
+   finger left                                {"card":"Thu Trang, 27","score":"5","left":"6","notice":"Passed Quang Huy. Score 5.","focus":"BODY"}  saved: LIKE,PASS
+   finger up                                  {"card":"Duc Long, 31","score":"30","left":"5","notice":"Super-liked Thu Trang. Score 30.","focus":"BODY"}  saved: LIKE,PASS,SUPER
+   page scrollY before/after: 0 / 0
+6. Two tabs disagree: the stale tab is corrected by the server
+   tab B: {"card":"Quang Huy, 29","notice":"Not saved: That is not the next card in the deck.","score":"10"}  saved: LIKE
+7. End of the deck, undo from the end, start over
+   end: {"h2":"No more cards","text":"You went through all 8 profiles. Final score: 65."}  saved: LIKE,PASS,SUPER,LIKE,PASS,SUPER,LIKE,PASS
+   a key at the end sends nothing, saved count: 8
+   Backspace from the end                     {"card":"Lan Phuong, 24","score":"70","left":"1","notice":"Undid passed Lan Phuong. Score 70.","focus":"SECTION \"Swipe deck\""}  saved: LIKE,PASS,SUPER,LIKE,PASS,SUPER,LIKE
+   end of the deck                violations: 0  rules passed: 31  needs manual review: [color-contrast]
+   Start over                                 {"card":"Minh Anh, 26","score":"0","left":"8","notice":"Deck restarted. Score 0.","focus":"SECTION \"Swipe deck\""}  saved: (none)
+8. Layout at three widths: no sideways scroll, targets at least 44 px
+    375 px {"scrollW":375,"innerW":375,"h1":1,"main":1,"div":0,"span":0,"smallest":44}
+    768 px {"scrollW":768,"innerW":768,"h1":1,"main":1,"div":0,"span":0,"smallest":44}
+   1440 px {"scrollW":1440,"innerW":1440,"h1":1,"main":1,"div":0,"span":0,"smallest":44}
+9. axe-core (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa, best-practice)
+   deck with a card               violations: 0  rules passed: 31  needs manual review: [color-contrast]
+   after a swipe (notice shown)   violations: 0  rules passed: 31  needs manual review: [color-contrast]
+   error state: Database is down.Try again
+   error state                    violations: 0  rules passed: 22  needs manual review: []
+
+Console errors, warnings: error: Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+
+Notes on this run
+ - "needs manual review: [color-contrast]" on the pages with a card: axe cannot measure the three arrow glyphs (left, right, up) that are
+   drawn inside the keyboard hints ("Element content contains only non-text characters"). They inherit the colour of their button, so the
+   ratio is the one of the label next to them, which axe did measure and pass: 7.83:1 (ink on accent, Like button) and 16.55:1 (text on
+   surface, the other buttons), computed from the design tokens.
+ - The single console line "Failed to load resource ... 500" is the one that this script causes on purpose in section 9, by answering
+   /api/profiles with a 500 to show the error state. There was no other console message, warning or page error.
+ - Section 5 uses Chrome's touch emulation through the DevTools protocol (Input.dispatchTouchEvent), not a physical phone.
