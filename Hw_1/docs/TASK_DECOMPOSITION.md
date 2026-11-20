@@ -104,10 +104,10 @@ Lightbox({ photo, previous, next, category, onClose })
 
 | Commit | Hash | Scope |
 | ------ | ---- | ----- |
-| 1 | pending | `chore(hw1)` scaffold, tokens, rules, generated pictures, `robots.txt` |
-| 2 | pending | `feat(hw1)` photo data and URL helpers, with their tests |
-| 3 | pending | `feat(hw1)` category filter and photo grid |
-| 4 | pending | `feat(hw1)` lightbox on the native dialog |
-| 5 | pending | `feat(hw1)` gallery page, routes and mounting |
-| 6 | pending | `test(hw1)` gallery, routes, source hygiene and the slide 30 reference code |
-| 7 | pending | `docs(hw1)` task decomposition, prompt log, failure audit, Lighthouse and browser logs |
+| 1 | `13e195d` | `chore(hw1)` scaffold, tokens, rules, generated pictures, `robots.txt` |
+| 2 | `a9a9b16` | `feat(hw1)` photo data and URL helpers, with their tests |
+| 3 | `b79fa34` | `feat(hw1)` category filter and photo grid |
+| 4 | `c558638` | `feat(hw1)` lightbox on the native dialog |
+| 5 | `f51cda6` | `feat(hw1)` gallery page, routes and mounting |
+| 6 | `f232cb5` | `test(hw1)` gallery, routes, source hygiene and the slide 30 reference code |
+| 7 | `cb138d6` | `docs(hw1)` task decomposition, prompt log, failure audit, Lighthouse and browser logs |
