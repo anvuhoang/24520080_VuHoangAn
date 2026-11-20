@@ -1,6 +1,6 @@
 // client/tests/deckReference.test.jsx — the slide 33 code, copied as written, to show where it fails.
 // Only the scaffolding around the lines (a harness component, a stand-in DossierView) is mine.
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { act, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -146,5 +146,37 @@ describe('slide 33 useMemo(() => computeMatrix(dossierData), [dossierData])', ()
     render(<Harness stable={false} compute={compute} />);
     for (let i = 0; i < 5; i++) await act(async () => screen.getByRole('button').click());
     expect(compute).toHaveBeenCalledTimes(6); // the memo saved nothing
+  });
+});
+
+// --- NOT from the deck: the countdown that most generated code contains, a counter that subtracts one per tick ---
+function useNaiveCountdown(seconds) {
+  const [left, setLeft] = useState(seconds);
+  useEffect(() => {
+    const id = setInterval(() => setLeft((value) => Math.max(0, value - 1)), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return left;
+}
+// ---------------------------------------------------------------------------------------------------------------
+
+describe('the usual counter that subtracts one per tick (not from the deck)', () => {
+  it('loses time for good when a tick is late: after a 10 s freeze it shows 89 s where the clock says 80', () => {
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+    let clock = 0;
+    vi.spyOn(Date, 'now').mockImplementation(() => clock);
+    try {
+      function Probe() {
+        return <p data-testid="left">{useNaiveCountdown(90)}</p>;
+      }
+      render(<Probe />);
+      clock = 10_000; // the main thread was blocked, or the laptop slept, for 10 s ...
+      act(() => vi.advanceTimersByTime(1000)); // ... and the interval fired once
+      const truth = 90 - clock / 1000; // what a clock-based countdown shows: 80
+      expect(Number(screen.getByTestId('left').textContent)).toBe(89);
+      expect(truth).toBe(80);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
