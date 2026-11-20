@@ -140,3 +140,8 @@ POST /api/appeals/:playerId     -> 201 receipt | 400 { error, details } | 403 wi
 | 5 | `306b362` | `feat(hw3)` appeal form engine and appeal section |
 | 6 | `fba873e` | `feat(hw3)` `/dossier/:playerID` routes, matrix and dossier pages |
 | 7 | `919216e` | `test(hw3)` matrix, routes, form engine, source rules, slide 33 reference code |
+| 8 | `910fd59` | `fix(hw3)` the appeal check answers 200 with null instead of a 404 in every console |
+| 9 | `00d8df9` | `test(hw3)` `useAppeal` on its own, the matrix memo, the style of the open link, the timer when shown again |
+| 10 | `c5e03d8` | `test(hw3)` a counter that subtracts one per tick loses time |
+| 11 | `a5f9b18` | `docs(hw3)` rules, decomposition, prompt log, failure audit, browser log |
+| 12 | — | `docs(hw3)` record the last commit hashes |
