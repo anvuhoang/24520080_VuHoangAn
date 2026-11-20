@@ -1,0 +1,65 @@
+/* Rows: label, control, ONE line kept free for the error, then the hint. When an error appears nothing moves, so the button
+   under the field stays under the pointer (otherwise the click on "Send" is lost). */
+.field {
+  display: grid;
+  grid-template-rows: auto auto minmax(1.4em, auto) auto;
+  gap: var(--space-xs);
+  min-inline-size: 0;
+  margin: 0;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.control {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: var(--tap-target);
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-field);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font: inherit;
+}
+
+/* An invalid field: a danger colour AND a dashed edge, so it is not colour alone */
+.control[aria-invalid='true'] {
+  border-style: dashed;
+  border-color: var(--color-danger);
+}
+
+.checkLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  min-block-size: var(--tap-target);
+  font-weight: 600;
+}
+
+.check {
+  flex: none;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  margin-block-start: var(--space-xs);
+}
+
+.error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* The cross is drawn by CSS: a screen reader reads the message, not "multiplication x" */
+.error:not(:empty)::before {
+  content: '\2715\00a0';
+}
+
+.hint {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.875rem;
+}

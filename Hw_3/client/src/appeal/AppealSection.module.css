@@ -1,0 +1,50 @@
+.section {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.heading {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.note {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.receipt {
+  padding: var(--space-lg);
+  border: 2px solid var(--color-success);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.receiptTitle {
+  margin: 0 0 var(--space-sm);
+  font-size: 1.125rem;
+  color: var(--color-success);
+}
+
+.error {
+  padding: var(--space-lg);
+  border: 2px solid var(--color-danger);
+  border-radius: var(--radius-card);
+}
+
+.errorText {
+  margin: 0 0 var(--space-md);
+  color: var(--color-danger);
+}
+
+.retry {
+  min-block-size: var(--tap-target);
+  padding: 0 var(--space-md);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-field);
+  background: var(--color-accent);
+  color: var(--color-ink-on-accent);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}

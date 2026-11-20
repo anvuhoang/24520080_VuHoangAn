@@ -1,0 +1,41 @@
+.form {
+  display: grid;
+  gap: var(--space-xs);
+  padding: var(--space-lg);
+  border: 2px solid var(--color-divider);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.title {
+  margin: 0 0 var(--space-sm);
+  font-size: 1.25rem;
+}
+
+.actions {
+  margin-block-start: var(--space-sm);
+}
+
+.submit {
+  min-block-size: var(--tap-target);
+  min-inline-size: var(--tap-target);
+  padding: 0 var(--space-lg);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-field);
+  background: var(--color-accent);
+  color: var(--color-ink-on-accent);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.submit[aria-disabled='true'] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.status {
+  margin: 0;
+  min-block-size: 1.5em; /* reserved, so a message does not move the page */
+  color: var(--color-muted);
+}
