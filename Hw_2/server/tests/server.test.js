@@ -119,6 +119,25 @@ describe('POST /api/swipes', () => {
   });
 });
 
+describe('the models themselves (a second line of defence behind the API checks)', () => {
+  it('Swipe refuses an action that is not in the list, even when the API is bypassed', async () => {
+    await expect(Swipe.create({ profileId: profiles[0].id, action: 'LOVE' })).rejects.toThrow(/validation failed/);
+  });
+
+  it('Swipe refuses a second record for the same profile (unique index)', async () => {
+    await Swipe.create({ profileId: profiles[0].id, action: 'LIKE' });
+    await expect(Swipe.create({ profileId: profiles[0].id, action: 'PASS' })).rejects.toMatchObject({ code: 11000 });
+  });
+
+  it('Profile refuses a minor, a missing name and an over-long bio', async () => {
+    const ok = { name: 'Test', age: 30, bio: 'Hi', order: 99 };
+    await expect(Profile.create({ ...ok, age: 17 })).rejects.toThrow(/validation failed/);
+    await expect(Profile.create({ ...ok, name: '' })).rejects.toThrow(/validation failed/);
+    await expect(Profile.create({ ...ok, bio: 'x'.repeat(281) })).rejects.toThrow(/validation failed/);
+    await expect(Profile.create(ok)).resolves.toBeTruthy();
+  });
+});
+
 describe('GET /api/swipes', () => {
   it('returns the history oldest first', async () => {
     await swipe(0, 'PASS');
