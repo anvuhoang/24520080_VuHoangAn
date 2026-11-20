@@ -14,7 +14,7 @@
 | 6 | 2026-11-20 | 4.3–4.5 | Write the tests for the page against a fake API that follows the server's rules, the source rules, and the slide 31 reference code. | Accepted | 110 tests in 5 files passed (client). | `789b5ee` |
 | 7 | 2026-11-20 | checkpoint | Run the real stack in real Chrome: MongoDB, `npm run seed`, `npm start`, the production build; keys, held key, burst, double click, mouse drag, touch swipe, reload, two tabs, end of deck, three widths, axe-core. | Modified | Everything behaved as designed. axe listed `color-contrast` as "needs manual review" for the three arrow glyphs in the key hints; they were hidden from screen readers and the keys were declared with `aria-keyshortcuts` (entry #09). The review item stays, and is explained in the log. | `c53ec14` |
 | 8 | 2026-11-20 | checkpoint | Break the source on purpose in both packages, one change at a time (43 in the client, 29 in the server). | Modified | Client: 38 caught, 5 survived. Server: 28 caught, 1 survived. After analysis, 4 tests were added (held key after a fast answer, a disabled card, `aria-disabled` buttons, the Mongoose model on its own). Final: client **41 of 43**, server **29 of 29**; the 2 left are equivalent changes (entry #10). Client 118 tests, server 44. | `c53ec14`, `5b6fc2f` |
-| 9 | 2026-11-20 | docs | Write this log, the failure audit and the browser log from the measurements above. | Accepted | Every number was copied from a run in this folder. | pending |
+| 9 | 2026-11-20 | docs | Write this log, the failure audit and the browser log from the measurements above. | Accepted | Every number was copied from a run in this folder. | `2be8029` |
 
 ---
 

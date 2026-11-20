@@ -120,3 +120,7 @@ DELETE /api/swipes              -> 204 (start over)
 | 6 | `c7ba2e5` | `feat(hw2)` `useDeck` hook |
 | 7 | `5e59ecb` | `feat(hw2)` card, key handling, score board, controls |
 | 8 | `789b5ee` | `test(hw2)` deck page, source rules, slide 31 reference code |
+| 9 | `c53ec14` | `fix(hw2)` key hints hidden from screen readers, `aria-keyshortcuts`, held key after a fast answer |
+| 10 | `5b6fc2f` | `test(hw2)` `SwipeCard`, `DeckControls` and the Mongoose models on their own |
+| 11 | `2be8029` | `docs(hw2)` rules, decomposition, prompt log, failure audit, browser log |
+| 12 | — | `docs(hw2)` record the last commit hashes |
